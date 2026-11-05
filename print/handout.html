@@ -40,7 +40,7 @@
     .hd-list { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
     .hde {
       display: grid; grid-template-columns: 13.5mm 1fr; column-gap: 2.5mm;
-      padding: 0.8mm 0; border-top: 1px solid var(--hairline); align-items: start;
+      padding: 0.35mm 0; border-top: 1px solid var(--hairline); align-items: start;
     }
     .hde:first-child { border-top: 0; }
     .hde-time { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 8.5pt; line-height: 1.15; padding-top: 0.2mm; }
@@ -103,7 +103,7 @@
           '<p class="hd-meta">' +
             'PÁ ' + P.esc(P.fmtDate(meta.date)) + ' · ' + P.esc(meta.time || '9:00 — 14:00') + '<br>' +
             '<span class="sub">' + P.esc(meta.place || 'FIT VUT v Brně') +
-              ' · KACHNA DO 16:00 — R212</span>' +
+              '</span>' +
           '</p>' +
         '</header>' +
         '<main class="hd-main">';

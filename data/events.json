@@ -144,14 +144,25 @@
       "icon": "tour"
     },
     {
-      "id": "kachna",
+      "id": "kachna-obed-1",
       "type": "zone",
       "start": "11:00",
-      "end": "16:00",
-      "title": "Kachna",
+      "end": "12:00",
+      "title": "Přestávka na oběd",
       "room": "R212",
       "floor": "2",
-      "desc": "Studentský klub U Kachničky — toasty a točená Kofola za studentské ceny. Zbytek programu si můžeš vychutnat v klubu.",
+      "desc": "Studentský klub U Kachničky — toasty a točená Kofola za studentské ceny.",
+      "icon": "duck"
+    },
+    {
+      "id": "kachna-obed-2",
+      "type": "zone",
+      "start": "14:00",
+      "end": "16:00",
+      "title": "Druhý oběd",
+      "room": "R212",
+      "floor": "2",
+      "desc": "Studentský klub U Kachničky — toasty a točená Kofola za studentské ceny.",
       "icon": "duck"
     }
   ],
@@ -167,7 +178,8 @@
     "workshop-security",
     "prohlidky-1",
     "prohlidky-2",
-    "kachna"
+    "kachna-obed-1",
+    "kachna-obed-2"
   ],
   "highlights": null,
   "partners": [

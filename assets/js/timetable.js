@@ -411,7 +411,7 @@
       html += '</div>';
     });
     if (mode === 'seq') {
-      html += '<p class="seq-end">14:00 konec programu · Kachna otevřená do 16:00</p>';
+      html += '<p class="seq-foot">16:00 konec programu</p>';
     }
     html += '</div>';
     return html;
