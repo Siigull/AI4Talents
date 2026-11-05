@@ -66,20 +66,29 @@
     .tl-h { position: absolute; left: 0; right: 0; height: 1px; background: rgba(20, 18, 15, 0.18); }
     .tl-lead {
       position: absolute; left: 18.5mm; width: 0; z-index: 2;
-      border-left: 2px solid rgba(20, 18, 15, 0.55);
+      border-left: 2.5px solid var(--ink);
     }
     .tl-lead::before { /* jog onto the rail's hour tick */
       content: ''; position: absolute; left: -5mm; right: -1px; height: 2px;
-      background: rgba(20, 18, 15, 0.55);
+      background: var(--ink);
     }
-    .tl-lead::after { /* jog toward the block's top edge */
-      content: ''; position: absolute; left: -1px; width: 1.9mm; height: 2px;
-      background: rgba(20, 18, 15, 0.55);
+    .tl-lead::after { /* bold tick at the block's top edge */
+      content: ''; position: absolute; left: -1px; width: 3.4mm; height: 3px;
+      background: var(--ink);
+    }
+    /* the true start time, stated at the rail end of the leader — the
+       nominal line has no hour digit of its own */
+    .tl-lead .lead-h {
+      position: absolute; left: -11mm; width: 9.5mm; height: 4mm; line-height: 4mm;
+      font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
+      color: var(--ink); text-align: right; background: var(--paper);
     }
     .tl-lead--down::before { top: -1px; }
     .tl-lead--up::before { bottom: -1px; }
     .tl-lead--down::after { bottom: -1px; }
     .tl-lead--up::after { top: -1px; }
+    .tl-lead--down .lead-h { top: -2mm; }
+    .tl-lead--up .lead-h { bottom: -2mm; }
     .tl-zone {
       position: absolute; left: 0; right: 0; background: #f0efec;
       padding: 3mm 4mm 3mm;
@@ -398,6 +407,15 @@
           if (Math.abs(actual - nominal) < 8) continue; // on its line — no lead
           var lead = document.createElement('div');
           lead.className = 'tl-lead ' + (actual > nominal ? 'tl-lead--down' : 'tl-lead--up');
+          var st = el.querySelector('.ev-start');
+          // label only when the nominal line has no rail digit of its own
+          // (full-hour starts already sit under their own rail number)
+          if (st && !/:00$/.test(st.textContent.trim())) {
+            var lab = document.createElement('span');
+            lab.className = 'lead-h';
+            lab.textContent = st.textContent.trim();
+            lead.appendChild(lab);
+          }
           var top = Math.min(nominal, actual), bot = Math.max(nominal, actual);
           // leads live in .door-tl (relative) — offset by the canvas position
           lead.style.top = (canvas.offsetTop + top).toFixed(1) + 'px';

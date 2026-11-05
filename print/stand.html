@@ -245,6 +245,13 @@
       }
       var at = info.room.id; // canonical id
       var floor = info.floor;
+      // stairwell rooms repeat on every floor (D106 = Schodiště on 1 and 2)
+      // and findRoom picks the first — the main path pins such stands to
+      // their true floor; trust it.
+      var MPSTOPS = (DATA.mainPath && DATA.mainPath.stops) || [];
+      MPSTOPS.forEach(function (s) {
+        if (String(s.id).toLowerCase() === at.toLowerCase()) floor = String(s.floor);
+      });
       var floorLbl = P.floorLabel(floor);
       var meta = (DATA.events && DATA.events.meta) || {};
 
@@ -508,6 +515,10 @@
           acc += Math.hypot(pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]);
           if (acc >= 40) exitI = i; // out of the door, into the corridor
         }
+        var walk = acc; // total corridor length of this first leg
+        for (var w = exitI + 1; w < pts.length; w++) {
+          walk += Math.hypot(pts[w][0] - pts[w-1][0], pts[w][1] - pts[w-1][1]);
+        }
         if (!exitI) exitI = pts.length - 1;
         var h = [pts[exitI][0] - pts[0][0], pts[exitI][1] - pts[0][1]];
         var hl = Math.hypot(h[0], h[1]) || 1;
@@ -521,13 +532,14 @@
           acc += sl;
           if (acc >= 190) break; // don't promise the whole route
         }
-        return { exitI: exitI, endI: endI, heading: [h[0] / hl, h[1] / hl], pts: pts };
+        return { exitI: exitI, endI: endI, heading: [h[0] / hl, h[1] / hl], pts: pts, walk: walk };
       }
 
-      // 8-way glyph from the heading (map coords, y down; the map orients)
+      // 8-way glyph from the heading (SVG coords: y points DOWN, angles run
+      // clockwise — negate y before atan2 so 45° reads as ↗, not ↘)
       function glyphOf(h) {
-        var a = Math.atan2(h[1], h[0]) * 180 / Math.PI; // 0 = east, cw
-        var G = ['\u2192', '\u2197', '\u2193', '\u2198', '\u2190', '\u2199', '\u2191', '\u2196'];
+        var a = Math.atan2(-h[1], h[0]) * 180 / Math.PI; // 0 = east, ccw
+        var G = ['\u2192', '\u2197', '\u2191', '\u2196', '\u2190', '\u2199', '\u2193', '\u2198'];
         var k = Math.round(((a + 360) % 360) / 45) % 8;
         return G[k];
       }
@@ -559,8 +571,19 @@
         var tFloor = P.findRoom(t);
         tFloor = tFloor ? tFloor.floor : floor;
         if (String(tFloor) !== String(floor)) other = tFloor;
-        var key = (adjacent ? 'adj' : (other === null ? 'same' : 'up' + other)) + '|' + fl.heading[0].toFixed(2) + ',' + fl.heading[1].toFixed(2);
+        // degenerate leg + floor change = the stairs ARE this stand (D106 →
+        // D0207): promise the floor change, not "hned vedle"
+        if (adjacent && other !== null) {
+          adjacent = false;
+          fl = { heading: [0, 0], pts: [], endI: 0, walk: 0 };
+        }
         var gk = adjacent ? '\u25c9' : glyphOf(fl.heading);
+        // stairs right at the stand (< 40px of corridor): promise the floor
+        // change, not a walk — ↑/↓ beats a misleading horizontal arrow
+        if (!adjacent && other !== null && fl.walk < 40) {
+          gk = (parseInt(other, 10) > parseInt(floor, 10)) ? '\u2191' : '\u2193';
+        }
+        var key = (adjacent ? 'adj' : (other === null ? 'same' : 'up' + other)) + '|' + gk + '|' + fl.heading[0].toFixed(2) + ',' + fl.heading[1].toFixed(2);
         if (!groups[key]) groups[key] = { glyph: gk, rooms: [], other: other, leg: fl, adjacent: adjacent };
         groups[key].rooms.push(t);
       });

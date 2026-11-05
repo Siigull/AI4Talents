@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <title>AI4Talents — leták (A4 složený na A5)</title>
-  <meta name="description" content="Kapesní leták AI4Talents@FIT VUT — A4 skládaný na A5: program, hlavní trasa, mapa.">
+  <meta name="description" content="Kapesní leták AI4Talents@FIT VUT — A4 skládaný na A5: uvítání, mapa s hlavní trasou, program dopoledne a odpoledne.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;700&amp;display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="../assets/css/print.css">
   <style>
     /* =====================================================================
        4×A5 folded leaflet on one A4 (duplex) — print/handout.html
-       Sheet 1 (outer): [ BACK | FRONT ]   Sheet 2 (inner): [ MAP | PROGRAM ]
-       Panels are A5 portrait; the sheet is A4 landscape. Print duplex, fold
-       once. Exact sizes: 1123×794px per sheet at 96dpi.
+       Sheet 1 (outer): [ MAP | FRONT ]   Sheet 2 (inner): [ DOPOLEDNE | ODPOLEDNE ]
+       Mirrors letacek-inspirace.pdf: welcome text on the cover, map on the
+       back of the folded leaflet, programme spread inside.
+       Panels are A5 portrait; the sheet is A4 landscape, 1123×794px @96dpi.
        ===================================================================== */
     @page { size: 297mm 210mm; margin: 0; }
     html, body { width: 297mm; }
@@ -57,24 +58,33 @@
       margin-top: 2.5mm; font-family: var(--font-mono); font-size: 7.5pt;
       color: var(--ink-soft); letter-spacing: 0.06em;
     }
-    .fr-hello { margin-top: 12mm; font-family: var(--font-display); font-weight: 600; font-size: 21pt; line-height: 1.12; }
+    .fr-when { margin-top: 1.2mm; font-family: var(--font-mono); font-size: 8pt; color: var(--ink); }
+
+    .fr-hello { margin-top: 13mm; font-family: var(--font-display); font-weight: 600; font-size: 26pt; line-height: 1.08; }
     .fr-hello .wm-4 { color: var(--blue); }
-    .fr-rules { margin-top: 9mm; display: flex; flex-direction: column; gap: 4.5mm; }
-    .fr-rule { display: flex; gap: 3.5mm; align-items: flex-start; }
-    .fr-rule-n {
-      flex: none; width: 7mm; height: 7mm; display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono); font-weight: 700; font-size: 10pt;
-      border: 2px solid var(--ink); border-radius: 2mm; background: var(--yellow);
+    .fr-lines { margin-top: 8mm; display: flex; flex-direction: column; gap: 5mm; }
+    .fr-line { display: flex; gap: 3mm; align-items: flex-start; }
+    .fr-line::before {
+      content: ''; flex: none; width: 2.4mm; height: 2.4mm; margin-top: 1.9mm;
+      background: var(--blue); border-radius: 50%;
     }
-    .fr-rule b { font-weight: 600; }
-    .fr-rule p { font-size: 10pt; line-height: 1.4; margin-top: 0.5mm; }
+    .fr-line p { font-size: 11.5pt; line-height: 1.42; }
+    .fr-line b { font-weight: 600; }
+
+    .fr-dod {
+      margin-top: 9mm; border: 2px solid var(--ink); border-radius: 2.5mm;
+      padding: 4.5mm 5mm; background: #fff;
+    }
+    .fr-dod .t { font-family: var(--font-display); font-weight: 600; font-size: 12pt; }
+    .fr-dod .q { font-size: 10pt; line-height: 1.4; margin-top: 1.8mm; }
+    .fr-dod .d { font-family: var(--font-mono); font-weight: 500; font-size: 10pt; margin-top: 2mm; }
+
     .fr-org {
-      margin-top: 10mm; padding-top: 6mm;
-      font-size: 8.5pt; line-height: 1.45; color: var(--ink);
+      margin-top: auto; padding-top: 5mm;
+      font-size: 9pt; line-height: 1.45; color: var(--ink);
       border-top: 2px solid var(--ink);
     }
-    .fr-org .sub { color: var(--ink-soft); font-size: 7.5pt; }
-    .fr-logos { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; padding-top: 6mm; }
+    .fr-logos { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; }
     .fr-logo { font-family: var(--font-display); font-weight: 700; font-size: 13pt; }
     .fr-logo small { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 6.5pt; color: var(--ink-soft); margin-top: 0.8mm; letter-spacing: 0.08em; }
     .fr-logo--dnai { text-align: right; }
@@ -120,57 +130,70 @@
     .mp-legend i.mag { border-top-color: var(--magenta-deep); border-top-style: dashed; }
     .mp-legend .num { display: inline-flex; width: 3.4mm; height: 3.4mm; border: 1.5px solid var(--blue); border-radius: 50%; align-items: center; justify-content: center; font-size: 6pt; }
 
-    /* --------------------------------------------------------- PROGRAM */
-    .pg-head { font-family: var(--font-display); font-weight: 600; font-size: 14pt; }
-    .pg-head .sub { font-family: var(--font-mono); font-weight: 400; font-size: 7pt; color: var(--ink-soft); display: block; margin-top: 0.6mm; }
-    .pg-cols { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 2.5mm; }
-    .pg-col { min-width: 0; display: flex; flex-direction: column; gap: 2mm; }
-    .pg-bar {
-      font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--ink); color: #fff; padding: 1.2mm 2mm; border-radius: 1.5mm;
-    }
-    .pg-bar--lunch { background: var(--yellow); color: var(--ink); text-align: center; letter-spacing: 0.04em; }
-    .ev2 { border-left: 3px solid var(--ink-soft); padding-left: 2mm; }
-    .ev2.lecture { border-left-color: var(--blue); }
-    .ev2.workshop { border-left-color: var(--magenta-deep); }
-    .ev2-t { font-weight: 600; font-size: 8.5pt; line-height: 1.15; }
-    .ev2-m { font-family: var(--font-mono); font-size: 6.5pt; margin-top: 0.7mm; color: var(--ink); }
-    .ev2-m .fl { color: var(--ink-soft); }
-    .ev2-s { font-size: 6.5pt; color: var(--ink-soft); margin-top: 0.4mm; }
-    .pg-lunch { text-align: center; }
-    .pg-col .pg-lunch:last-child { margin-top: auto; }
-    .pg-lunch .t { font-family: var(--font-display); font-weight: 600; font-size: 9.5pt; }
-    .pg-lunch .m { font-family: var(--font-mono); font-size: 6.5pt; color: var(--ink-soft); margin-top: 0.5mm; }
+    .mp-route { margin-top: 2mm; font-size: 8pt; line-height: 1.45; }
+    .mp-route b { font-family: var(--font-mono); font-weight: 500; }
+    .mp-route .both { display: block; margin-top: 1.2mm; font-family: var(--font-mono); font-size: 7pt; color: #4a463f; }
 
-    /* -------------------------------------------------------------- BACK */
-    .bk-title { font-family: var(--font-display); font-weight: 600; font-size: 14pt; }
-    .bk-steps { margin-top: 4mm; display: flex; flex-direction: column; gap: 3mm; }
-    .bk-step { display: flex; gap: 2.5mm; align-items: baseline; font-size: 8.5pt; line-height: 1.35; }
-    .bk-n {
-      flex: none; width: 5mm; height: 5mm; display: inline-flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono); font-weight: 700; font-size: 7pt;
-      border: 1.5px solid var(--blue); border-radius: 50%; color: var(--blue);
-    }
-    .bk-step.split .bk-n { border-color: var(--magenta-deep); color: var(--magenta-deep); }
-    .bk-step.split b { color: var(--magenta-deep); }
-    .bk-both {
-      margin-top: 3mm; font-family: var(--font-mono); font-size: 7pt; color: #4a463f;
-    }
-    .bk-bottom { margin-top: auto; display: flex; gap: 4mm; align-items: flex-end; }
-    .bk-qr { flex: none; }
-    .bk-qr .qr-slot { width: 21mm; height: 21mm; }
-    .bk-qr .qr-cap { font-size: 6.5pt; max-width: 46mm; margin-top: 0; color: #4a463f; }
-    .bk-note { flex: 1; font-size: 8pt; line-height: 1.4; color: var(--ink); }
-    .bk-note b { color: var(--blue); }
-    .bk-foot {
-      margin-top: 3mm; background: var(--ink); color: var(--paper);
-      border-radius: 0 0 0 0; padding: 2.2mm 3mm;
+    .mp-bottom { margin-top: 3mm; display: flex; gap: 4mm; align-items: flex-end; }
+    .mp-qr { flex: none; }
+    .mp-qr .qr-slot { width: 17mm; height: 17mm; }
+    .mp-note { flex: 1; font-size: 8pt; line-height: 1.4; color: var(--ink); }
+    .mp-note b { color: var(--blue); }
+    .mp-foot {
+      margin-top: 2.5mm; background: var(--ink); color: var(--paper);
+      padding: 2.2mm 3mm;
       display: flex; justify-content: space-between; align-items: baseline;
     }
-    .bk-foot .w { font-family: var(--font-display); font-weight: 700; font-size: 11pt; }
-    .bk-foot .w .wm-4 { color: #7db1f5; }
-    .bk-foot .u { font-family: var(--font-mono); font-size: 7pt; color: #cfcac2; }
+    .mp-foot .w { font-family: var(--font-display); font-weight: 700; font-size: 11pt; }
+    .mp-foot .w .wm-4 { color: #7db1f5; }
+    .mp-foot .u { font-family: var(--font-mono); font-size: 7pt; color: #cfcac2; }
+
+    /* --------------------------------------------------------- PROGRAM */
+    .pr-head { flex: none; }
+    .pr-title { font-family: var(--font-display); font-weight: 600; font-size: 14pt; }
+    .pr-sub { font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft); margin-top: 0.6mm; }
+    .pr-list { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.4mm; margin-top: 3mm; }
+
+    .pev { border-left: 3px solid var(--ink-soft); padding-left: 2.4mm; }
+    .pev.lecture { border-left-color: var(--blue); }
+    .pev.workshop { border-left-color: var(--magenta-deep); }
+    .pev-head { display: flex; baseline; justify-content: space-between; align-items: baseline; gap: 2mm; }
+    .pev-time { font-family: var(--font-mono); font-weight: 700; font-size: 8.5pt; }
+    .pev-room { font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft); text-align: right; }
+    .pev-t { font-weight: 600; font-size: 9.5pt; line-height: 1.18; margin-top: 0.6mm; }
+    .pev-m { font-family: var(--font-mono); font-size: 7pt; color: var(--ink); margin-top: 0.7mm; }
+    .pev-d { font-size: 7.5pt; line-height: 1.34; color: var(--ink); margin-top: 0.9mm; }
+    .pev-b {
+      font-family: var(--font-mono); font-size: 6.5pt; line-height: 1.35; color: var(--ink);
+      margin-top: 0.9mm; padding: 1.1mm 1.8mm; background: var(--yellow); border-radius: 1.2mm;
+      display: inline-block;
+    }
+    .pr-bar {
+      flex: none; font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--ink); color: #fff; padding: 1.2mm 2mm; border-radius: 1.5mm;
+      text-align: center;
+    }
+    .pr-bar--lunch { background: var(--yellow); color: var(--ink); letter-spacing: 0.04em; }
+    .pr-par { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4mm; }
+    .pr-par .pev { min-width: 0; }
+    .pr-end { margin-top: auto; }
+
+    /* dopoledne has fewer entries — bigger type, stacked parallels */
+    .pr--dopo .pr-list { gap: 5mm; justify-content: space-between; }
+    .pr--dopo .pr-end { margin-top: 0; }
+    .pr-tip {
+      border: 2px solid var(--ink); border-radius: 2.5mm; background: #fff;
+      padding: 3mm 4mm; font-size: 9pt; line-height: 1.4;
+    }
+    .pr-tip b { font-family: var(--font-mono); font-weight: 500; font-size: 7pt;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); display: block; margin-bottom: 1mm; }
+    .pr--dopo .pev-time { font-size: 10.5pt; }
+    .pr--dopo .pev-room { font-size: 8pt; }
+    .pr--dopo .pev-t { font-size: 13pt; }
+    .pr--dopo .pev-m { font-size: 8.5pt; }
+    .pr--dopo .pev-d { font-size: 10.5pt; line-height: 1.4; }
+    .pr--dopo .pr-bar { font-size: 8pt; padding: 1.8mm 2mm; }
   </style>
 </head>
 <body class="pp page-handout">
@@ -188,39 +211,54 @@
       if (!P) { root.textContent = 'Chybí data (AI4TPrint).'; return; }
       var meta = (DATA.events && DATA.events.meta) || {};
       var esc = P.esc;
-
       var evs = P.allEvents();
+      function byId(id) { return evs.filter(function (e) { return e.id === id; })[0]; }
       function who(ev) { return ev.speaker || ev.partner || ''; }
       function minOf(t) {
         var m = /^(\d{1,2}):(\d{2})$/.exec(String(t || ''));
         return m ? (+m[1]) * 60 + (+m[2]) : 0;
       }
 
-      /* ------------------------------------------------------- FRONT panel */
+      // official long texts (timetable.txt / workshops_email.txt) — the
+      // programme pages carry them in full; only minor edits allowed
+      var LONG_DESC = {
+        'workshop-security':
+          'Úprava jediného faktu ve velkém jazykovém modelu obvykle připomíná operaci srdce kladivem. Přetrénování je pomalé a drahé a často naruší chování, které s úpravou vůbec nesouvisí. ROME (Rank-One Model Editing) nabízí chirurgicky přesnější alternativu: s vahami modelu zachází jako s databází, kterou lze aktualizovat přímo na místě. V tomto praktickém workshopu si celou operaci provedete sami.' +
+          ' Workshop vychází z probíhajícího výzkumu Red Hatu a FIT VUT v oblasti forenzní analýzy umělé inteligence a krok za krokem vás provede naším open-source nástrojem. Nejprve přepíšete fakt v modelu jedinou úpravou (rank-one), jejíž aplikace trvá jen pár sekund. Poté pacienta vyšetříte. Drží nový fakt, i když otázku přeformulujete? A co dalšího se omylem změnilo? Pak přejdete na druhou stranu a zahrajete si na útočníka. Do modelu podstrčíte nepravdivý fakt a uvidíte, jak přesvědčivě ho opakuje, zatímco se jinak chová zcela normálně. Cestou metodu dotlačíme až k bodu, kdy selže, abyste na vlastní oči viděli, kde přestávají platit předpoklady ROME. Nakonec si vyzkoušíte náš prototyp pro detekci upravených modelů a zjistíte, zda lze takovou manipulaci odhalit.',
+        'prednaska-cernocky': 'Jak AI mění svět kolem nás – a jaká v ní může být tvoje role.'
+      };
+
+      /* ------------------------------------------------------- FRONT panel
+         same text as letacek-inspirace.pdf */
       var front =
         '<section class="panel">' +
           '<div class="fr-brand"><p class="fr-word">AI<span class="wm-4">4</span>Talents</p>' +
-            '<p class="fr-date">PÁ ' + esc(P.fmtDate(meta.date)) + '</p></div>' +
-          '<p class="fr-tag">' + esc(meta.tagline || '') + '</p>' +
-          '<p class="fr-date" style="margin-top:1mm">' + esc(meta.time) + ' · ' + esc(meta.place) + '</p>' +
-          '<h1 class="fr-hello">Vítáme tě na<br>AI<span class="wm-4">4</span>Talents</h1>' +
-          '<div class="fr-rules">' +
-            '<div class="fr-rule"><span class="fr-rule-n">1</span><p><b>Registrovat se můžeš v C107</b> hned od 8:30 — rozdáme ti program a připínáček.</p></div>' +
-            '<div class="fr-rule"><span class="fr-rule-n">2</span><p><b>Oběd:</b> přestávka 11:10–12:00 a druhý oběd 14:00–16:00 v Kachně (R212, 2. patro).</p></div>' +
-            '<div class="fr-rule"><span class="fr-rule-n">3</span><p><b>Na workshopy si vezmi vlastní notebook</b> — mobil nebo tablet také poslouží.</p></div>' +
+            '<p class="fr-date">2026</p></div>' +
+          '<p class="fr-tag">Akce pro středoškolské nadšence do umělé inteligence</p>' +
+          '<p class="fr-when">pátek 6. listopadu 2026 · ' + esc(meta.time) + ' · ' + esc(meta.place) + '</p>' +
+          '<h1 class="fr-hello">Vítáme vás na<br>AI<span class="wm-4">4</span>Talents</h1>' +
+          '<div class="fr-lines">' +
+            '<div class="fr-line"><p>Prosíme o dodržování účasti na registrované workshopy a přednášky.</p></div>' +
+            '<div class="fr-line"><p>Pokud něco nevíte, zeptejte se na místě registrace.</p></div>' +
+            '<div class="fr-line"><p>Obědová pauza 11:10–12:00 v klubu U Kachničky (možnost koupení toastu a kofoly / sníst si vlastní jídlo).</p></div>' +
           '</div>' +
-          '<p class="fr-org">' + esc(meta.festival || '') +
-            '<br><span class="sub">' + esc(meta.audience || '') + '</span></p>' +
+          '<div class="fr-dod">' +
+            '<p class="t">Dny otevřených dveří</p>' +
+            '<p class="q">Chtěl by ses dozvědět víc o studiu na naší fakultě?</p>' +
+            '<p class="d">27. 11. 2026 · 29. 1. 2027 · 26. 2. 2027</p>' +
+          '</div>' +
+          '<p class="fr-org">Akce je organizována Fakultou informačních technologií VUT a je součástí festivalu umělé inteligence Dny&nbsp;AI&nbsp;2026.</p>' +
           '<div class="fr-logos">' +
             '<p class="fr-logo">FIT&nbsp;VUT<small>V BRNĚ · BOŽETĚCHOVA 2</small></p>' +
             '<p class="fr-logo fr-logo--dnai"><b>Dny&nbsp;AI</b><small>2026</small></p>' +
           '</div>' +
         '</section>';
 
-      /* --------------------------------------------------------- MAP panel */
+      /* --------------------------------------------------------- MAP panel
+         (back cover of the folded leaflet) */
       var mapPanel =
         '<section class="panel">' +
-          '<div class="mp-head"><p class="mp-title">Hlavní trasa</p>' +
+          '<div class="mp-head"><p class="mp-title">Mapa — hlavní trasa</p>' +
             '<div class="floor-toggle" role="group" aria-label="Zvýraznit patro">' +
               '<button type="button" data-fl="1">1. patro</button>' +
               '<button type="button" data-fl="2">2. patro</button>' +
@@ -233,72 +271,83 @@
             '<span><span class="num">1</span> zastávky trasy</span>' +
             '<span style="margin-left:auto">žlutá = registrace C107</span>' +
           '</p>' +
+          '<p class="mp-route"><b>E103</b> stánky → <b>C107</b> registrace → <b>C106</b> → <b>C228</b> workshopy → ' +
+            '<b>D106</b> ·odbočka dolů D0207· → <b>A218</b> → most ·odbočka N105· → <b>R212</b> Kachna' +
+            '<span class="both">Trasa je značená šipkami na stojanech a funguje oběma směry.</span></p>' +
+          '<div class="mp-bottom">' +
+            '<div class="mp-qr">' + P.qrBlock(17, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
+            '<p class="mp-note"><b>Program i mapa</b> se ti vejdou do kapsy — naskenuj QR kód a měj vše po ruce.</p>' +
+          '</div>' +
+          '<div class="mp-foot"><p class="w">AI<span class="wm-4">4</span>Talents@FIT VUT</p><p class="u">siigull.github.io/AI4Talents</p></div>' +
         '</section>';
 
-      /* ------------------------------------------------------ PROGRAM panel */
-      function evRow(ev) {
-        return '<div class="ev2 ' + esc(ev.type) + '">' +
-          '<p class="ev2-t">' + esc(ev.title) + '</p>' +
-          '<p class="ev2-m">' + esc(ev.start) + '–' + esc(ev.end) + ' · ' + esc(ev.room) +
-            ' · <span class="fl">' + esc(P.floorLabel(ev.floor)) + '</span></p>' +
-          (who(ev) ? '<p class="ev2-s">' + esc(who(ev)) + '</p>' : '') +
-        '</div>';
+      /* ------------------------------------------------------ PROGRAM pages */
+      function evBlock(ev, opts) {
+        opts = opts || {};
+        var desc = LONG_DESC[ev.id] || ev.desc || '';
+        return '<article class="pev ' + esc(ev.type) + '">' +
+          '<div class="pev-head"><p class="pev-time">' + esc(ev.start) + '–' + esc(ev.end) + '</p>' +
+            '<p class="pev-room">' + esc(ev.room) + ' · ' + esc(P.floorLabel(ev.floor)) + '</p></div>' +
+          '<p class="pev-t">' + esc(ev.title) + '</p>' +
+          (who(ev) ? '<p class="pev-m">' + esc(who(ev)) + '</p>' : '') +
+          (desc ? '<p class="pev-d">' + esc(desc) + '</p>' : '') +
+          (ev.bring && !opts.noBring ? '<p class="pev-b">Přines si: ' + esc(ev.bring) + '</p>' : '') +
+        '</article>';
       }
-      var LUNCH1 = 11 * 60 + 10;
-      var morning = evs.filter(function (e) { return minOf(e.start) < LUNCH1 && e.id !== 'kachna-obed-1'; });
-      var afternoon = evs.filter(function (e) { return minOf(e.start) >= LUNCH1 && e.id !== 'kachna-obed-1' && e.id !== 'kachna-obed-2'; });
-      var progPanel =
-        '<section class="panel">' +
-          '<p class="pg-head">Program<span class="sub">všechny akce dne · barva = typ</span></p>' +
-          '<div class="pg-cols">' +
-            '<div class="pg-col">' +
-              '<p class="pg-bar">Dopoledne · přednášky</p>' +
-              morning.map(evRow).join('') +
-              '<p class="pg-bar pg-bar--lunch">Přestávka na oběd · 11:10–12:00</p>' +
-              '<div class="ev2 zone pg-lunch"><p class="t">Kachna · R212</p><p class="m">2. patro · studentský klub</p></div>' +
-            '</div>' +
-            '<div class="pg-col">' +
-              '<p class="pg-bar">Odpoledne · workshopy a prohlídky</p>' +
-              afternoon.map(evRow).join('') +
-              '<p class="pg-bar pg-bar--lunch" style="margin-top:auto">Druhý oběd · 14:00–16:00</p>' +
-              '<div class="ev2 zone pg-lunch"><p class="t">Kachna · R212</p><p class="m">2. patro · studentský klub</p></div>' +
-            '</div>' +
+
+      // dopoledne — until the lunch break
+      var reg = byId('registrace'), stanky = byId('nabidka-stanky');
+      var cernocky = byId('prednaska-cernocky');
+      var sekanina = byId('prednaska-sekanina'), bezpec = byId('prednaska-bezpecnost');
+      var dopoledne =
+        '<section class="panel pr--dopo">' +
+          '<header class="pr-head"><p class="pr-title">Program — dopoledne</p>' +
+            '<p class="pr-sub">pátek 6. 11. 2026 · 8:30–12:00 · vstup zdarma po registraci</p></header>' +
+          '<div class="pr-list">' +
+            '<article class="pev ' + esc(reg.type) + '">' +
+              '<div class="pev-head"><p class="pev-time">' + esc(reg.start) + '–' + esc(reg.end) + '</p>' +
+                '<p class="pev-room">' + esc(reg.room) + ' · ' + esc(P.floorLabel(reg.floor)) + '</p></div>' +
+              '<p class="pev-t">' + esc(reg.title) + '</p>' +
+              '<p class="pev-d">' + esc(reg.desc) + '</p>' +
+            '</article>' +
+            evBlock(stanky) +
+            evBlock(cernocky) +
+            '<p class="pr-bar">10:10–11:10 · současně na dvou místech</p>' +
+            evBlock(sekanina, { noBring: true }) +
+            evBlock(bezpec, { noBring: true }) +
+            '<div class="pr-tip"><b>Tip</b>Od 12:00 tě čekají workshopy a prohlídky fakulty — jejich program najdeš na druhé straně letáku. Na workshopy si vezmi vlastní notebook.</div>' +
+            '<p class="pr-bar pr-bar--lunch pr-end">Přestávka na oběd · 11:10–12:00 · Kachna R212 · 2. patro</p>' +
           '</div>' +
         '</section>';
 
-      /* -------------------------------------------------------- BACK panel */
-      var MP = DATA.mainPath || { stops: [] };
-      var steps = [
-        'E103 — stánky firem a sraz prohlídek',
-        'C107 — registrace (žluté na mapě)',
-        'C106 a po schodišti nahoru',
-        'C228 — workshopy',
-        'u D106 odbočka dolů → D0207 (RedHat, −2. podlaží)',
-        'A218 — druhé patro A',
-        'přes most · odbočka na N105 (Security@FIT)',
-        'R212 — Kachna'
-      ];
-      var back =
+      // odpoledne — workshops, tours, second lunch
+      var proh1 = byId('prohlidky-1'), proh2 = byId('prohlidky-2');
+      var redhat = byId('workshop-redhat'), solar = byId('workshop-solarwinds');
+      var sap = byId('workshop-sap'), sec = byId('workshop-security');
+      var odpoledne =
         '<section class="panel">' +
-          '<p class="bk-title">Jak se tu vyznat</p>' +
-          '<div class="bk-steps">' +
-            steps.map(function (s, i) {
-              var split = i === 4 || i === 6;
-              return '<div class="bk-step' + (split ? ' split' : '') + '"><span class="bk-n">' + (i + 1) + '</span><span>' + esc(s) + '</span></div>';
-            }).join('') +
+          '<header class="pr-head"><p class="pr-title">Program — odpoledne</p>' +
+            '<p class="pr-sub">workshopy · prohlídky · 12:00–16:00 · kapacity workshopů jsou omezené</p></header>' +
+          '<div class="pr-list">' +
+            '<article class="pev zone">' +
+              '<div class="pev-head"><p class="pev-time">12:00–14:00</p>' +
+                '<p class="pev-room">' + esc(proh1.room) + ' · ' + esc(P.floorLabel(proh1.floor)) + '</p></div>' +
+              '<p class="pev-t">Prohlídka fakulty — dvě kola</p>' +
+              '<p class="pev-m">1. kolo 12:00 · 2. kolo 13:00 · sraz ' + esc(proh1.room) + '</p>' +
+              '<p class="pev-d">' + esc(proh1.desc) + '</p>' +
+            '</article>' +
+            evBlock(redhat) +
+            evBlock(solar) +
+            evBlock(sap) +
+            evBlock(sec) +
+            '<p class="pr-bar pr-bar--lunch pr-end">Druhý oběd · 14:00–16:00 · Kachna R212 · 2. patro</p>' +
           '</div>' +
-          '<p class="bk-both">Trasa je značená šipkami na stojanech a funguje oběma směry.</p>' +
-          '<div class="bk-bottom">' +
-            '<div class="bk-qr">' + P.qrBlock(21, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
-            '<p class="bk-note"><b>Program i mapa</b> se ti vejdou do kapsy —<br>naskenuj QR kód a měj vše po ruce.</p>' +
-          '</div>' +
-          '<div class="bk-foot"><p class="w">AI<span class="wm-4">4</span>Talents@FIT VUT</p><p class="u">' + esc('ai4talents.fit.vut.cz') + '</p></div>' +
         '</section>';
 
       /* ------------------------------------------------------------ sheets */
       root.innerHTML =
-        '<div class="sheet"><div class="foldline"></div>' + back + front + '</div>' +
-        '<div class="sheet"><div class="foldline"></div>' + mapPanel + progPanel + '</div>';
+        '<div class="sheet"><div class="foldline"></div>' + mapPanel + front + '</div>' +
+        '<div class="sheet"><div class="foldline"></div>' + dopoledne + odpoledne + '</div>';
 
       /* ------------------------------------------- map panel: route overlay */
       (function drawMap() {
@@ -313,6 +362,7 @@
         });
         if (!svg) { box.textContent = 'Mapu se nepodařilo vykreslit.'; return; }
         box.appendChild(svg);
+        var MP = DATA.mainPath;
         if (!MP.legs) return;
 
         var NS = 'http://www.w3.org/2000/svg';
