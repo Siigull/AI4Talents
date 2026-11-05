@@ -27,7 +27,7 @@
 
     /* --- two zones: programme list | maps + registration + QR --- */
     .hd-main {
-      flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 72mm;
+      flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 112mm;
       gap: 5mm; padding: 2.5mm 6mm 2mm;
     }
 
@@ -46,22 +46,29 @@
     .hde--zone { border-top-style: dashed; }
     .room-chip { font-size: 7pt; border-width: 1px; padding: 0 0.9mm; line-height: 1.4; }
 
-    /* --- right column: mini maps (fill), registration, QR --- */
-    .hd-side { display: flex; flex-direction: column; gap: 2.5mm; min-height: 0; }
-    .hd-maps { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; }
-    .hd-map { display: flex; flex-direction: column; min-height: 0; }
-    .hd-map .mapbox { flex: 1; min-height: 0; width: 100%; }
-    .hd-map .map-cap { text-align: center; margin-top: 1mm; flex: none; }
+    /* --- right column: FULL-FLOOR maps (whole context), reg, QR -----------
+       A5 landscape: the floors are ~740×930 units (aspect 0.79) — two maps
+       side by side at ~54mm each show every wing at the height the side
+       column has; the old narrow boxes (aspect 0.45) forced a zoom-in crop
+       that cut half the building off. */
+    .hd-side { display: flex; flex-direction: column; gap: 2mm; min-height: 0; }
+    .hd-maps { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; }
+    .hd-map { display: flex; flex-direction: column; }
+    .hd-map .mapbox { width: 100%; aspect-ratio: 740 / 930; }
+    .hd-map .map-cap { text-align: center; margin-top: 0.6mm; flex: none; }
 
     /* registration callout — blue field (Dny AI motif) */
-    .hd-reg { background: var(--blue); color: var(--paper); border-radius: 4px; padding: 2.4mm 3mm; flex: none; }
+    .hd-reg { background: var(--blue); color: var(--paper); border-radius: 4px; padding: 2.4mm 3mm; }
     .hd-reg .kicker { font-size: 7.5pt; color: var(--paper); }
     .hd-reg p { font-size: 9pt; font-weight: 500; margin-top: 0.8mm; line-height: 1.25; }
     .hd-reg .mono { font-weight: 500; }
 
-    .hd-qr { flex: none; display: flex; align-items: flex-end; gap: 3mm; }
+    /* registration + QR share one bottom row — no dead space right of the QR */
+    .hd-bottom { flex: none; display: flex; gap: 2.5mm; align-items: stretch; }
+    .hd-bottom .hd-reg { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .hd-qr { flex: none; display: flex; align-items: flex-end; gap: 2.5mm; }
     .hd-qr .qr-slot { width: 21mm; height: 21mm; }
-    .hd-qr .qr-cap { margin-top: 0; margin-bottom: 0.6mm; font-size: 6pt; max-width: 46mm; }
+    .hd-qr .qr-cap { margin-top: 0; margin-bottom: 0.6mm; font-size: 6pt; max-width: 40mm; }
 
     .pfooter { padding: 1.4mm 6mm 2mm; }
   </style>
@@ -121,11 +128,13 @@
           '<div class="hd-map"><div class="mapbox" id="map-f2"></div>' +
             '<p class="map-cap">2. patro</p></div>' +
         '</div>' +
-        '<div class="hd-reg">' +
-          '<p class="kicker">Zde se registruješ</p>' +
-          '<p>Registrace a info: <span class="mono">C106</span> (vchod do E)</p>' +
+        '<div class="hd-bottom">' +
+          '<div class="hd-reg">' +
+            '<p class="kicker">Zde se registruješ</p>' +
+            '<p>Registrace a info: <span class="mono">C106</span> (vchod do E)</p>' +
+          '</div>' +
+          '<div class="hd-qr">' + P.qrBlock(21, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
         '</div>' +
-        '<div class="hd-qr">' + P.qrBlock(21, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
       '</aside>';
 
       h += '</main>' + P.footerStrip();
@@ -147,7 +156,7 @@
           var svg = P.miniMap({
             floor: m[1],
             subject: m[2],
-            crop: { rooms: byFloor[m[1]] || [], margin: 30 },
+            crop: { buildings: true, margin: 10 },
             aspect: rect.width / rect.height,
             boxMm: rect.width * 25.4 / 96,
             labelPx: 9,   // pocket overview: tiny map, codes stay legible

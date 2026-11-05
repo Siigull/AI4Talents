@@ -355,6 +355,20 @@
           // an isolated room (cluster of one) still gets corridor context
           growToMin(b, MIN_CROP);
         }
+      } else if (o.crop.buildings) {
+        // whole-floor content: bbox over every building polygon — full
+        // context (all wings), no zoom-in, only the empty margins trimmed
+        var bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+        fl.buildings.forEach(function (bl) {
+          (bl.pts || []).forEach(function (pt) {
+            bx0 = Math.min(bx0, pt[0]); by0 = Math.min(by0, pt[1]);
+            bx1 = Math.max(bx1, pt[0]); by1 = Math.max(by1, pt[1]);
+          });
+        });
+        if (bx0 !== Infinity) {
+          var bm = o.crop.margin != null ? o.crop.margin : 10;
+          b = [bx0 - bm, by0 - bm, bx1 + bm, by1 + bm];
+        }
       } else if (o.crop.rooms && o.crop.rooms.length) {
         var margin = o.crop.margin != null ? o.crop.margin : 60;
         var bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
