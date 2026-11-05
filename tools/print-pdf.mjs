@@ -23,7 +23,7 @@ const DOOR_ROOMS = ['C107', 'E103', 'E112', 'E105', 'E104', 'A104', 'D0207', 'C2
 const STAND_ROOMS = ['A101', 'E103', 'C107', 'C106', 'C228', 'D106', 'A218', 'N105', 'R212'];
 
 const PAGES = [
-  { kind: 'handout', url: '/print/handout.html', name: 'handout-a5' },
+  { kind: 'handout', url: '/print/handout.html', name: 'letak-a4' },
   { kind: 'a3', url: '/print/program-a3.html', name: 'program-a3' },
   ...DOOR_ROOMS.map((r) => ({ kind: 'door', url: `/print/door.html?room=${r}`, name: `door-${r.toLowerCase()}` })),
   ...STAND_ROOMS.map((r) => ({ kind: 'stand', url: `/print/stand.html?at=${r}`, name: `stand-${r.toLowerCase()}` })),
