@@ -2,184 +2,407 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8">
-  <title>AI4Talents — kapesní program (A5)</title>
-  <!-- Print mode guard: must be set BEFORE map.js loads (inline script). -->
-  <script>window.AI4T_PRINT_MODE = true;</script>
+  <title>AI4Talents — leták (A4 složený na A5)</title>
+  <meta name="description" content="Kapesní leták AI4Talents@FIT VUT — A4 skládaný na A5: program, hlavní trasa, mapa.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;700&amp;display=swap">
   <link rel="stylesheet" href="../assets/css/print.css">
   <style>
-    /* A5 landscape — exact sheet, for screenshotting at paper size. */
-    @page { size: 210mm 148mm; margin: 0; }
-    html, body { width: 210mm; height: 148mm; }
+    /* =====================================================================
+       4×A5 folded leaflet on one A4 (duplex) — print/handout.html
+       Sheet 1 (outer): [ BACK | FRONT ]   Sheet 2 (inner): [ MAP | PROGRAM ]
+       Panels are A5 portrait; the sheet is A4 landscape. Print duplex, fold
+       once. Exact sizes: 1123×794px per sheet at 96dpi.
+       ===================================================================== */
+    @page { size: 297mm 210mm; margin: 0; }
+    html, body { width: 297mm; }
+    .pp-root { display: block; }
 
-    .page-handout { padding: 0; }
-
-    /* --- compact header band --- */
-    .hd-head {
-      flex: none; display: flex; justify-content: space-between; align-items: center;
-      gap: 6mm; padding: 2.8mm 6mm;
+    .sheet {
+      width: 297mm; height: 210mm;
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--paper);
+      position: relative;
+      break-after: page;
     }
-    .hd-head .wordmark { font-size: 16pt; letter-spacing: -0.01em; }
-    .hd-meta { text-align: right; font-family: var(--font-mono); font-size: 7.5pt; line-height: 1.45; }
-    .hd-meta .sub { color: var(--muted-on-dark); }
+    .sheet:last-child { break-after: auto; }
 
-    /* --- two zones: programme list | map rail --------------------------------
-       v4: the programme list IS the handout, so it takes the dominant width
-       (~64%). The side rail shrinks to 70mm: ONE floor-1 map (registration
-       desk + lecture wing context) that flex-grows into every leftover mm
-       of rail height, then registration + QR compose the bottom flush —
-       no dead zone below them. */
-    .hd-main {
-      flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 70mm;
-      gap: 2.5mm; padding: 2.5mm 6mm 2mm;
+    /* fold hint: hairline + tiny triangles at top/bottom center */
+    .foldline {
+      position: absolute; left: 50%; top: 0; bottom: 0; width: 0;
+      border-left: 1px dashed rgba(20, 18, 15, 0.25);
+      pointer-events: none;
+    }
+    .foldline::before, .foldline::after {
+      content: ''; position: absolute; left: -3.5px;
+      border-left: 3.5px solid transparent; border-right: 3.5px solid transparent;
+    }
+    .foldline::before { top: 0; border-top: 5px solid rgba(20, 18, 15, 0.45); }
+    .foldline::after  { bottom: 0; border-bottom: 5px solid rgba(20, 18, 15, 0.45); }
+
+    .panel {
+      min-width: 0; min-height: 0;
+      display: flex; flex-direction: column;
+      padding: 8mm 7mm 7mm;
+      overflow: hidden;
     }
 
-    /* programme rows — brutal density, ledger rules between rows */
-    .hd-list { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
-    .hde {
-      display: grid; grid-template-columns: 13.5mm 1fr; column-gap: 2.5mm;
-      padding: 0.35mm 0; border-top: 1px solid var(--hairline); align-items: start;
+    /* ------------------------------------------------------------ FRONT */
+    .fr-brand { display: flex; align-items: baseline; gap: 3mm; }
+    .fr-word { font-family: var(--font-display); font-weight: 700; font-size: 17pt; letter-spacing: -0.01em; }
+    .fr-word .wm-4 { color: var(--blue); }
+    .fr-date { font-family: var(--font-mono); font-size: 8pt; color: var(--ink-soft); margin-left: auto; }
+    .fr-tag {
+      margin-top: 2.5mm; font-family: var(--font-mono); font-size: 7.5pt;
+      color: var(--ink-soft); letter-spacing: 0.06em;
     }
-    .hde:first-child { border-top: 0; }
-    .hde-time { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 8.5pt; line-height: 1.15; padding-top: 0.2mm; }
-    .hde-time .end { display: block; font-size: 6.5pt; color: var(--ink-soft); }
-    .hde-title { font-family: var(--font-body); font-weight: 600; font-size: 9.5pt; line-height: 1.15; }
-    .hde-meta { margin-top: 0.35mm; font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 1mm 2mm; align-items: center; }
-    .hde--zone .hde-title { font-weight: 500; }
-    .hde--zone { border-top-style: dashed; }
-    .room-chip { font-size: 7pt; border-width: 1px; padding: 0 0.9mm; line-height: 1.4; }
+    .fr-hello { margin-top: 12mm; font-family: var(--font-display); font-weight: 600; font-size: 21pt; line-height: 1.12; }
+    .fr-hello .wm-4 { color: var(--blue); }
+    .fr-rules { margin-top: 9mm; display: flex; flex-direction: column; gap: 4.5mm; }
+    .fr-rule { display: flex; gap: 3.5mm; align-items: flex-start; }
+    .fr-rule-n {
+      flex: none; width: 7mm; height: 7mm; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-weight: 700; font-size: 10pt;
+      border: 2px solid var(--ink); border-radius: 2mm; background: var(--yellow);
+    }
+    .fr-rule b { font-weight: 600; }
+    .fr-rule p { font-size: 10pt; line-height: 1.4; margin-top: 0.5mm; }
+    .fr-org {
+      margin-top: 10mm; padding-top: 6mm;
+      font-size: 8.5pt; line-height: 1.45; color: var(--ink);
+      border-top: 2px solid var(--ink);
+    }
+    .fr-org .sub { color: var(--ink-soft); font-size: 7.5pt; }
+    .fr-logos { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; padding-top: 6mm; }
+    .fr-logo { font-family: var(--font-display); font-weight: 700; font-size: 13pt; }
+    .fr-logo small { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 6.5pt; color: var(--ink-soft); margin-top: 0.8mm; letter-spacing: 0.08em; }
+    .fr-logo--dnai { text-align: right; }
+    .fr-logo--dnai b { color: var(--magenta-deep); }
 
-    /* --- side rail: ONE full-floor map (floor 1), reg, QR --------------------
-       The mapbox flex-grows to all leftover rail height (aspect 740/930 →
-       ≈69×87mm at a 70mm rail) — the crop stays whole-floor via
-       P.miniMap({ crop: { buildings: true, margin: 10 } }), every wing
-       visible; the caption pins it, then reg+QR close the rail flush. */
-    .hd-side { display: flex; flex-direction: column; gap: 2.5mm; min-height: 0; }
-    .hd-map { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; }
-    .hd-map .mapbox { flex: 1; min-height: 0; max-width: 100%; aspect-ratio: 740 / 930; }
-    .hd-map .map-cap { flex: none; align-self: stretch; text-align: center; margin-top: 0.8mm; }
+    /* -------------------------------------------------------------- MAP */
+    .mp-head { display: flex; align-items: baseline; justify-content: space-between; }
+    .mp-title { font-family: var(--font-display); font-weight: 600; font-size: 14pt; }
+    .floor-toggle { display: flex; gap: 1.5mm; }
+    .floor-toggle button {
+      font-family: var(--font-mono); font-size: 7pt; line-height: 1;
+      padding: 1.6mm 2.2mm; background: #fff; color: var(--ink);
+      border: 1.5px solid var(--ink); border-radius: 2mm; cursor: pointer;
+    }
+    .floor-toggle button.is-on { background: var(--blue); border-color: var(--ink); color: #fff; }
+    @media print { .floor-toggle { display: none; } }
 
-    /* registration callout — blue field (Dny AI motif); fills the corner
-       beside the QR so the rail has no white pocket */
-    .hd-reg { background: var(--blue); color: var(--paper); border-radius: 4px; padding: 2.6mm 3.2mm; }
-    .hd-reg .kicker { font-size: 8pt; color: var(--paper); }
-    .hd-reg p { font-size: 10pt; font-weight: 500; margin-top: 1mm; line-height: 1.3; }
-    .hd-reg .mono { font-weight: 500; }
+    .mp-mapbox { flex: 1; min-height: 0; margin-top: 2.5mm; }
+    .mp-mapbox svg { width: 100%; height: 100%; display: block; }
 
-    /* registration + QR compose the rail bottom, both flush to the footer */
-    .hd-bottom { flex: none; display: flex; gap: 2.5mm; align-items: stretch; }
-    .hd-bottom .hd-reg { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    /* QR stack: code on top, its caption centred underneath — the 70mm rail
-       is too narrow for the old caption-beside-code row */
-    .hd-qr { flex: none; display: flex; flex-direction: column; align-items: center; }
-    .hd-qr .qr-slot { width: 21mm; height: 21mm; }
-    .hd-qr .qr-cap { margin-top: 1mm; margin-bottom: 0; font-size: 6pt; max-width: 23mm; text-align: center; line-height: 1.3; }
+    /* hlavní trasa overlay (svg units) */
+    .pm-ov .l1 { fill: none; stroke: var(--blue); stroke-width: 4.5px; stroke-linecap: round; stroke-linejoin: round; }
+    .pm-ov .l2 { fill: none; stroke: var(--blue); stroke-width: 4.5px; stroke-dasharray: 10 7; stroke-linecap: round; stroke-linejoin: round; }
+    .pm-ov.show-1 .l2, .pm-ov.show-2 .l1 { opacity: 0.15; }
+    .pm-ov .stub { fill: none; stroke: var(--magenta-deep); stroke-width: 3.5px; stroke-dasharray: 7 6; stroke-linecap: round; }
+    .pm-ov .stop-c { fill: #fff; stroke: var(--blue); stroke-width: 3px; }
+    .pm-ov .stop-c.reg { fill: var(--yellow); }
+    .pm-ov .stop-c.split { stroke: var(--magenta-deep); }
+    .pm-ov .stop-t { font: 700 20px 'IBM Plex Mono', monospace; fill: var(--blue); text-anchor: middle; dominant-baseline: central; }
+    .pm-ov .stop-c.split + .stop-t { fill: var(--magenta-deep); }
+    .pm-ov .hop-c { fill: var(--blue); stroke: #fff; stroke-width: 3px; }
+    .pm-ov .hop-t { font: 700 22px 'IBM Plex Mono', monospace; fill: #fff; text-anchor: middle; dominant-baseline: central; }
+    .pm-ov .lab { font: 500 15px 'IBM Plex Mono', monospace; fill: var(--blue); paint-order: stroke; stroke: #fff; stroke-width: 4px; }
+    .pm-ov .lab--split { fill: var(--magenta-deep); }
 
-    .pfooter { padding: 1.4mm 6mm 2mm; }
+    .mp-legend {
+      flex: none; margin-top: 2mm; padding-top: 1.6mm; border-top: 1.5px solid var(--ink);
+      font-family: var(--font-mono); font-size: 6.5pt; color: var(--ink);
+      display: flex; flex-wrap: wrap; gap: 1mm 3mm;
+    }
+    .mp-legend i { display: inline-block; width: 6mm; height: 0; border-top: 2.5px solid var(--blue); vertical-align: middle; margin-right: 1mm; }
+    .mp-legend i.dash { border-top-style: dashed; }
+    .mp-legend i.mag { border-top-color: var(--magenta-deep); border-top-style: dashed; }
+    .mp-legend .num { display: inline-flex; width: 3.4mm; height: 3.4mm; border: 1.5px solid var(--blue); border-radius: 50%; align-items: center; justify-content: center; font-size: 6pt; }
+
+    /* --------------------------------------------------------- PROGRAM */
+    .pg-head { font-family: var(--font-display); font-weight: 600; font-size: 14pt; }
+    .pg-head .sub { font-family: var(--font-mono); font-weight: 400; font-size: 7pt; color: var(--ink-soft); display: block; margin-top: 0.6mm; }
+    .pg-cols { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 2.5mm; }
+    .pg-col { min-width: 0; display: flex; flex-direction: column; gap: 2mm; }
+    .pg-bar {
+      font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--ink); color: #fff; padding: 1.2mm 2mm; border-radius: 1.5mm;
+    }
+    .pg-bar--lunch { background: var(--yellow); color: var(--ink); text-align: center; letter-spacing: 0.04em; }
+    .ev2 { border-left: 3px solid var(--ink-soft); padding-left: 2mm; }
+    .ev2.lecture { border-left-color: var(--blue); }
+    .ev2.workshop { border-left-color: var(--magenta-deep); }
+    .ev2-t { font-weight: 600; font-size: 8.5pt; line-height: 1.15; }
+    .ev2-m { font-family: var(--font-mono); font-size: 6.5pt; margin-top: 0.7mm; color: var(--ink); }
+    .ev2-m .fl { color: var(--ink-soft); }
+    .ev2-s { font-size: 6.5pt; color: var(--ink-soft); margin-top: 0.4mm; }
+    .pg-lunch { text-align: center; }
+    .pg-col .pg-lunch:last-child { margin-top: auto; }
+    .pg-lunch .t { font-family: var(--font-display); font-weight: 600; font-size: 9.5pt; }
+    .pg-lunch .m { font-family: var(--font-mono); font-size: 6.5pt; color: var(--ink-soft); margin-top: 0.5mm; }
+
+    /* -------------------------------------------------------------- BACK */
+    .bk-title { font-family: var(--font-display); font-weight: 600; font-size: 14pt; }
+    .bk-steps { margin-top: 4mm; display: flex; flex-direction: column; gap: 3mm; }
+    .bk-step { display: flex; gap: 2.5mm; align-items: baseline; font-size: 8.5pt; line-height: 1.35; }
+    .bk-n {
+      flex: none; width: 5mm; height: 5mm; display: inline-flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-weight: 700; font-size: 7pt;
+      border: 1.5px solid var(--blue); border-radius: 50%; color: var(--blue);
+    }
+    .bk-step.split .bk-n { border-color: var(--magenta-deep); color: var(--magenta-deep); }
+    .bk-step.split b { color: var(--magenta-deep); }
+    .bk-both {
+      margin-top: 3mm; font-family: var(--font-mono); font-size: 7pt; color: #4a463f;
+    }
+    .bk-bottom { margin-top: auto; display: flex; gap: 4mm; align-items: flex-end; }
+    .bk-qr { flex: none; }
+    .bk-qr .qr-slot { width: 21mm; height: 21mm; }
+    .bk-qr .qr-cap { font-size: 6.5pt; max-width: 46mm; margin-top: 0; color: #4a463f; }
+    .bk-note { flex: 1; font-size: 8pt; line-height: 1.4; color: var(--ink); }
+    .bk-note b { color: var(--blue); }
+    .bk-foot {
+      margin-top: 3mm; background: var(--ink); color: var(--paper);
+      border-radius: 0 0 0 0; padding: 2.2mm 3mm;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .bk-foot .w { font-family: var(--font-display); font-weight: 700; font-size: 11pt; }
+    .bk-foot .w .wm-4 { color: #7db1f5; }
+    .bk-foot .u { font-family: var(--font-mono); font-size: 7pt; color: #cfcac2; }
   </style>
 </head>
 <body class="pp page-handout">
-  <div id="page" class="pp-root"></div>
+  <div id="poster" class="pp-root"></div>
 
   <script src="../assets/js/data.js" defer></script>
   <script src="../assets/js/routing.js" defer></script>
-  <script src="../assets/js/map.js" defer></script>
   <script src="../assets/js/print.js" defer></script>
   <script>
-    // Handout boot — A5 pocket programme: dense list + v2 mini maps.
+    // Leták boot — 4×A5 panels on 2 A4-landscape sheets (duplex + fold).
     window.addEventListener('DOMContentLoaded', function () {
       var P = window.AI4TPrint;
-      var root = document.getElementById('page');
+      var DATA = window.AI4T_DATA;
+      var root = document.getElementById('poster');
       if (!P) { root.textContent = 'Chybí data (AI4TPrint).'; return; }
+      var meta = (DATA.events && DATA.events.meta) || {};
+      var esc = P.esc;
 
-      var meta = (window.AI4T_DATA.events && window.AI4T_DATA.events.meta) || {};
       var evs = P.allEvents();
+      function who(ev) { return ev.speaker || ev.partner || ''; }
+      function minOf(t) {
+        var m = /^(\d{1,2}):(\d{2})$/.exec(String(t || ''));
+        return m ? (+m[1]) * 60 + (+m[2]) : 0;
+      }
 
-      var h =
-        '<header class="p-head hd-head">' +
-          '<p class="wordmark">AI<span class="wm-4">4</span>Talents</p>' +
-          '<p class="hd-meta">' +
-            'PÁ ' + P.esc(P.fmtDate(meta.date)) + ' · ' + P.esc(meta.time || '9:00 — 14:00') + '<br>' +
-            '<span class="sub">' + P.esc(meta.place || 'FIT VUT v Brně') +
-              '</span>' +
-          '</p>' +
-        '</header>' +
-        '<main class="hd-main">';
-
-      // ---- compact programme list ------------------------------------------
-      h += '<section class="hd-list" aria-label="Program dne">';
-      evs.forEach(function (ev) {
-        h +=
-          '<div class="hde hde--' + P.esc(ev.type) + '">' +
-            '<div class="hde-time">' + P.esc(ev.start) +
-              '<span class="end">— ' + P.esc(ev.end) + '</span></div>' +
-            '<div>' +
-              '<p class="hde-title">' + P.esc(ev.title) + '</p>' +
-              '<p class="hde-meta">' +
-                '<span class="room-chip">' + P.esc(ev.room) + '</span>' +
-                (ev.speaker || ev.partner ? '<span>' + P.esc(ev.speaker || ev.partner) + '</span>' : '') +
-                (ev.type === 'zone' ? '<span>průběžně</span>' : '') +
-              '</p>' +
-            '</div>' +
-          '</div>';
-      });
-      h += '</section>';
-
-      // ---- side rail: floor-1 map + registration + QR --------------------
-      h += '<aside class="hd-side">' +
-        '<div class="hd-map">' +
-          '<div class="mapbox" id="map-f1"></div>' +
-          '<p class="map-cap">1. patro · žlutá = registrace</p>' +
-        '</div>' +
-        '<div class="hd-bottom">' +
-          '<div class="hd-reg">' +
-            '<p class="kicker">Zde se registruješ</p>' +
-            '<p>Registrace a info: <span class="mono">C106</span> (vchod do E)</p>' +
+      /* ------------------------------------------------------- FRONT panel */
+      var front =
+        '<section class="panel">' +
+          '<div class="fr-brand"><p class="fr-word">AI<span class="wm-4">4</span>Talents</p>' +
+            '<p class="fr-date">PÁ ' + esc(P.fmtDate(meta.date)) + '</p></div>' +
+          '<p class="fr-tag">' + esc(meta.tagline || '') + '</p>' +
+          '<p class="fr-date" style="margin-top:1mm">' + esc(meta.time) + ' · ' + esc(meta.place) + '</p>' +
+          '<h1 class="fr-hello">Vítáme tě na<br>AI<span class="wm-4">4</span>Talents</h1>' +
+          '<div class="fr-rules">' +
+            '<div class="fr-rule"><span class="fr-rule-n">1</span><p><b>Registrovat se můžeš v C107</b> hned od 8:30 — rozdáme ti program a připínáček.</p></div>' +
+            '<div class="fr-rule"><span class="fr-rule-n">2</span><p><b>Oběd:</b> přestávka 11:10–12:00 a druhý oběd 14:00–16:00 v Kachně (R212, 2. patro).</p></div>' +
+            '<div class="fr-rule"><span class="fr-rule-n">3</span><p><b>Na workshopy si vezmi vlastní notebook</b> — mobil nebo tablet také poslouží.</p></div>' +
           '</div>' +
-          '<div class="hd-qr">' + P.qrBlock(21, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
-        '</div>' +
-      '</aside>';
+          '<p class="fr-org">' + esc(meta.festival || '') +
+            '<br><span class="sub">' + esc(meta.audience || '') + '</span></p>' +
+          '<div class="fr-logos">' +
+            '<p class="fr-logo">FIT&nbsp;VUT<small>V BRNĚ · BOŽETĚCHOVA 2</small></p>' +
+            '<p class="fr-logo fr-logo--dnai"><b>Dny&nbsp;AI</b><small>2026</small></p>' +
+          '</div>' +
+        '</section>';
 
-      h += '</main>' + P.footerStrip();
-      root.innerHTML = h;
+      /* --------------------------------------------------------- MAP panel */
+      var mapPanel =
+        '<section class="panel">' +
+          '<div class="mp-head"><p class="mp-title">Hlavní trasa</p>' +
+            '<div class="floor-toggle" role="group" aria-label="Zvýraznit patro">' +
+              '<button type="button" data-fl="1">1. patro</button>' +
+              '<button type="button" data-fl="2">2. patro</button>' +
+              '<button type="button" data-fl="all" class="is-on">obojí</button>' +
+            '</div></div>' +
+          '<div class="mp-mapbox" id="lt-map"></div>' +
+          '<p class="mp-legend">' +
+            '<span><i></i>1. patro</span><span><i class="dash"></i>2. patro</span>' +
+            '<span><i class="mag"></i>odbočky (D0207, N105)</span>' +
+            '<span><span class="num">1</span> zastávky trasy</span>' +
+            '<span style="margin-left:auto">žlutá = registrace C107</span>' +
+          '</p>' +
+        '</section>';
 
-      // v2 mini map: every event room of floor 1, tinted + labelled
-      // (pocket overview), expanded to the measured box aspect so the SVG
-      // fills its box. C106 = yellow registration marker.
-      function renderMaps() {
-        [['map-f1', '1', 'C106']].forEach(function (m) {
-          var box = document.getElementById(m[0]);
-          if (!box) return;
-          var rect = box.getBoundingClientRect();
-          if (rect.width < 10 || rect.height < 10) return;
-          var svg = P.miniMap({
-            floor: m[1],
-            subject: m[2],
-            crop: { buildings: true, margin: 10 },
-            aspect: rect.width / rect.height,
-            boxMm: rect.width * 25.4 / 96,
-            labelPx: 9,   // pocket overview: tiny map, codes stay legible
-          });
-          if (svg) {
-            box.innerHTML = '';
-            box.appendChild(svg);
+      /* ------------------------------------------------------ PROGRAM panel */
+      function evRow(ev) {
+        return '<div class="ev2 ' + esc(ev.type) + '">' +
+          '<p class="ev2-t">' + esc(ev.title) + '</p>' +
+          '<p class="ev2-m">' + esc(ev.start) + '–' + esc(ev.end) + ' · ' + esc(ev.room) +
+            ' · <span class="fl">' + esc(P.floorLabel(ev.floor)) + '</span></p>' +
+          (who(ev) ? '<p class="ev2-s">' + esc(who(ev)) + '</p>' : '') +
+        '</div>';
+      }
+      var LUNCH1 = 11 * 60 + 10;
+      var morning = evs.filter(function (e) { return minOf(e.start) < LUNCH1 && e.id !== 'kachna-obed-1'; });
+      var afternoon = evs.filter(function (e) { return minOf(e.start) >= LUNCH1 && e.id !== 'kachna-obed-1' && e.id !== 'kachna-obed-2'; });
+      var progPanel =
+        '<section class="panel">' +
+          '<p class="pg-head">Program<span class="sub">všechny akce dne · barva = typ</span></p>' +
+          '<div class="pg-cols">' +
+            '<div class="pg-col">' +
+              '<p class="pg-bar">Dopoledne · přednášky</p>' +
+              morning.map(evRow).join('') +
+              '<p class="pg-bar pg-bar--lunch">Přestávka na oběd · 11:10–12:00</p>' +
+              '<div class="ev2 zone pg-lunch"><p class="t">Kachna · R212</p><p class="m">2. patro · studentský klub</p></div>' +
+            '</div>' +
+            '<div class="pg-col">' +
+              '<p class="pg-bar">Odpoledne · workshopy a prohlídky</p>' +
+              afternoon.map(evRow).join('') +
+              '<p class="pg-bar pg-bar--lunch" style="margin-top:auto">Druhý oběd · 14:00–16:00</p>' +
+              '<div class="ev2 zone pg-lunch"><p class="t">Kachna · R212</p><p class="m">2. patro · studentský klub</p></div>' +
+            '</div>' +
+          '</div>' +
+        '</section>';
+
+      /* -------------------------------------------------------- BACK panel */
+      var MP = DATA.mainPath || { stops: [] };
+      var steps = [
+        'E103 — stánky firem a sraz prohlídek',
+        'C107 — registrace (žluté na mapě)',
+        'C106 a po schodišti nahoru',
+        'C228 — workshopy',
+        'u D106 odbočka dolů → D0207 (RedHat, −2. podlaží)',
+        'A218 — druhé patro A',
+        'přes most · odbočka na N105 (Security@FIT)',
+        'R212 — Kachna'
+      ];
+      var back =
+        '<section class="panel">' +
+          '<p class="bk-title">Jak se tu vyznat</p>' +
+          '<div class="bk-steps">' +
+            steps.map(function (s, i) {
+              var split = i === 4 || i === 6;
+              return '<div class="bk-step' + (split ? ' split' : '') + '"><span class="bk-n">' + (i + 1) + '</span><span>' + esc(s) + '</span></div>';
+            }).join('') +
+          '</div>' +
+          '<p class="bk-both">Trasa je značená šipkami na stojanech a funguje oběma směry.</p>' +
+          '<div class="bk-bottom">' +
+            '<div class="bk-qr">' + P.qrBlock(21, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
+            '<p class="bk-note"><b>Program i mapa</b> se ti vejdou do kapsy —<br>naskenuj QR kód a měj vše po ruce.</p>' +
+          '</div>' +
+          '<div class="bk-foot"><p class="w">AI<span class="wm-4">4</span>Talents@FIT VUT</p><p class="u">' + esc('ai4talents.fit.vut.cz') + '</p></div>' +
+        '</section>';
+
+      /* ------------------------------------------------------------ sheets */
+      root.innerHTML =
+        '<div class="sheet"><div class="foldline"></div>' + back + front + '</div>' +
+        '<div class="sheet"><div class="foldline"></div>' + mapPanel + progPanel + '</div>';
+
+      /* ------------------------------------------- map panel: route overlay */
+      (function drawMap() {
+        var box = document.getElementById('lt-map');
+        if (!box) return;
+        var svg = P.miniMap({
+          floor: '1',
+          crop: { buildings: true, margin: 10 },
+          aspect: (box.clientWidth || 400) / (box.clientHeight || 500),
+          boxMm: (box.clientWidth || 400) * 25.4 / 96,
+          labelPx: 9
+        });
+        if (!svg) { box.textContent = 'Mapu se nepodařilo vykreslit.'; return; }
+        box.appendChild(svg);
+        if (!MP.legs) return;
+
+        var NS = 'http://www.w3.org/2000/svg';
+        var g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'pm-ov');
+        var el = function (name, attrs, txt) {
+          var e = document.createElementNS(NS, name);
+          for (var k in attrs) e.setAttribute(k, attrs[k]);
+          if (txt != null) e.textContent = txt;
+          g.appendChild(e);
+          return e;
+        };
+
+        var poly = function (pts, cls) {
+          if (!pts || pts.length < 2) return;
+          el('polyline', { class: cls,
+            points: pts.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ') });
+        };
+
+        // main legs: floor 1 solid, floor 2 dashed; hop marker at floor changes
+        MP.legs.forEach(function (leg, i) {
+          var cls = String(leg.floor) === '2' ? 'l2' : 'l1';
+          poly(leg.points, cls);
+          var next = MP.legs[i + 1];
+          if (leg.stairs && next) {
+            var at = next.points[0] || leg.points[leg.points.length - 1];
+            el('circle', { class: 'hop-c', cx: at[0], cy: at[1], r: 19 });
+            var up = Number(next.floor) > Number(leg.floor);
+            el('text', { class: 'hop-t', x: at[0], y: at[1] + 1 }, up ? '↑' : '↓');
           }
         });
-      }
-      var done = false;
-      function run() {
-        if (done) return;
-        done = true;
-        requestAnimationFrame(renderMaps);
-      }
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(run);
-        setTimeout(run, 900);
-      } else {
-        run();
-      }
+
+        // split stubs (~140 svg units along the branch) + labels
+        Object.keys(MP.splits || {}).forEach(function (k) {
+          var sp = MP.splits[k];
+          var first = sp.legs && sp.legs.find(function (l) { return l.points && l.points.length > 1; });
+          if (!first) return;
+          var acc = 0, pts = [first.points[0], first.points[1]]; // min. 2 pts
+          for (var i = 2; i < first.points.length && acc < 140; i++) {
+            acc += Math.hypot(first.points[i][0] - first.points[i-1][0], first.points[i][1] - first.points[i-1][1]);
+            pts.push(first.points[i]);
+          }
+          poly(pts, 'stub');
+          var end = pts[pts.length - 1];
+          el('text', { class: 'lab lab--split', x: Math.min(end[0] + 10, 640), y: end[1] - 12 },
+            k.toUpperCase() + ' ↓');
+        });
+
+        // numbered stops (svg units, mono digits); a room label is drawn only
+        // when the base map doesn't already label that room (event rooms do)
+        var eventRoomIds = {};
+        (DATA.events.events || []).forEach(function (ev) { eventRoomIds[ev.room] = 1; });
+        (MP.stops || []).forEach(function (s, i) {
+          if (String(s.floor) !== '2' && String(s.floor) !== '1') return;
+          el('circle', {
+            class: 'stop-c' + (s.kind === 'reg' ? ' reg' : s.kind === 'split' ? ' split' : ''),
+            cx: s.at[0], cy: s.at[1], r: s.kind === 'split' ? 14 : 12
+          });
+          el('text', { class: 'stop-t', x: s.at[0], y: s.at[1] + 1 }, String(i + 1));
+          if (s.room && !eventRoomIds[s.room]) {
+            el('text', { class: 'lab', x: s.at[0] + 16, y: s.at[1] + 22 },
+              s.room + (String(s.floor) === '2' ? ' · 2.p' : ' · 1.p'));
+          }
+        });
+
+        svg.appendChild(g);
+        // never clip the overlay: grow the viewBox to cover stops + stubs
+        // (getBBox needs the group rendered, hence append first)
+        var bb = g.getBBox();
+        var vb = (svg.getAttribute('viewBox') || '0 0 720 1000').split(/\s+/).map(Number);
+        var pad = 26;
+        var nx = Math.max(0, Math.min(vb[0], bb.x - pad));
+        var ny = Math.max(0, Math.min(vb[1], bb.y - pad));
+        var nx1 = Math.min(720, Math.max(vb[0] + vb[2], bb.x + bb.width + pad));
+        var ny1 = Math.min(1000, Math.max(vb[1] + vb[3], bb.y + bb.height + pad));
+        svg.setAttribute('viewBox', nx + ' ' + ny + ' ' + (nx1 - nx) + ' ' + (ny1 - ny));
+
+        // dynamic floor emphasis (screen only; print shows both)
+        var ovl = g;
+        document.querySelectorAll('.floor-toggle button').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            document.querySelectorAll('.floor-toggle button').forEach(function (b) { b.classList.remove('is-on'); });
+            btn.classList.add('is-on');
+            ovl.classList.remove('show-1', 'show-2');
+            var fl = btn.getAttribute('data-fl');
+            if (fl === '1') ovl.classList.add('show-1');
+            if (fl === '2') ovl.classList.add('show-2');
+          });
+        });
+      })();
     });
   </script>
 </body>
