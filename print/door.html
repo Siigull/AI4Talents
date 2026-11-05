@@ -131,6 +131,21 @@
     }
     .door-qr .qr-cap { max-width: 31mm; margin-bottom: 1.6mm; }
 
+    /* day-programme chips — fills the strip below the 15:00 line */
+    .door-chips { flex: none; padding: 2mm 12mm 0; }
+    .door-chips-label {
+      font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+      margin-bottom: 1.5mm;
+    }
+    .door-chip-row { display: flex; flex-wrap: wrap; gap: 1.6mm; }
+    .door-chip {
+      font-family: var(--font-mono); font-size: 7pt; line-height: 1;
+      background: var(--paper); border: 1px solid var(--ink); border-radius: 3px;
+      padding: 1.6mm 2.2mm; white-space: nowrap;
+    }
+    .door-chip b { color: var(--blue); font-weight: 500; }
+
     .pfooter { padding: 1.8mm 12mm 2.6mm; }
     .pfooter:first-letter { letter-spacing: 0; }
 
@@ -264,10 +279,37 @@
         '<div class="door-qr">' + P.qrBlock(30, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
       '</div></main>';
 
+      h += '<section class="door-chips" aria-label="Program dne">' +
+        '<p class="door-chips-label">Program — pátek ' + P.esc(P.fmtDate(meta.date)) + '</p>' +
+        '<div class="door-chip-row" id="chips"></div>' +
+      '</section>';
+
       h += P.footerStrip();
 
       root.innerHTML = h;
       document.title = 'AI4Talents — dveře ' + room.id;
+
+      // short day-overview chips (same device as the stand posters)
+      var SHORT_TITLE = {
+        'registrace': 'Registrace',
+        'nabidka-stanky': 'Stánky firem',
+        'prohlidky-1': 'Prohlídky fakulty',
+        'prohlidky-2': 'Prohlídky fakulty',
+        'kachna-obed-1': 'Oběd — Kachna',
+        'kachna-obed-2': 'Druhý oběd — Kachna'
+      };
+      function chipWho(ev) {
+        if (ev.partner) return ev.partner;
+        if (ev.speaker) {
+          var words = String(ev.speaker).replace(/[„"«»]/g, ' ').trim().split(/\s+/);
+          return words[words.length - 1];
+        }
+        return SHORT_TITLE[ev.id] || ev.title;
+      }
+      document.getElementById('chips').innerHTML = P.allEvents().map(function (ev) {
+        return '<span class="door-chip"><b>' + P.esc(ev.start) + '</b> · ' +
+          P.esc(chipWho(ev)) + ' — ' + P.esc(ev.room) + '</span>';
+      }).join('');
 
       // ---- layout pass (needs real font metrics) ---------------------------
       // 1. Rail numbers sized dynamically to the hour-band height.

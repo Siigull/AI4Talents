@@ -497,10 +497,20 @@
   var GRID_DAY_START = 8 * 60 + 30;   // 8:30
   var GRID_DAY_END = 16 * 60;         // 16:00
   var GRID_SPAN = GRID_DAY_END - GRID_DAY_START;
-  var GRID_GROUPS = [
-    { label: '1. patro', rooms: ['E112', 'E105', 'E104', 'E103', 'C106', 'N105'] },
-    { label: '2. patro', rooms: ['A218', 'C228', 'R212'] },
-  ];
+  // grid room rows are DERIVED from the events — rooms without events never
+  // appear (the hardcoded list went stale when rooms moved: C106→C107 etc.)
+  var GRID_GROUPS = (function () {
+    var byFloor = {}, order = [];
+    allEvents().forEach(function (ev) {
+      var f = String(ev.floor);
+      if (!byFloor[f]) { byFloor[f] = []; order.push(f); }
+      if (byFloor[f].indexOf(ev.room) < 0) byFloor[f].push(ev.room);
+    });
+    var want = ['-2', '1', '2'].filter(function (f) { return byFloor[f]; });
+    order.forEach(function (f) { if (want.indexOf(f) < 0) want.push(f); });
+    var LABELS = { '-2': '-2. podlaží', '1': '1. patro', '2': '2. patro' };
+    return want.map(function (f) { return { label: LABELS[f] || f, rooms: byFloor[f] }; });
+  })();
   var GRID_TYPE_COLOR = {
     lecture: '#1761cc', workshop: '#c21f9f', zone: '#6f6b64', milestone: '#14120f',
   };
@@ -563,10 +573,12 @@
       var style = 'left:' + left + '%;width:calc(' + width + '% - 1.5mm);top:' +
         lane.top.toFixed(1) + 'mm;height:' + lane.h.toFixed(1) + 'mm;--evt-color:' + color;
       var who = ev.speaker || ev.partner || '';
+      // A3 wall poster: concise display titles (full titles live on doors)
+      var title = (opts.shortTitle && opts.shortTitle[ev.id]) || ev.title;
       var short = (item.endMin - item.startMin) <= 45;
       return '<div class="' + cls + '" style="' + style + '">' +
         '<span class="pg-time">' + esc(ev.start) + (short ? '' : '–' + esc(ev.end)) + '</span>' +
-        '<span class="pg-title">' + esc(ev.title) + '</span>' +
+        '<span class="pg-title">' + esc(title) + '</span>' +
         (who ? '<span class="pg-who">' + esc(who) + '</span>' : '') +
         '</div>';
     }
@@ -578,7 +590,12 @@
       var hcls = hr === 16 ? 'pg-hour is-edge-right' : 'pg-hour';
       h += '<span class="' + hcls + '" style="left:' + gridPct(hr * 60).toFixed(3) + '%">' + hr + ':00</span>';
     }
-    h += '</div></div><div class="pg-body"><div class="pg-lines">';
+    h += '</div></div>' +
+      '<div class="pg-legend">' +
+        '<span><i style="background:#1761cc"></i>přednáška</span>' +
+        '<span><i style="background:#c21f9f"></i>workshop</span>' +
+        '<span><i style="background:#14120f"></i>průběžně / registrace</span>' +
+      '</div><div class="pg-body"><div class="pg-lines">';
     for (var hl = 9; hl <= 16; hl++) {
       h += '<div class="pg-vline" style="left:' + gridPct(hl * 60).toFixed(3) + '%"></div>';
     }
