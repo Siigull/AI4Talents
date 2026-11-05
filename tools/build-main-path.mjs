@@ -78,14 +78,15 @@ const stops = [
   { id: 'c107', room: 'C107', label: 'C107 · REGISTRACE', kind: 'reg' },
   { id: 'c106', room: 'C106', label: 'C106', kind: 'way' },
   { id: 'c228', room: 'C228', label: 'C228 · workshopy', kind: 'way' },
-  { id: 'd106', room: 'D106', label: 'D106 · rozcestí', kind: 'split', split: 'd0207' },
+  { id: 'd106', room: 'D106', label: 'D106 · rozcestí', kind: 'split', split: 'd0207',
+    floor: '2', at: [614, 373] }, // pinned: the split is at the F2 stairwell
   { id: 'a218', room: 'A218', label: 'A218 · 2. patro A', kind: 'way' },
   { id: 'nsplit', at: [+splitPt[0].toFixed(1), +splitPt[1].toFixed(1)], floor: '2', label: 'rozcestí · most', kind: 'split', split: 'n105' },
   { id: 'kachna', room: 'R212', label: 'R212 · Kachna', kind: 'end' },
 ];
 // position each room stop at its door anchor (svg coords)
 for (const s of stops) {
-  if (s.room) {
+  if (s.room && !s.at) {
     let floor = null;
     for (const f of Object.keys(D.map)) {
       if (D.map[f].rooms.some((r) => r.id === s.room)) { floor = f; break; }

@@ -229,6 +229,12 @@ main {
   display: none;
 }
 
+/* the browser's native #hash scroll must not tuck the section under the
+   sticky topbar (it hid the map's floor switcher) */
+.view {
+  scroll-margin-top: calc(var(--topbar-h) + 8px);
+}
+
 /* Segmented control (grid/sequential toggle) */
 .seg {
   display: inline-flex;

@@ -53,11 +53,11 @@
    "label": "D106 · rozcestí",
    "kind": "split",
    "split": "d0207",
+   "floor": "2",
    "at": [
-    634,
-    366
-   ],
-   "floor": "1"
+    614,
+    373
+   ]
   },
   {
    "id": "a218",
@@ -435,8 +435,8 @@
    "label": "D0207 · workshop RedHat",
    "hint": "-2. podlaží, sjezd schodištěm D",
    "at": [
-    634,
-    366
+    614,
+    373
    ],
    "legs": [
     {

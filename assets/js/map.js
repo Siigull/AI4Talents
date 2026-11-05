@@ -227,6 +227,12 @@
 #map-root .map-floorbtn:last-child{border-right:0;}
 #map-root .map-floorbtn:hover{background:#e8eaea;}
 #map-root .map-floorbtn[aria-pressed="true"]{background:#1761cc;color:#fff;}
+@media (max-width: 520px) {
+  #map-root .map-floorbtn { min-height: 34px; padding: 8px 10px; font-size: 12px; }
+  #map-root .map-floor-caption { display: none; }
+  #map-root .map-floorbar { gap: 6px; padding: 6px 8px; }
+  #map-root .map-outlier-chip { font-size: 11px; padding: 6px 8px; }
+}
 #map-root .map-viewport{position:relative;width:100%;aspect-ratio:720/1000;max-height:78vh;overflow:hidden;background:#fff;touch-action:none;cursor:grab;outline:none;user-select:none;-webkit-user-select:none;}
 #map-root .map-viewport:active{cursor:grabbing;}
 #map-root svg{width:100%;height:100%;display:block;}
@@ -413,7 +419,8 @@
     const poly = (pts, cls) => {
       if (pts.length < 2) return;
       const d = pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
-      layer.insertAdjacentHTML('beforeend', '<polyline class="' + cls + '" points="' + d + '"/>');
+      layer.insertAdjacentHTML('beforeend',
+        '<polyline class="' + cls + '" points="' + d + '" vector-effect="non-scaling-stroke"/>');
     };
     const chevrons = (pts) => {
       // direction chevrons every ~170 svg units along the path
@@ -453,8 +460,9 @@
       }
       poly(pts, 'mp-split');
       const end = pts[pts.length - 1];
+      const lx = Math.min(end[0] + 16, VB_W - 40), ly = Math.max(end[1] - 14, 14);
       layer.insertAdjacentHTML('beforeend', '<text class="mp-splabel" x="' +
-        (end[0] + 6).toFixed(1) + '" y="' + (end[1] - 6).toFixed(1) + '">' + key.toUpperCase() + '</text>');
+        lx.toFixed(1) + '" y="' + ly.toFixed(1) + '">' + key.toUpperCase() + '</text>');
     }
     // numbered stops on this floor
     let n = 0;
@@ -462,10 +470,14 @@
       n++;
       if (String(s.floor) !== f) continue;
       const split = s.kind === 'split';
+      const evRoom = (S.eventRoomsByFloor[f] || []).indexOf(s.room) >= 0;
       layer.insertAdjacentHTML('beforeend',
         '<g class="mp-stop' + (split ? ' mp-stop--split' : '') + '">' +
         '<circle cx="' + s.at[0] + '" cy="' + s.at[1] + '" r="' + (split ? 10 : 8) + '"/>' +
-        '<text class="mp-num" x="' + s.at[0] + '" y="' + s.at[1] + '">' + n + '</text></g>');
+        '<text class="mp-num" x="' + s.at[0] + '" y="' + s.at[1] + '">' + n + '</text></g>' +
+        (s.room && !evRoom
+          ? '<text class="mp-splabel" style="fill:var(--blue)" x="' + (s.at[0] + 13) + '" y="' + (s.at[1] + 4) + '">' + s.room + '</text>'
+          : ''));
     }
   }
 
@@ -512,6 +524,7 @@
     S.labelK = eff;
     const px = Math.max(2, LABEL_PX / eff);
     S.world.querySelectorAll('.ev-label').forEach((el) => { el.style.fontSize = px + 'px'; });
+    S.world.querySelectorAll('.mp-num').forEach((el) => { el.style.fontSize = Math.max(2, px * 0.85) + 'px'; });
   }
 
   // Client (page) coords -> viewBox coords, honouring preserveAspectRatio meet.
@@ -623,6 +636,31 @@
     const fit = clusterBBoxFor(S.floor);
     S.vb = fit ? fit.vb : { x: 0, y: 0, w: VB_W, h: VB_H };
     S.outliers = fit ? fit.outlierIds : [];
+    // the hlavní trasa is the map's spine — the crop must contain it whole
+    const MP = window.AI4T_DATA && window.AI4T_DATA.mainPath;
+    if (MP) {
+      const f = String(S.floor);
+      let x0 = S.vb.x, y0 = S.vb.y, x1 = S.vb.x + S.vb.w, y1 = S.vb.y + S.vb.h;
+      const grow = (px, py) => { x0 = Math.min(x0, px); y0 = Math.min(y0, py); x1 = Math.max(x1, px); y1 = Math.max(y1, py); };
+      (MP.legs || []).forEach((l) => {
+        if (String(l.floor) !== f) return;
+        l.points.forEach((p) => grow(p[0], p[1]));
+      });
+      (MP.stops || []).forEach((s) => { if (String(s.floor) === f) grow(s.at[0], s.at[1]); });
+      Object.keys(MP.splits || {}).forEach((k) => {
+        const sp = MP.splits[k];
+        (sp.legs || []).forEach((l) => {
+          if (String(l.floor) !== f) return;
+          l.points.slice(0, 8).forEach((p) => grow(p[0], p[1]));
+        });
+      });
+      const mw = (x1 - x0) * 0.06, mh = (y1 - y0) * 0.06;
+      S.vb = {
+        x: Math.max(0, x0 - mw), y: Math.max(0, y0 - mh),
+        w: Math.min(VB_W, x1 + mw) - Math.max(0, x0 - mw),
+        h: Math.min(VB_H, y1 + mh) - Math.max(0, y0 - mh),
+      };
+    }
     S.svg.setAttribute('viewBox', `${S.vb.x} ${S.vb.y} ${S.vb.w} ${S.vb.h}`);
     const vp = S.root.querySelector('.map-viewport');
     if (vp) vp.style.aspectRatio = String(Math.round(S.vb.w) + ' / ' + Math.round(S.vb.h));
