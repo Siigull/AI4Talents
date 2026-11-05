@@ -19,7 +19,7 @@ const BASE = 'http://localhost:8765';
 const OUT = 'pdf';
 
 // Event rooms per floor (kept in sync with data/events.json).
-const DOOR_ROOMS = ['C106', 'E103', 'E112', 'E105', 'E104', 'A104', 'A218', 'C228', 'N105', 'R212'];
+const DOOR_ROOMS = ['C106', 'E103', 'E112', 'E105', 'E104', 'A104', 'D0207', 'C228', 'N105', 'R212'];
 const STAND_ROOMS = ['A101', 'C106', 'E103', 'C228', 'N105', 'R212'];
 
 const PAGES = [

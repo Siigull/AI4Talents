@@ -293,7 +293,12 @@
   // ------------------------------------------------------------------ DOM ---
 
   function buildDOM() {
-    const floorBtns = UI_FLOORS.map((f) =>
+    // base 1+2; floors hosting events (e.g. a basement room) join the bar
+    const extra = Object.keys(S.eventRoomsByFloor)
+      .filter((f) => UI_FLOORS.indexOf(f) < 0)
+      .sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
+    const floors = UI_FLOORS.slice().concat(extra);
+    const floorBtns = floors.map((f) =>
       `<button type="button" class="map-floorbtn" data-floor="${f}" aria-pressed="${f === S.floor}">${esc(FLOOR_CAPTION[f] || f)}</button>`).join('');
     S.root.innerHTML = `
       <div class="map-floorbar">

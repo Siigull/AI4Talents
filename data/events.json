@@ -77,8 +77,8 @@
       "end": "13:30",
       "title": "AI: Pravděpodobnostní budoucnost",
       "partner": "RedHat",
-      "room": "A218",
-      "floor": "2",
+      "room": "D0207",
+      "floor": "-2",
       "bring": "Vlastní notebook, tablet nebo mobil.",
       "desc": "Proč se AI zásadně liší od tradičního softwaru a jak si vytvořit správnou představu o jejím fungování. Zaměříme se také na ekonomické a etické otázky spojené se soukromím. Zjistíte, proč to, co zadáte do cloudového AI nástroje, nemusí být nikdy skutečně smazáno – a proč vám schopnost provozovat lokální open-source modely dává mnohem větší kontrolu nad vlastními daty.",
       "icon": "brain"

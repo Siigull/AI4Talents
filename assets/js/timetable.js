@@ -55,7 +55,8 @@
   // Grid rows: floor 1 rooms first, then floor 2 (spec order).
   const ROOM_GROUPS = [
     { floor: '1', label: '1. patro', rooms: ['E112', 'E105', 'E104', 'E103', 'C106', 'A104', 'N105'] },
-    { floor: '2', label: '2. patro', rooms: ['A218', 'C228', 'R212'] },
+    { floor: '2', label: '2. patro', rooms: ['C228', 'R212'] },
+    { floor: '-2', label: '-2. podlaží', rooms: ['D0207'] },
   ];
 
   const LANE_H = 58;      // normal event lane height (px) — keep in sync with --lane-h in main.css
