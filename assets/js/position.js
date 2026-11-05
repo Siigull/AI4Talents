@@ -25,7 +25,7 @@
   // Named POIs usable in #at= QR links (id → room).
   var NAMED_POIS = [
     { id: 'vstup', label: 'Vstup — hlavní vchod (A101)', room: 'A101' },
-    { id: 'registrace', label: 'Registrace — C106', room: 'C106' },
+    { id: 'registrace', label: 'Registrace — C107', room: 'C107' },
     { id: 'stanky', label: 'Stánky firem — E103', room: 'E103' },
     { id: 'kachna', label: 'Kachna — R212', room: 'R212' }
   ];

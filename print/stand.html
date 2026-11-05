@@ -128,6 +128,23 @@
       border-bottom: 2px solid var(--ink); padding-bottom: 1mm;
     }
 
+    /* ---- hlavní trasa: this stand's place on the designed route ---- */
+    .mp-box {
+      border: 2px solid var(--blue); border-radius: 2.5mm;
+      padding: 2mm 2.2mm 1.6mm; margin-bottom: 3mm;
+      background: var(--paper);
+    }
+    .mp-title {
+      font-family: var(--font-mono); font-size: 7pt; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--blue);
+      border-bottom: 1.5px solid var(--blue); padding-bottom: 1mm; margin-bottom: 1.2mm;
+    }
+    .mp-row { display: flex; gap: 2mm; align-items: baseline; font-size: 8pt; line-height: 1.4; margin-top: 0.7mm; }
+    .mp-arrow { flex: none; font-family: var(--font-mono); font-weight: 700; color: var(--blue); }
+    .mp-row--split .mp-arrow { color: var(--magenta-deep); }
+    .mp-row--split { color: var(--magenta-deep); }
+    .mp-sub { font-family: var(--font-mono); font-size: 6.5pt; color: var(--ink-soft); }
+
     /* ---- signboard: tourist-trail fingers — one line per DIRECTION ---- */
     .sg-line {
       display: flex; align-items: flex-start; gap: 2.5mm;
@@ -257,6 +274,7 @@
           '</div>' +
 
           '<aside class="st-rail">' +
+            '<div id="mainpath"></div>' +
             '<div>' +
               '<p class="rc-kicker">Kudy kam — následuj šipky</p>' +
               '<div id="signs"></div>' +
@@ -417,7 +435,31 @@
       // sign takes over. Rooms this sign is CLOSEST to get a full approach
       // path on the map + a detail card with their programme.
 
-      var STANDS = ['A101', 'C106', 'E103', 'C228', 'N105', 'R212'];
+      var STANDS = ['A101', 'E103', 'C107', 'C106', 'C228', 'D106', 'A218', 'N105', 'R212'];
+
+      // ---- hlavní trasa (designed route, both directions) ----
+      (function renderMainPath() {
+        var MP = (window.AI4T_DATA && window.AI4T_DATA.mainPath) || null;
+        var el = document.getElementById('mainpath');
+        if (!MP || !MP.stops || !el) return;
+        var idx = -1;
+        for (var i = 0; i < MP.stops.length; i++) if (MP.stops[i].room === at) { idx = i; break; }
+        if (idx < 0) return;
+        var stops = MP.stops;
+        var next = stops[idx + 1], prev = stops[idx - 1];
+        var h = '<div class="mp-box"><p class="mp-title">Hlavní trasa — E103 ↔ Kachna</p>';
+        if (next) h += '<div class="mp-row"><span class="mp-arrow">→</span><span><b>' +
+          esc(next.label) + '</b><br><span class="mp-sub">dál po trase</span></span></div>';
+        if (prev) h += '<div class="mp-row"><span class="mp-arrow">←</span><span><b>' +
+          esc(prev.label) + '</b><br><span class="mp-sub">zpět po trase</span></span></div>';
+        var sp = stops[idx].split && MP.splits[stops[idx].split];
+        if (sp) {
+          h += '<div class="mp-row mp-row--split"><span class="mp-arrow">↳</span><span><b>' +
+            esc(sp.label) + '</b><br><span class="mp-sub">' + esc(sp.hint) + '</span></span></div>';
+        }
+        h += '</div>';
+        el.innerHTML = h;
+      })();
       var DEST = []; // all event rooms worth pointing at
       (DATA.events.events || []).forEach(function (ev) {
         if (ev.room && DEST.indexOf(ev.room) < 0) DEST.push(ev.room);

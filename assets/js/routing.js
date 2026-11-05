@@ -191,6 +191,113 @@
     return graph;
   }
 
+  // ---------------------------------------------------- hub graph (v3) ---
+  // The island-level BFS could not see intra-floor distances, so multi-floor
+  // routes always descended via the FIRST-INSERTED link (e.g. everything to
+  // the basement funnelled through the far-away A213 elevator instead of the
+  // D-wing stairs next door). The hub graph fixes that: nodes are link
+  // endpoint cells, edge weights are REAL walk distances (single-source
+  // distance fields, cached per hub), link hops cost HOP_COST. Dijkstra then
+  // picks the nearest stairwell naturally.
+
+  const HOP_COST = 30; // one stairwell/elevator flight, in grid units
+
+  function buildHubs() {
+    const hubs = []; // {id, floor, isle, cell, partner (index), link}
+    const byCell = new Map(); // 'floor:cellIdx' -> hub index (shared cells merge)
+    R.links.forEach((link) => {
+      const mk = (end, other, link) => {
+        const key = end.floor + ':' + (end.gy * W + end.gx);
+        let i = byCell.get(key);
+        if (i == null) {
+          i = hubs.length;
+          byCell.set(key, i);
+          hubs.push({
+            id: key, floor: end.floor, roomId: end.roomId, kind: link.kind,
+            isle: islandIndexOf(end.floor, [end.gx, end.gy]),
+            cell: [end.gx, end.gy], partner: -1, link: link,
+          });
+        }
+        return i;
+      };
+      const ia = mk(link.a, link.b, link);
+      const ib = mk(link.b, link.a, link);
+      if (ia !== ib) {
+        if (hubs[ia].partner < 0) hubs[ia].partner = ib;
+        if (hubs[ib].partner < 0) hubs[ib].partner = ia;
+      }
+    });
+    // same-island buckets for fast neighbour enumeration
+    const byIsle = new Map(); // 'floor:isle' -> [hubIndex]
+    hubs.forEach((h, i) => {
+      if (h.isle < 0) return;
+      const k = h.floor + ':' + h.isle;
+      if (!byIsle.has(k)) byIsle.set(k, []);
+      byIsle.get(k).push(i);
+    });
+    return { hubs, byIsle };
+  }
+
+  const fieldCache = new Map(); // hubId -> Float64Array distances (island-wide)
+
+  // single-source distance field over the whole floor grid (binary-heap Dijkstra)
+  function distField(floor, cell) {
+    const key = floor + ':' + (cell[1] * W + cell[0]);
+    if (fieldCache.has(key)) return fieldCache.get(key);
+    const grid = gridFor(floor);
+    const dist = new Float64Array(W * H).fill(Infinity);
+    const sx = cell[0], sy = cell[1];
+    if (!grid[sy * W + sx]) { fieldCache.set(key, dist); return dist; }
+    dist[sy * W + sx] = 0;
+    // binary heap of [dist, index]
+    const heap = [[0, sy * W + sx]];
+    const push = (d, i) => {
+      heap.push([d, i]);
+      let c = heap.length - 1;
+      while (c > 0) {
+        const p = (c - 1) >> 1;
+        if (heap[p][0] <= heap[c][0]) break;
+        [heap[p], heap[c]] = [heap[c], heap[p]];
+        c = p;
+      }
+    };
+    const pop = () => {
+      const top = heap[0];
+      const last = heap.pop();
+      if (heap.length) {
+        heap[0] = last;
+        let c = 0;
+        for (;;) {
+          const l = c * 2 + 1, r = l + 1;
+          let m = c;
+          if (l < heap.length && heap[l][0] < heap[m][0]) m = l;
+          if (r < heap.length && heap[r][0] < heap[m][0]) m = r;
+          if (m === c) break;
+          [heap[m], heap[c]] = [heap[c], heap[m]];
+          c = m;
+        }
+      }
+      return top;
+    };
+    const visited = new Uint8Array(W * H);
+    while (heap.length) {
+      const [d, u] = pop();
+      if (visited[u]) continue;
+      visited[u] = 1;
+      const ux = u % W, uy = (u / W) | 0;
+      for (let k = 0; k < 4; k++) {
+        const nx = ux + [1, -1, 0, 0][k], ny = uy + [0, 0, 1, -1][k];
+        if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+        const v = ny * W + nx;
+        if (!grid[v] || visited[v]) continue;
+        const nd = d + 1;
+        if (nd < dist[v]) { dist[v] = nd; push(nd, v); }
+      }
+    }
+    fieldCache.set(key, dist);
+    return dist;
+  }
+
   // ------------------------------------------------------------------- A* ---
 
   // A* over one floor grid. Returns array of cell indices start->target, or null.
@@ -477,44 +584,93 @@
     let cur = { floor: A.floor, cell: A.cell.slice() };
 
     if (!(A.floor === B.floor && isA === isB)) {
-      // BFS across the island graph from start island to destination island.
-      const g = adjacency();
-      const startNode = A.floor + ':' + isA;
-      const endNode = B.floor + ':' + isB;
-      const prevMap = new Map([[startNode, null]]);
-      const queue = [startNode];
+      // Hub Dijkstra over link endpoints with REAL walk distances — picks
+      // the nearest stairwell, not the first-inserted link (v3 fix).
+      const { hubs, byIsle } = buildHubs();
+      const END = 'end';
+      const dist = new Map();   // node key -> cost
+      const prev = new Map();   // node key -> { node, viaHop(hubIdx|-1) }
+      const keyOf = (floor, cell) => floor + ':' + (cell[1] * W + cell[0]);
+      const startKey = 'start';
+      dist.set(startKey, 0);
+      const startField = distField(A.floor, A.cell);
+
+      const relax = (key, cost, fromKey, viaHop) => {
+        if (!dist.has(key) || cost < dist.get(key)) {
+          dist.set(key, cost);
+          prev.set(key, { node: fromKey, viaHop: viaHop });
+        }
+      };
+
       let found = false;
-      for (let head = 0; head < queue.length && !found; head++) {
-        const u = queue[head];
-        for (const edge of (g.get(u) || [])) {
-          if (prevMap.has(edge.node)) continue;
-          prevMap.set(edge.node, { from: u, link: edge.link });
-          if (edge.node === endNode) { found = true; break; }
-          queue.push(edge.node);
+      const settled = new Set();
+      while (true) {
+        // pop the unsettled node with the smallest cost (node count is tiny)
+        let uk = null, ud = Infinity;
+        for (const [k, d] of dist) {
+          if (!settled.has(k) && d < ud) { ud = d; uk = k; }
+        }
+        if (uk == null) break;
+        settled.add(uk);
+        if (uk === END) { found = true; break; }
+
+        let uFloor, uCell, uIsle, uField;
+        if (uk === startKey) {
+          uFloor = A.floor; uCell = A.cell; uIsle = isA; uField = startField;
+        } else {
+          const h = hubs[+uk];
+          if (!h || h.isle < 0) continue;
+          uFloor = h.floor; uCell = h.cell; uIsle = h.isle;
+          uField = distField(uFloor, uCell);
+        }
+        // a) the link hop (only from a hub)
+        if (uk !== startKey) {
+          const h = hubs[+uk];
+          if (h.partner >= 0) {
+            relax(String(h.partner), ud + HOP_COST, uk, +uk);
+          }
+        }
+        // b) same-island moves: to every hub on this island, and to the target
+        const bucket = byIsle.get(uFloor + ':' + uIsle) || [];
+        for (const hi of bucket) {
+          const h = hubs[hi];
+          const c = uField[h.cell[1] * W + h.cell[0]];
+          if (c < Infinity && String(hi) !== uk) relax(String(hi), ud + c, uk, -1);
+        }
+        if (uFloor === B.floor && uIsle === isB) {
+          const c = uField[B.cell[1] * W + B.cell[0]];
+          if (c < Infinity) relax(END, ud + c, uk, -1);
         }
       }
       if (!found) return null;
 
-      // Reconstruct the island hops, then A* one floor leg per hop.
-      const hops = [];
-      for (let n = endNode; n !== startNode;) {
-        const p = prevMap.get(n);
-        hops.push({ node: n, link: p.link });
-        n = p.from;
+      // Reconstruct the node chain end -> start, then materialise legs.
+      const chain = []; // [{toKey, viaHop}]
+      for (let k = END; k !== startKey;) {
+        const p = prev.get(k);
+        if (!p) return null;
+        chain.push({ toKey: k, viaHop: p.viaHop });
+        k = p.node;
       }
-      hops.reverse();
-      for (const hop of hops) {
-        const link = hop.link;
-        const fromEnd = link.a.floor === cur.floor ? link.a : link.b;
-        const toStart = fromEnd === link.a ? link.b : link.a;
-        if (fromEnd.floor !== cur.floor) return null; // inconsistent island graph
-        const grid = gridFor(cur.floor);
-        const legOpts = withCost(routeOpts, grid);
-        const path = astar(grid, cur.cell[0], cur.cell[1], fromEnd.gx, fromEnd.gy, legOpts);
-        if (!path) return null;
-        total += path.length;
-        legs.push({ floor: cur.floor, cellPath: path, stairs: { roomId: fromEnd.roomId, kind: link.kind } });
-        cur = { floor: toStart.floor, cell: [toStart.gx, toStart.gy] };
+      chain.reverse();
+      for (const step of chain) {
+        if (step.viaHop >= 0) {
+          // link hop: walk to the hub cell, then change floors
+          const h = hubs[step.viaHop];
+          const grid = gridFor(cur.floor);
+          const legOpts = withCost(routeOpts, grid);
+          const path = astar(grid, cur.cell[0], cur.cell[1], h.cell[0], h.cell[1], legOpts);
+          if (!path) return null;
+          total += path.length;
+          legs.push({ floor: cur.floor, cellPath: path, stairs: { roomId: h.roomId, kind: h.kind } });
+          const ph = hubs[h.partner];
+          cur = { floor: ph.floor, cell: ph.cell.slice() };
+        } else {
+          // same-island move to a hub (or the final target)
+          const target = step.toKey === END ? { floor: B.floor, cell: B.cell } : hubs[+step.toKey];
+          if (target.floor === cur.floor) continue; // no-op guard
+          return null; // same-island steps never change floors
+        }
       }
     }
 

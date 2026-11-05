@@ -246,6 +246,19 @@
 /* Route + jump styles are kept for print/stand.html, which draws its own
    static routes into the (always empty in the app) .route-layer group. */
 #map-root .route-layer{pointer-events:none;}
+/* hlavní trasa — the designed main path with numbered stops */
+#map-root .mp-line{fill:none;stroke:var(--blue);stroke-width:3.5px;opacity:.85;
+  stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}
+#map-root .mp-chev{fill:var(--blue);pointer-events:none;}
+#map-root .mp-stop{fill:#fff;stroke:var(--blue);stroke-width:2.5px;pointer-events:none;}
+#map-root .mp-stop.mp-stop--split{stroke:var(--magenta-deep);}
+#map-root .mp-num{font:700 13px 'IBM Plex Mono',monospace;fill:var(--blue);
+  stroke:#fff;stroke-width:3px;paint-order:stroke;pointer-events:none;text-anchor:middle;dominant-baseline:central;}
+#map-root .mp-stop.mp-stop--split .mp-num{fill:var(--magenta-deep);}
+#map-root .mp-split{fill:none;stroke:var(--magenta-deep);stroke-width:2.5px;
+  stroke-dasharray:6 5;pointer-events:none;}
+#map-root .mp-splabel{font:500 12px 'IBM Plex Mono',monospace;fill:var(--magenta-deep);
+  stroke:#fff;stroke-width:3px;paint-order:stroke;pointer-events:none;}
 #map-root .route-halo{fill:none;stroke:#ff2fd6;stroke-width:6px;opacity:.4;stroke-linecap:round;stroke-linejoin:round;filter:url(#ai4t-blur);}
 #map-root .route-line{fill:none;stroke:#ff2fd6;stroke-width:2px;stroke-linecap:round;stroke-linejoin:round;}
 #map-root .route-dot{fill:#ff2fd6;pointer-events:none;}
@@ -371,6 +384,7 @@
     applyViewBox();
     applyTransform();
     paintEventRooms();
+    paintMainPath();
     drawPosition();
     updateFloorbar();
   }
@@ -383,6 +397,78 @@
 
   // Compose the full class of an event room group + label from live state
   // and selection. Cheap (a handful of rooms per floor).
+  // hlavní trasa: draw the designed main path + stops + split stubs on the
+  // current floor. Static geometry from AI4T_DATA.mainPath (build tool).
+  function paintMainPath() {
+    const layer = S.root && S.root.querySelector('.route-layer');
+    if (!layer) return;
+    layer.querySelectorAll('.mp-line,.mp-chev,.mp-stop,.mp-num,.mp-split,.mp-splabel')
+      .forEach((el) => el.remove());
+    const MP = window.AI4T_DATA && window.AI4T_DATA.mainPath;
+    if (!MP || !MP.legs) return;
+    const f = String(S.floor);
+    const geo = [];
+    const onFloor = (legs, filter) => legs.filter(filter).forEach((l) => geo.push(l));
+
+    const poly = (pts, cls) => {
+      if (pts.length < 2) return;
+      const d = pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+      layer.insertAdjacentHTML('beforeend', '<polyline class="' + cls + '" points="' + d + '"/>');
+    };
+    const chevrons = (pts) => {
+      // direction chevrons every ~170 svg units along the path
+      let acc = 0;
+      for (let i = 1; i < pts.length; i++) {
+        const d = Math.hypot(pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]);
+        acc += d;
+        if (acc >= 170) {
+          acc = 0;
+          const a = pts[i - 1], b = pts[i];
+          const ux = (b[0] - a[0]) / (d || 1), uy = (b[1] - a[1]) / (d || 1);
+          const vx = -uy, vy = ux, W = 9, Hw = 4.5;
+          const tip = b, L = [b[0] - ux * W + vx * Hw, b[1] - uy * W + vy * Hw],
+                R = [b[0] - ux * W - vx * Hw, b[1] - uy * W - vy * Hw];
+          layer.insertAdjacentHTML('beforeend', '<polygon class="mp-chev" points="' +
+            tip[0].toFixed(1) + ',' + tip[1].toFixed(1) + ' ' +
+            L[0].toFixed(1) + ',' + L[1].toFixed(1) + ' ' +
+            R[0].toFixed(1) + ',' + R[1].toFixed(1) + '"/>');
+        }
+      }
+    };
+
+    for (const l of MP.legs) {
+      if (String(l.floor) !== f) continue;
+      poly(l.points, 'mp-line');
+      chevrons(l.points);
+    }
+    // split stubs (from the split point along the branch, first ~140 units)
+    for (const key of Object.keys(MP.splits || {})) {
+      const sp = MP.splits[key];
+      const first = (sp.legs || []).find((l) => String(l.floor) === f);
+      if (!first) continue;
+      let acc = 0, pts = [first.points[0]];
+      for (let i = 1; i < first.points.length && acc < 140; i++) {
+        acc += Math.hypot(first.points[i][0] - first.points[i-1][0], first.points[i][1] - first.points[i-1][1]);
+        pts.push(first.points[i]);
+      }
+      poly(pts, 'mp-split');
+      const end = pts[pts.length - 1];
+      layer.insertAdjacentHTML('beforeend', '<text class="mp-splabel" x="' +
+        (end[0] + 6).toFixed(1) + '" y="' + (end[1] - 6).toFixed(1) + '">' + key.toUpperCase() + '</text>');
+    }
+    // numbered stops on this floor
+    let n = 0;
+    for (const s of MP.stops || []) {
+      n++;
+      if (String(s.floor) !== f) continue;
+      const split = s.kind === 'split';
+      layer.insertAdjacentHTML('beforeend',
+        '<g class="mp-stop' + (split ? ' mp-stop--split' : '') + '">' +
+        '<circle cx="' + s.at[0] + '" cy="' + s.at[1] + '" r="' + (split ? 10 : 8) + '"/>' +
+        '<text class="mp-num" x="' + s.at[0] + '" y="' + s.at[1] + '">' + n + '</text></g>');
+    }
+  }
+
   function paintEventRooms() {
     for (const id of S.eventRoomsByFloor[S.floor] || []) {
       const els = S.floorEls && S.floorEls[id];
@@ -402,6 +488,7 @@
   // Refresh live tints (called on ai4t:tick and on view show) + open card.
   function updateLiveStates() {
     paintEventRooms();
+    paintMainPath();
     if (S.cardRoom) {
       const card = S.root.querySelector('.map-info-card');
       if (card && !card.hidden) showInfoCard(S.cardRoom);
@@ -600,6 +687,7 @@
   function clearSelection() {
     S.selected = null;
     paintEventRooms();
+    paintMainPath();
   }
 
   // ------------------------------------------------------- room detail card --

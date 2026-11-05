@@ -19,7 +19,7 @@
       "start": "8:30",
       "end": "9:00",
       "title": "Registrace",
-      "room": "C106",
+      "room": "C107",
       "floor": "1",
       "desc": "Přivítáme tě, rozdáme program a připínáček. Vstup do fakulty se řídí značkami AI4Talents.",
       "icon": "ticket"
@@ -129,7 +129,7 @@
       "title": "Prohlídka fakulty – 1. kolo",
       "room": "A104",
       "floor": "1",
-      "desc": "Prohlédni si fakultu s našimi studenty. Sraz v místnosti A104. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
+      "desc": "Prohlédni si fakultu s našimi studenty — součástí prohlídky je i muzeum fakulty. Sraz v místnosti A104. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
       "icon": "tour"
     },
     {
@@ -140,13 +140,13 @@
       "title": "Prohlídka fakulty – 2. kolo",
       "room": "A104",
       "floor": "1",
-      "desc": "Prohlédni si fakultu s našimi studenty. Sraz v místnosti A104. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
+      "desc": "Prohlédni si fakultu s našimi studenty — součástí prohlídky je i muzeum fakulty. Sraz v místnosti A104. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
       "icon": "tour"
     },
     {
       "id": "kachna-obed-1",
       "type": "zone",
-      "start": "11:00",
+      "start": "11:10",
       "end": "12:00",
       "title": "Přestávka na oběd",
       "room": "R212",
