@@ -17,7 +17,7 @@
 //   AI4TPrint.eventsForRoom(id)     events filtered to one room (sorted)
 //   AI4TPrint.eventRooms()           unique event rooms [{roomId, floor, room}]
 //   AI4TPrint.typeKick(ev)           CZ kicker: "PŘEDNÁŠKA" | "WORKSHOP" | ...
-//   AI4TPrint.qrBlock(sizeMm, cap)   QR placeholder square + caption (HTML string)
+//   AI4TPrint.qrBlock(sizeMm, cap)   real QR (assets/img/qr.svg) + caption
 //   AI4TPrint.footerStrip()          footer strip (HTML string)
 //   AI4TPrint.miniMap(opts)          static SVG mini-map — v2 style (below)
 //   AI4TPrint.programGrid(opts)      static room×time grid HTML (A3 poster)
@@ -164,17 +164,15 @@
 
   // ------------------------------------------------------ shared DOM bits ---
 
-  // QR placeholder: framed square + hairline diagonal cross + mono "QR".
-  // The real code gets pasted over the frame later by the print studio.
+  // QR: real code → https://siigull.github.io/AI4Talents/
+  // (assets/img/qr.svg, version 5-Q, 4-module quiet zone baked in;
+  // regenerate with: npx -y --package qrcode qrcode "<url>" -e Q -t svg -w 660)
   function qrBlock(sizeMm, caption) {
     var s = Number(sizeMm) || 30;
     var h =
       '<div class="qr-slot" style="width:' + s + 'mm;height:' + s + 'mm">' +
-        '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">' +
-          '<line class="qr-cross" x1="0" y1="0" x2="100" y2="100"/>' +
-          '<line class="qr-cross" x1="100" y1="0" x2="0" y2="100"/>' +
-        '</svg>' +
-        '<span class="qr-word">QR</span>' +
+        '<img class="qr-img" src="../assets/img/qr.svg" width="' + s + '" height="' + s + '"' +
+          ' alt="QR kód: program a mapa na siigull.github.io/AI4Talents"/>' +
       '</div>';
     if (caption) h += '<p class="qr-cap">' + esc(caption) + '</p>';
     return h;
