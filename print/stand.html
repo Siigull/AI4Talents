@@ -103,6 +103,10 @@
       stroke-dasharray: 7 5; stroke-linecap: round; stroke-linejoin: round;
       pointer-events: none;
     }
+    /* first leg (tourist sign): solid, bolder, with an arrowhead — the sign
+       only points the way OUT, the next sign takes over */
+    #poster #map-root .st-leg { stroke-width: 4.5px; stroke-dasharray: none; }
+    #poster #map-root .st-head { fill: var(--magenta); stroke: none; }
     /* destination ring at the end of a route (same floor only) */
     #poster #map-root .st-dest {
       fill: none; stroke: var(--magenta); stroke-width: 2.5px;
@@ -123,14 +127,36 @@
       letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
       border-bottom: 2px solid var(--ink); padding-bottom: 1mm;
     }
-    .rc-route { margin-bottom: 3mm; }
-    .rc-route:last-of-type { margin-bottom: 0; }
-    .rc-route-head {
-      font-family: var(--font-mono); font-size: 7.5pt; font-weight: 500;
-      color: var(--blue); margin-bottom: 0.8mm;
+
+    /* ---- signboard: tourist-trail fingers — one line per DIRECTION ---- */
+    .sg-line {
+      display: flex; align-items: flex-start; gap: 2.5mm;
+      padding: 1.6mm 0; border-bottom: 1px solid var(--hairline);
     }
-    .rc-route-head b { color: var(--ink); }
-    .rc-route-desc { font-size: 7.5pt; line-height: 1.45; color: var(--ink); }
+    .sg-line:last-child { border-bottom: 0; }
+    .sg-glyph {
+      flex: none; width: 9mm; height: 9mm; display: flex; align-items: center;
+      justify-content: center; font-size: 15pt; line-height: 1;
+      background: var(--yellow); border: 2px solid var(--ink);
+      border-radius: 2.5mm; font-family: var(--font-mono);
+    }
+    .sg-rooms { font-family: var(--font-mono); font-size: 10pt; font-weight: 700; line-height: 1.35; }
+    .sg-sub { font-family: var(--font-mono); font-size: 6.5pt; color: var(--ink-soft); margin-top: 0.6mm; line-height: 1.35; }
+
+    /* ---- nearby rooms: this sign is their final approach ---- */
+    .nb-card { padding: 2mm 0 1.6mm; border-bottom: 1px solid var(--hairline); }
+    .nb-card--here { background: var(--yellow); border: 2px solid var(--ink);
+      border-radius: 2.5mm; padding: 2mm 2.2mm 1.8mm; margin-bottom: 1.5mm; }
+    .nb-card:last-child { border-bottom: 0; }
+    .nb-room { font-family: var(--font-mono); font-size: 8pt; }
+    .nb-room b { font-size: 11pt; font-weight: 700; }
+    .nb-room .nb-rn { color: var(--ink-soft); }
+    .nb-evs { list-style: none; margin: 1.2mm 0 0; padding: 0; }
+    .nb-evs li {
+      display: flex; gap: 2mm; align-items: baseline;
+      font-size: 7.5pt; line-height: 1.35; margin-top: 0.7mm;
+    }
+    .nb-t { flex: none; font-family: var(--font-mono); font-weight: 500; color: var(--blue); }
 
     .st-qr { margin-top: auto; }
     .st-qr .qr-slot { width: 28mm; height: 28mm; }
@@ -232,8 +258,12 @@
 
           '<aside class="st-rail">' +
             '<div>' +
-              '<p class="rc-kicker">Jak se dostat</p>' +
-              '<div id="routes"></div>' +
+              '<p class="rc-kicker">Kudy kam — následuj šipky</p>' +
+              '<div id="signs"></div>' +
+            '</div>' +
+            '<div>' +
+              '<p class="rc-kicker">Blízko tohoto stojanu</p>' +
+              '<div id="nearby"></div>' +
             '</div>' +
             '<div class="st-qr">' + P.qrBlock(28, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
           '</aside>' +
@@ -311,9 +341,28 @@
               else y = Math.min(sb + 18, 988);
             }
           }
-          layer.insertAdjacentHTML('beforeend',
-            '<text class="st-yah-label" x="' + p[0] + '" y="' + y +
-            '" text-anchor="middle">Jste tady</text>');
+          var yah = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          yah.setAttribute('class', 'st-yah-label');
+          yah.setAttribute('text-anchor', 'middle');
+          yah.textContent = 'Jste tady';
+          layer.appendChild(yah);
+          // candidate anchors around the default spot — pick the first that
+          // clears every event-room code label (E104 sits right below E103)
+          var labels = Array.prototype.slice.call(
+            document.querySelectorAll('#map-world .ev-label'));
+          var cands = [y, y + 26, y - 26, y + 52, y - 52];
+          var chosen = cands[0];
+          for (var ci = 0; ci < cands.length; ci++) {
+            yah.setAttribute('x', p[0]); yah.setAttribute('y', cands[ci]);
+            var bb = yah.getBBox();
+            var hit = labels.some(function (lb) {
+              var b2 = lb.getBBox();
+              return bb.x < b2.x + b2.width && bb.x + bb.width > b2.x &&
+                     bb.y < b2.y + b2.height && bb.y + bb.height > b2.y;
+            });
+            if (!hit) { chosen = cands[ci]; break; }
+          }
+          yah.setAttribute('x', p[0]); yah.setAttribute('y', chosen);
         }
       }
 
@@ -362,87 +411,229 @@
         ' · žlutá = tento stojan' +
         (nEvRooms ? ' · modrá = místnosti s programem' : '');
 
-      // ------------------------------------------- corridor-centre routes --
+      // ---------------------------- tourist signs (v3) ----------------------
+      // The poster works like trail signage: every DIRECTION gets one line
+      // (one finger); the line only promises "leave this way" — the next
+      // sign takes over. Rooms this sign is CLOSEST to get a full approach
+      // path on the map + a detail card with their programme.
 
-      // Dashed magenta routes from THIS stand to C106 (registration) and
-      // E103 (hub/stands) — corridor CENTRES via AI4TRoute.corridorPath.
-      // A stand standing at its own target gets no route to it.
-      var TARGETS = [
-        { roomId: 'C106', head: '→ <b>C106</b> · registrace (8:30)' },
-        { roomId: 'E103', head: '→ <b>E103</b> · stánky firem a prohlídky' },
-      ];
+      var STANDS = ['A101', 'C106', 'E103', 'C228', 'N105', 'R212'];
+      var DEST = []; // all event rooms worth pointing at
+      (DATA.events.events || []).forEach(function (ev) {
+        if (ev.room && DEST.indexOf(ev.room) < 0) DEST.push(ev.room);
+      });
       var from = { roomId: at };
-      if (cell) { from.floor = floor; from.cell = cell; } // roomId kept for override keys
-      var routesEl = document.getElementById('routes');
-      var routeHtml = '';
-      var drawn = [];
+      if (cell) { from.floor = floor; from.cell = cell; }
 
-      TARGETS.forEach(function (t) {
-        if (t.roomId === at) {
-          routeHtml += '<div class="rc-route"><p class="rc-route-head">' + t.head + '</p>' +
-            '<p class="rc-route-desc">Tento stojan stojí přímo tady.</p></div>';
-          return;
+      // path cache (corridorPath honours route-overrides.json)
+      var PATHS = {};
+      function pathTo(roomId) {
+        if (!(roomId in PATHS)) {
+          PATHS[roomId] = (roomId === at) ? null :
+            (RT && RT.corridorPath ? RT.corridorPath(from, { roomId: roomId }) : null);
         }
-        var r = RT && typeof RT.corridorPath === 'function'
-          ? RT.corridorPath(from, { roomId: t.roomId })
-          : null;
-        if (r && r.legs && r.legs.length) {
-          drawn.push({ route: r, target: t.roomId });
-          routeHtml += '<div class="rc-route"><p class="rc-route-head">' + t.head + '</p>' +
-            '<p class="rc-route-desc">' + esc(RT.describe(r)) + '</p></div>';
+        return PATHS[roomId];
+      }
+
+      // walk out of the room, then down the corridor until the first turn:
+      // that stable heading is the direction this sign points.
+      function firstLeg(leg) {
+        var pts = leg.points;
+        if (!pts || pts.length < 2) return null;
+        var acc = 0, exitI = 0;
+        for (var i = 1; i < pts.length && exitI === 0; i++) {
+          acc += Math.hypot(pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]);
+          if (acc >= 40) exitI = i; // out of the door, into the corridor
+        }
+        if (!exitI) exitI = pts.length - 1;
+        var h = [pts[exitI][0] - pts[0][0], pts[exitI][1] - pts[0][1]];
+        var hl = Math.hypot(h[0], h[1]) || 1;
+        var endI = exitI;
+        for (var j = exitI + 1; j < pts.length; j++) {
+          var seg = [pts[j][0] - pts[j-1][0], pts[j][1] - pts[j-1][1]];
+          var sl = Math.hypot(seg[0], seg[1]) || 1;
+          var dot = (h[0] * seg[0] + h[1] * seg[1]) / (hl * sl);
+          if (dot < Math.cos(Math.PI / 5)) break; // a real turn — stop here
+          endI = j;
+          acc += sl;
+          if (acc >= 190) break; // don't promise the whole route
+        }
+        return { exitI: exitI, endI: endI, heading: [h[0] / hl, h[1] / hl], pts: pts };
+      }
+
+      // 8-way glyph from the heading (map coords, y down; the map orients)
+      function glyphOf(h) {
+        var a = Math.atan2(h[1], h[0]) * 180 / Math.PI; // 0 = east, cw
+        var G = ['\u2192', '\u2197', '\u2193', '\u2198', '\u2190', '\u2199', '\u2191', '\u2196'];
+        var k = Math.round(((a + 360) % 360) / 45) % 8;
+        return G[k];
+      }
+
+      // ---- build the signboard: group destinations by direction -----------
+      var groups = {}; // key -> { glyph, rooms: [], floors: Set, leg }
+      DEST.forEach(function (t) {
+        if (t === at) return;
+        var r = pathTo(t);
+        if (!r || !r.legs || !r.legs.length) return;
+        var leg = r.legs[0]; // first leg is on THIS floor, toward the target
+        // (or toward the stairs when the target is on another floor)
+        var fl = null, adjacent = false;
+        if (!leg.points || leg.points.length < 2) {
+          // degenerate route = the room is next door: geometric heading
+          // between the two centroids, no corridor line to draw
+          var ti = P.findRoom(t);
+          if (ti && ti.room.c && info.room.c) {
+            var dx = ti.room.c[0] - info.room.c[0], dy = ti.room.c[1] - info.room.c[1];
+            var dl = Math.hypot(dx, dy) || 1;
+            fl = { heading: [dx / dl, dy / dl], pts: [], endI: 0, adjacent: true };
+            adjacent = true;
+          }
         } else {
-          routeHtml += '<div class="rc-route"><p class="rc-route-head">' + t.head + '</p>' +
-            '<p class="rc-route-desc">Trasu se nepodařilo spočítat.</p></div>';
+          fl = firstLeg(leg);
         }
+        if (!fl) return;
+        var other = null;
+        var tFloor = P.findRoom(t);
+        tFloor = tFloor ? tFloor.floor : floor;
+        if (String(tFloor) !== String(floor)) other = tFloor;
+        var key = (adjacent ? 'adj' : (other === null ? 'same' : 'up' + other)) + '|' + fl.heading[0].toFixed(2) + ',' + fl.heading[1].toFixed(2);
+        var gk = adjacent ? '\u25c9' : glyphOf(fl.heading);
+        if (!groups[key]) groups[key] = { glyph: gk, rooms: [], other: other, leg: fl, adjacent: adjacent };
+        groups[key].rooms.push(t);
       });
-      routesEl.innerHTML = routeHtml;
 
-      drawn.forEach(function (d) {
-        var r = d.route;
-        var layer = document.querySelector('#map-world .route-layer');
-        if (!layer) return;
-        var parts = [];
-        var fragEnd = null, fragStart = null;
-        r.legs.forEach(function (leg) {
-          if (leg.floor !== floor) return; // only legs on the shown floor
-          if (leg.points.length > 1) {
-            var pts = leg.points.map(function (p) {
-              return p[0].toFixed(1) + ',' + p[1].toFixed(1);
-            }).join(' ');
-            parts.push('<polyline class="st-route" points="' + pts + '"/>');
-            if (!fragStart) fragStart = leg.points[0];
-            fragEnd = leg.points[leg.points.length - 1];
+      var signHtml = '';
+      Object.keys(groups).map(function (k) { return groups[k]; })
+        .sort(function (a, b) { return b.rooms.length - a.rooms.length; })
+        .forEach(function (g) {
+          var sub = '';
+          if (g.adjacent) {
+            sub = '<p class="sg-sub">hned vedle tohoto stojanu</p>';
+          } else if (g.other !== null) {
+            sub = '<p class="sg-sub">schodiště → ' + esc(P.floorLabel(g.other)) + '</p>';
+          } else {
+            sub = '<p class="sg-sub">dál tě dovedou další šipky</p>';
           }
+          signHtml +=
+            '<div class="sg-line">' +
+              '<span class="sg-glyph">' + g.glyph + '</span>' +
+              '<div><p class="sg-rooms">' + g.rooms.map(esc).join(' · ') + '</p>' + sub + '</div>' +
+            '</div>';
         });
-        // multi-floor route: mark the handover points (blue square + glyph)
-        // so the fragments on this floor read as ONE route
-        if (r.legs.length > 1) {
-          var glyph = function (txt, x, y) {
-            parts.push('<g class="st-hop"><rect x="' + (x - 11) + '" y="' + (y - 11) +
-              '" width="22" height="22" rx="4"/><text x="' + x + '" y="' + (y + 5) +
-              '" text-anchor="middle">' + txt + '</text></g>');
-          };
-          var nextFloor = null, prevFloor = null;
-          for (var li = 0; li < r.legs.length; li++) {
-            if (r.legs[li].floor === floor) {
-              if (li > 0) prevFloor = r.legs[li - 1].floor;
-              if (li < r.legs.length - 1) nextFloor = r.legs[li + 1].floor;
-            }
-          }
-          if (fragStart && prevFloor !== null)
-            glyph('\u2193', fragStart[0], fragStart[1]);
-          if (fragEnd && nextFloor !== null)
-            glyph('\u2191', fragEnd[0], fragEnd[1]);
-        }
-        // destination ring at the route end when it is on this floor
-        var last = r.legs[r.legs.length - 1];
-        if (last.floor === floor && last.points.length) {
-          var end = last.points[last.points.length - 1];
-          parts.push('<circle class="st-dest" cx="' + end[0].toFixed(1) +
-            '" cy="' + end[1].toFixed(1) + '" r="10"/>');
-        }
-        layer.insertAdjacentHTML('beforeend', parts.join(''));
+      if (!signHtml) signHtml = '<p class="rc-route-desc">Z tohoto stojanu nevedou žádné trasy.</p>';
+      document.getElementById('signs').innerHTML = signHtml;
+
+      // ---- nearby rooms: this stand is their closest sign ------------------
+      var candidates = STANDS.slice();
+      if (candidates.indexOf(at) < 0) candidates.push(at);
+      var ownRooms = [];
+      DEST.forEach(function (t) {
+        if (t === at) return;
+        var best = null, bestLen = Infinity;
+        candidates.forEach(function (s) {
+          // for THIS room use the cached path (door cell anchor — more
+          // accurate); compare like any other candidate
+          var p = (s === at) ? pathTo(t)
+            : (RT ? RT.corridorPath({ roomId: s }, { roomId: t }) : null);
+          if (p && p.length < bestLen) { best = s; bestLen = p.length; }
+        });
+        if (best === at) ownRooms.push(t);
       });
+
+      var roomTitle = {}; // roomId -> short human line for cards
+      (DATA.events.events || []).forEach(function (ev) {
+        if (!roomTitle[ev.room]) roomTitle[ev.room] = [];
+        roomTitle[ev.room].push(ev);
+      });
+      var nearHtml = '';
+      var ownEvents = roomTitle[at] || [];
+      if (ownEvents.length) {
+        nearHtml +=
+          '<div class="nb-card nb-card--here">' +
+            '<p class="nb-room"><b>' + esc(at) + '</b> <span class="nb-rn">· zde — co se tu děje</span></p>' +
+            '<ul class="nb-evs">' + ownEvents.map(function (ev) {
+              return '<li><span class="nb-t">' + esc(ev.start) + '</span><span>' +
+                esc(ev.title) +
+                (ev.speaker || ev.partner ? ' — ' + esc(ev.speaker || ev.partner) : '') +
+                '</span></li>';
+            }).join('') + '</ul>' +
+          '</div>';
+      }
+      ownRooms.forEach(function (t) {
+        var fi = P.findRoom(t);
+        var evs = roomTitle[t] || [];
+        var lis = evs.map(function (ev) {
+          return '<li><span class="nb-t">' + esc(ev.start) + '</span><span>' +
+            esc(ev.title) +
+            (ev.speaker || ev.partner ? ' — ' + esc(ev.speaker || ev.partner) : '') +
+            '</span></li>';
+        }).join('');
+        nearHtml +=
+          '<div class="nb-card">' +
+            '<p class="nb-room"><b>' + esc(t) + '</b> <span class="nb-rn">· ' +
+              esc(fi && fi.room.name || '') + '</span></p>' +
+            '<ul class="nb-evs">' + lis + '</ul>' +
+          '</div>';
+      });
+      if (!nearHtml) nearHtml = '<p class="rc-route-desc">Žádná místnost s programem není v blízkosti tohoto stojanu.</p>';
+      document.getElementById('nearby').innerHTML = nearHtml;
+
+      // ---- draw on the map: first legs (bold + arrowhead) + approaches -----
+      if (MAP) {
+        var layer = document.querySelector('#map-world .route-layer');
+        if (layer) {
+          var parts = [];
+          var legTips = []; // arrowhead tips — dest rings must not sit on them
+          // first legs — one per direction group
+          Object.keys(groups).forEach(function (k) {
+            var g = groups[k];
+            if (g.adjacent) return; // next door — the ring on the map is enough
+            var pts = g.leg.pts.slice(0, g.leg.endI + 1);
+            if (pts.length < 2) return;
+            var str = pts.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+            parts.push('<polyline class="st-route st-leg" points="' + str + '"/>');
+            // arrowhead at the far end
+            var a = pts[pts.length - 1], b = pts[pts.length - 2];
+            var dx = a[0] - b[0], dy = a[1] - b[1], l = Math.hypot(dx, dy) || 1;
+            var ux = dx / l, uy = dy / l; // along
+            var vx = -uy, vy = ux;        // across
+            var W = 12, Hw = 5.5;
+            var tip = [a[0] + ux * 6, a[1] + uy * 6];
+            legTips.push(tip);
+            var left = [a[0] - ux * W + vx * Hw, a[1] - uy * W + vy * Hw];
+            var right = [a[0] - ux * W - vx * Hw, a[1] - uy * W - vy * Hw];
+            parts.push('<polygon class="st-route st-head" points="' +
+              tip[0].toFixed(1) + ',' + tip[1].toFixed(1) + ' ' +
+              left[0].toFixed(1) + ',' + left[1].toFixed(1) + ' ' +
+              right[0].toFixed(1) + ',' + right[1].toFixed(1) + '"/>');
+          });
+          // approach paths to the rooms this sign serves (short by nature)
+          ownRooms.forEach(function (t) {
+            var r = pathTo(t);
+            if (!r) return;
+            var last = r.legs[r.legs.length - 1];
+            r.legs.forEach(function (leg) {
+              if (String(leg.floor) !== String(floor)) return;
+              if (leg.points.length > 1) {
+                parts.push('<polyline class="st-route" points="' +
+                  leg.points.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ') +
+                  '"/>');
+              }
+            });
+            if (String(last.floor) === String(floor) && last.points.length) {
+              var end = last.points[last.points.length - 1];
+              var onArrow = legTips.some(function (tp) {
+                return Math.hypot(tp[0] - end[0], tp[1] - end[1]) < 24;
+              });
+              if (!onArrow) {
+                parts.push('<circle class="st-dest" cx="' + end[0].toFixed(1) +
+                  '" cy="' + end[1].toFixed(1) + '" r="10"/>');
+              }
+            }
+          });
+          layer.insertAdjacentHTML('beforeend', parts.join(''));
+        }
+      }
 
       // ------------------------------------------------------- event chips --
 

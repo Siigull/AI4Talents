@@ -370,6 +370,21 @@
           </a>
         </div>
       </section>
+      <!-- ------------------------------------------------------------ PDFs -->
+      <section class="ps-sec" aria-labelledby="pdf-title">
+        <p class="ps-sec-kicker">Automaticky vygenerované PDF</p>
+        <h2 class="ps-sec-title" id="pdf-title">PDF podklady</h2>
+        <p class="ps-sec-desc">
+          Všechny varianty (plakáty na dveře, stojany, kapesní program, A3 program)
+          jako hotová PDF v přesných velikostech papíru — generované bezhlavým
+          Chrome, takže odpovídají stránkám 1:1 včetně QR kódů:
+        </p>
+        <div class="door-grid" id="pdf-grid"></div>
+        <p class="ps-sec-desc" style="margin-top: 10px">
+          Přegenerování po změně dat: <code>node tools/print-pdf.mjs</code>
+          (musí běžet <code>python3 -m http.server 8765</code> z kořene repa).
+        </p>
+      </section>
     </main>
 
     <footer class="ps-foot">
@@ -430,7 +445,7 @@
       // -------------------------------------------------------- door grid --
 
       // Event rooms with their own programme (SPEC 4 door poster set).
-      var DOOR_ROOMS = ['E112', 'E105', 'E104', 'A218', 'C228', 'N105', 'R212'];
+      var DOOR_ROOMS = ['E112', 'E105', 'E104', 'A218', 'C228', 'N105', 'R212', 'A104'];
       var eventsByRoom = {};
       ((DATA.events && DATA.events.events) || []).forEach(function (ev) {
         (eventsByRoom[ev.room] = eventsByRoom[ev.room] || []).push(ev);
@@ -604,6 +619,22 @@
         persist();
         row.querySelector('input').focus();
       });
+      // ----------------------------------------------------------- PDFs --
+      var PDFS = [
+        ['../pdf/handout-a5.pdf', 'Kapesní program', 'A5'],
+        ['../pdf/program-a3.pdf', 'Velký program', 'A3'],
+      ].concat(DOOR_ROOMS.map(function (id) {
+        return ['../pdf/door-' + id.toLowerCase() + '.pdf', 'Dveře ' + id, 'A4'];
+      })).concat(loadStands().map(function (id) {
+        return ['../pdf/stand-' + id.toLowerCase() + '.pdf', 'Stojan ' + id, 'A4'];
+      }));
+      var pdfGrid = document.getElementById('pdf-grid');
+      pdfGrid.innerHTML = PDFS.map(function (p) {
+        return '<a class="door-btn" href="' + p[0] + '" target="_blank" rel="noopener">' +
+          '<span class="door-code">' + esc(p[2]) + '</span>' +
+          '<p class="door-name">' + esc(p[1]) + '</p></a>';
+      }).join('');
+
     })();
   </script>
 </body>

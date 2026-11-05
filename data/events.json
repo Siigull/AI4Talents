@@ -127,9 +127,9 @@
       "start": "12:00",
       "end": "13:00",
       "title": "Prohlídka fakulty – 1. kolo",
-      "room": "E103",
+      "room": "A104",
       "floor": "1",
-      "desc": "Prohlédni si fakultu s našimi studenty. Sraz u stánků v respiriu. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
+      "desc": "Prohlédni si fakultu s našimi studenty. Sraz v místnosti A104. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
       "icon": "tour"
     },
     {
@@ -138,9 +138,9 @@
       "start": "13:00",
       "end": "14:00",
       "title": "Prohlídka fakulty – 2. kolo",
-      "room": "E103",
+      "room": "A104",
       "floor": "1",
-      "desc": "Prohlédni si fakultu s našimi studenty. Sraz u stánků v respiriu. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
+      "desc": "Prohlédni si fakultu s našimi studenty. Sraz v místnosti A104. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
       "icon": "tour"
     },
     {

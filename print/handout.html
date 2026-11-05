@@ -25,10 +25,15 @@
     .hd-meta { text-align: right; font-family: var(--font-mono); font-size: 7.5pt; line-height: 1.45; }
     .hd-meta .sub { color: var(--muted-on-dark); }
 
-    /* --- two zones: programme list | maps + registration + QR --- */
+    /* --- two zones: programme list | map rail --------------------------------
+       v4: the programme list IS the handout, so it takes the dominant width
+       (~64%). The side rail shrinks to 70mm: ONE floor-1 map (registration
+       desk + lecture wing context) that flex-grows into every leftover mm
+       of rail height, then registration + QR compose the bottom flush —
+       no dead zone below them. */
     .hd-main {
-      flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 112mm;
-      gap: 5mm; padding: 2.5mm 6mm 2mm;
+      flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 70mm;
+      gap: 2.5mm; padding: 2.5mm 6mm 2mm;
     }
 
     /* programme rows — brutal density, ledger rules between rows */
@@ -46,29 +51,31 @@
     .hde--zone { border-top-style: dashed; }
     .room-chip { font-size: 7pt; border-width: 1px; padding: 0 0.9mm; line-height: 1.4; }
 
-    /* --- right column: FULL-FLOOR maps (whole context), reg, QR -----------
-       A5 landscape: the floors are ~740×930 units (aspect 0.79) — two maps
-       side by side at ~54mm each show every wing at the height the side
-       column has; the old narrow boxes (aspect 0.45) forced a zoom-in crop
-       that cut half the building off. */
-    .hd-side { display: flex; flex-direction: column; gap: 2mm; min-height: 0; }
-    .hd-maps { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; }
-    .hd-map { display: flex; flex-direction: column; }
-    .hd-map .mapbox { width: 100%; aspect-ratio: 740 / 930; }
-    .hd-map .map-cap { text-align: center; margin-top: 0.6mm; flex: none; }
+    /* --- side rail: ONE full-floor map (floor 1), reg, QR --------------------
+       The mapbox flex-grows to all leftover rail height (aspect 740/930 →
+       ≈69×87mm at a 70mm rail) — the crop stays whole-floor via
+       P.miniMap({ crop: { buildings: true, margin: 10 } }), every wing
+       visible; the caption pins it, then reg+QR close the rail flush. */
+    .hd-side { display: flex; flex-direction: column; gap: 2.5mm; min-height: 0; }
+    .hd-map { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; }
+    .hd-map .mapbox { flex: 1; min-height: 0; max-width: 100%; aspect-ratio: 740 / 930; }
+    .hd-map .map-cap { flex: none; align-self: stretch; text-align: center; margin-top: 0.8mm; }
 
-    /* registration callout — blue field (Dny AI motif) */
-    .hd-reg { background: var(--blue); color: var(--paper); border-radius: 4px; padding: 2.4mm 3mm; }
-    .hd-reg .kicker { font-size: 7.5pt; color: var(--paper); }
-    .hd-reg p { font-size: 9pt; font-weight: 500; margin-top: 0.8mm; line-height: 1.25; }
+    /* registration callout — blue field (Dny AI motif); fills the corner
+       beside the QR so the rail has no white pocket */
+    .hd-reg { background: var(--blue); color: var(--paper); border-radius: 4px; padding: 2.6mm 3.2mm; }
+    .hd-reg .kicker { font-size: 8pt; color: var(--paper); }
+    .hd-reg p { font-size: 10pt; font-weight: 500; margin-top: 1mm; line-height: 1.3; }
     .hd-reg .mono { font-weight: 500; }
 
-    /* registration + QR share one bottom row — no dead space right of the QR */
+    /* registration + QR compose the rail bottom, both flush to the footer */
     .hd-bottom { flex: none; display: flex; gap: 2.5mm; align-items: stretch; }
     .hd-bottom .hd-reg { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    .hd-qr { flex: none; display: flex; align-items: flex-end; gap: 2.5mm; }
+    /* QR stack: code on top, its caption centred underneath — the 70mm rail
+       is too narrow for the old caption-beside-code row */
+    .hd-qr { flex: none; display: flex; flex-direction: column; align-items: center; }
     .hd-qr .qr-slot { width: 21mm; height: 21mm; }
-    .hd-qr .qr-cap { margin-top: 0; margin-bottom: 0.6mm; font-size: 6pt; max-width: 40mm; }
+    .hd-qr .qr-cap { margin-top: 1mm; margin-bottom: 0; font-size: 6pt; max-width: 23mm; text-align: center; line-height: 1.3; }
 
     .pfooter { padding: 1.4mm 6mm 2mm; }
   </style>
@@ -120,13 +127,11 @@
       });
       h += '</section>';
 
-      // ---- right column: v2 mini maps + registration + QR ------------------
+      // ---- side rail: floor-1 map + registration + QR --------------------
       h += '<aside class="hd-side">' +
-        '<div class="hd-maps">' +
-          '<div class="hd-map"><div class="mapbox" id="map-f1"></div>' +
-            '<p class="map-cap">1. patro · žlutá = registrace</p></div>' +
-          '<div class="hd-map"><div class="mapbox" id="map-f2"></div>' +
-            '<p class="map-cap">2. patro</p></div>' +
+        '<div class="hd-map">' +
+          '<div class="mapbox" id="map-f1"></div>' +
+          '<p class="map-cap">1. patro · žlutá = registrace</p>' +
         '</div>' +
         '<div class="hd-bottom">' +
           '<div class="hd-reg">' +
@@ -140,15 +145,11 @@
       h += '</main>' + P.footerStrip();
       root.innerHTML = h;
 
-      // v2 mini maps: every event room of the floor, tinted + labelled
-      // (pocket overview), expanded to the measured box aspect so each SVG
-      // fills its box. C106 = yellow registration marker on floor 1.
+      // v2 mini map: every event room of floor 1, tinted + labelled
+      // (pocket overview), expanded to the measured box aspect so the SVG
+      // fills its box. C106 = yellow registration marker.
       function renderMaps() {
-        var byFloor = {};
-        P.eventRooms().forEach(function (p) {
-          (byFloor[p.floor] = byFloor[p.floor] || []).push(p.roomId);
-        });
-        [['map-f1', '1', 'C106'], ['map-f2', '2', null]].forEach(function (m) {
+        [['map-f1', '1', 'C106']].forEach(function (m) {
           var box = document.getElementById(m[0]);
           if (!box) return;
           var rect = box.getBoundingClientRect();

@@ -54,7 +54,7 @@
 
   // Grid rows: floor 1 rooms first, then floor 2 (spec order).
   const ROOM_GROUPS = [
-    { floor: '1', label: '1. patro', rooms: ['E112', 'E105', 'E104', 'E103', 'C106', 'N105'] },
+    { floor: '1', label: '1. patro', rooms: ['E112', 'E105', 'E104', 'E103', 'C106', 'A104', 'N105'] },
     { floor: '2', label: '2. patro', rooms: ['A218', 'C228', 'R212'] },
   ];
 
