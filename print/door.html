@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>AI4Talents — plakát na dveře</title>
+  <!-- Print mode guard: must be set BEFORE map.js loads (inline script). -->
+  <script>window.AI4T_PRINT_MODE = true;</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="../assets/css/print.css">
+  <style>
+    /* A4 portrait — exact sheet, for screenshotting at paper size. */
+    @page { size: 210mm 297mm; margin: 0; }
+    html, body { width: 210mm; height: 297mm; }
+
+    .page-door { padding: 0; }
+
+    /* --- header band: room code HUGE (design kept from v1 — user likes it) --- */
+    .door-head { padding: 8mm 12mm 7mm; flex: none; }
+    .dh-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: var(--font-mono); font-size: 8pt; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted-on-dark);
+    }
+    .dh-top .dot { color: var(--magenta); }
+    .dh-code {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 100pt; line-height: 0.92; letter-spacing: -0.015em;
+      font-variant-numeric: tabular-nums;
+      margin: 2mm 0 2mm;
+    }
+    .dh-name { font-family: var(--font-body); font-weight: 500; font-size: 23pt; line-height: 1.1; }
+    .dh-floor {
+      margin-top: 1.5mm; font-family: var(--font-mono); font-size: 10pt;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted-on-dark);
+    }
+
+    /* --- programme: hour rail on the left, events sit at their time spot --- */
+    .door-main { flex: 1; display: flex; flex-direction: column; padding: 6mm 12mm 5mm; min-height: 0; }
+    .door-h {
+      font-family: var(--font-display); font-weight: 600; font-size: 16pt;
+      padding-bottom: 2mm; border-bottom: 2px solid var(--ink); flex: none;
+    }
+    .door-tl { flex: 1 1 auto; min-height: 0; display: flex; gap: 5mm;
+               padding-top: 8mm; position: relative; }
+
+    /* hour rail: 8 hour bands (8:00–16:00), number centered per band.
+       Numbers are sized by JS to fill the band — readable from a distance. */
+    .tl-rail { flex: none; width: 16mm; display: flex; flex-direction: column; }
+    .tl-band { flex: 1; position: relative; display: flex; align-items: flex-start; justify-content: flex-start; }
+    .tl-band::before { /* hour tick inside the rail — ties digit to line */
+      content: ''; position: absolute; top: 0; right: 0; width: 3.5mm; height: 1.5px;
+      background: rgba(20, 18, 15, 0.3);
+    }
+    .tl-num {
+      font-family: var(--font-mono); font-weight: 500; line-height: 1;
+      color: var(--ink); font-variant-numeric: tabular-nums;
+      transform: translateY(-50%); /* every digit sits ON its hour line */
+    }
+
+    /* event canvas: hour hairlines + absolutely positioned blocks.
+       A block's top edge = its start time (8:00 = top, 16:00 = bottom).
+       Blocks pushed off their line get a leader line in the rail gutter. */
+    .tl-canvas { flex: 1 1 auto; min-width: 0; position: relative; }
+    .tl-h { position: absolute; left: 0; right: 0; height: 1px; background: rgba(20, 18, 15, 0.18); }
+    .tl-lead {
+      position: absolute; left: 18.5mm; width: 0; z-index: 2;
+      border-left: 2px solid rgba(20, 18, 15, 0.55);
+    }
+    .tl-lead::before { /* jog onto the rail's hour tick */
+      content: ''; position: absolute; left: -5mm; right: -1px; height: 2px;
+      background: rgba(20, 18, 15, 0.55);
+    }
+    .tl-lead::after { /* jog toward the block's top edge */
+      content: ''; position: absolute; left: -1px; width: 1.9mm; height: 2px;
+      background: rgba(20, 18, 15, 0.55);
+    }
+    .tl-lead--down::before { top: -1px; }
+    .tl-lead--up::before { bottom: -1px; }
+    .tl-lead--down::after { bottom: -1px; }
+    .tl-lead--up::after { top: -1px; }
+    .tl-zone {
+      position: absolute; left: 0; right: 0; background: #f0efec;
+      padding: 3mm 4mm 3mm;
+    }
+    .ev {
+      position: absolute; left: 0; right: 0; background: #fff;
+      border: 2px solid var(--ink); border-bottom-style: dashed; border-radius: 2mm;
+      padding: 3mm 4mm; display: grid; grid-template-columns: 28mm 1fr; column-gap: 5mm;
+      box-sizing: border-box;
+    }
+    .tl-zone .ev { position: static; border: 0; padding: 0; background: transparent; display: block; }
+    .door-empty { font-size: 13pt; color: var(--ink-soft); padding-top: 4mm; }
+
+    /* single-event rooms: poster-scale type inside the (one) block */
+    .tl-canvas--single .ev { grid-template-columns: 44mm 1fr; column-gap: 7mm; }
+    .tl-canvas--single .ev-start { font-size: 34pt; }
+    .tl-canvas--single .ev-title { font-size: 27pt; line-height: 1.15; }
+    .tl-canvas--single .ev-desc { font-size: 15.5pt; line-height: 1.5; }
+    .tl-canvas--single .ev-meta { font-size: 14pt; }
+    .tl-canvas--single .ev-kick { font-size: 11pt; }
+    .tl-canvas--single .ev-bring { font-size: 13pt; }
+
+    .ev-start { font-size: 21pt; font-weight: 500; }
+    .ev-end { font-size: 11pt; color: var(--ink-soft); margin-top: 0.6mm; }
+    .ev-kick { font-size: 8pt; display: flex; align-items: center; gap: 2mm; }
+    .ev-kick::before { /* type-colored square dot, like the site timetable */
+      content: ''; width: 2.6mm; height: 2.6mm; border-radius: 0.6mm; flex: none;
+    }
+    .ev--lecture .ev-kick::before { background: var(--blue); }
+    .ev--workshop .ev-kick::before { background: var(--magenta-deep); }
+    .ev--zone .ev-kick::before, .ev--milestone .ev-kick::before { background: var(--ink-soft); }
+    .ev-title { font-size: 19pt; line-height: 1.08; margin-top: 1.2mm; text-wrap: balance; }
+    .ev-meta { font-family: var(--font-mono); font-size: 11pt; color: var(--ink-soft); margin-top: 1.2mm; }
+    .ev-desc { font-size: 12.5pt; line-height: 1.42; margin-top: 1.8mm; }
+    .ev-bring { font-size: 10.5pt; line-height: 1.3; margin-top: 1.6mm; }
+
+    /* --- bottom row: where-you-are line + QR flush corner (NO map) --- */
+    .door-bottom {
+      flex: none; display: flex; align-items: flex-end; gap: 6mm;
+      padding-top: 4mm; margin-top: auto; border-top: 2px solid var(--ink);
+    }
+    .door-where {
+      flex: 1; font-family: var(--font-mono); font-size: 10pt;
+      color: var(--ink-soft); line-height: 1.45; padding-top: 2.5mm;
+    }
+    .door-qr {
+      flex: none; width: 31mm; display: flex; flex-direction: column;
+      justify-content: flex-end; align-items: flex-start;
+    }
+    .door-qr .qr-cap { max-width: 31mm; margin-bottom: 1.6mm; }
+
+    .pfooter { padding: 1.8mm 12mm 2.6mm; }
+    .pfooter:first-letter { letter-spacing: 0; }
+
+    /* unknown room fallback */
+    .door-unknown { padding: 20mm 12mm; }
+    .door-unknown h2 { font-family: var(--font-display); font-size: 34pt; font-weight: 700; }
+    .door-unknown p { margin-top: 6mm; font-size: 14pt; max-width: 120mm; line-height: 1.45; }
+  </style>
+</head>
+<body class="pp page-door">
+  <div id="poster" class="pp-root"></div>
+
+  <script src="../assets/js/data.js" defer></script>
+  <script src="../assets/js/routing.js" defer></script>
+  <script src="../assets/js/map.js" defer></script>
+  <script src="../assets/js/print.js" defer></script>
+  <script>
+    // Door poster boot — runs after the deferred libraries (DOMContentLoaded
+    // fires after deferred scripts). Parametric: print/door.html?room=E112
+    window.addEventListener('DOMContentLoaded', function () {
+      var P = window.AI4TPrint;
+      var root = document.getElementById('poster');
+      if (!P) { root.textContent = 'Chybí data (AI4TPrint).'; return; }
+
+      // Timeline day: 8:00–16:00 (the event runs 8:30–16:00).
+      var DAY0 = 8 * 60, DAY1 = 16 * 60;
+      var toMin = function (t) {
+        var m = /^(\d{1,2}):(\d{2})$/.exec(String(t || ''));
+        return m ? (+m[1]) * 60 + (+m[2]) : DAY0;
+      };
+      var frac = function (t) {
+        return Math.max(0, Math.min(0.985, (toMin(t) - DAY0) / (DAY1 - DAY0)));
+      };
+      var spanMin = function (ev) { return toMin(ev.end) - toMin(ev.start); };
+      var endFrac = function (t) { // zone bands may reach the 16:00 rule exactly
+        return Math.max(0, Math.min(1, (toMin(t) - DAY0) / (DAY1 - DAY0)));
+      };
+
+      var params = new URLSearchParams(location.search);
+      var roomId = (params.get('room') || 'E112').trim();
+      var info = P.findRoom(roomId);
+      var meta = (window.AI4T_DATA.events && window.AI4T_DATA.events.meta) || {};
+
+      if (!info) {
+        // Unknown room id — show a fallback sheet, still exactly A4.
+        root.innerHTML =
+          '<header class="p-head door-head"><div class="dh-top"><span>' +
+            P.esc(meta.name || 'AI4Talents@FIT VUT') + ' · ' + P.esc(P.fmtDate(meta.date)) +
+            '</span><span class="dot">●</span></div>' +
+            '<div class="dh-code">?</div>' +
+            '<div class="dh-name">Neznámá místnost</div>' +
+            '<div class="dh-floor">' + P.esc(roomId) + '</div></header>' +
+          '<div class="door-main door-unknown">' +
+            '<h2>Místnost „' + P.esc(roomId) + '“ nebyla nalezena</h2>' +
+            '<p>Zkontroluj parametr <span class="mono">?room=</span> v adrese — musí obsahovat ' +
+              'číslo místnosti z mapy fakulty, např. <span class="mono">?room=E112</span>.</p>' +
+          '</div>' + P.footerStrip();
+        return;
+      }
+
+      var room = info.room;
+      var floorLbl = P.floorLabel(info.floor);
+      var evs = P.eventsForRoom(room.id).slice().sort(function (a, b) {
+        return toMin(a.start) - toMin(b.start);
+      });
+
+      // ---- header band (design kept) ---------------------------------------
+      var h =
+        '<header class="p-head door-head">' +
+          '<div class="dh-top">' +
+            '<span>' + P.esc(meta.name || 'AI4Talents@FIT VUT') + ' · ' +
+              P.esc(P.fmtDate(meta.date)) + '</span>' +
+            '<span>' + P.esc(floorLbl) + '</span>' +
+          '</div>' +
+          '<h1 class="dh-code">' + P.esc(room.id) + '</h1>' +
+          '<p class="dh-name">' + P.esc(room.name) + '</p>' +
+          '<p class="dh-floor">' + P.esc(floorLbl) + ' · ' + P.esc(meta.place || 'FIT VUT v Brně') + '</p>' +
+        '</header>';
+
+      // ---- programme: hour rail + events at their time-of-day spot ----------
+      // Long zones (>2h) become gray background bands; everything else is a
+      // framed block whose TOP EDGE sits on its start time. From a distance:
+      // rail digit + block height on the door ≈ time of day.
+      var single = evs.length === 1;
+      h += '<main class="door-main"><h2 class="door-h">Program v této místnosti</h2>' +
+        '<div class="door-tl">' +
+          '<div class="tl-rail" aria-hidden="true">';
+      for (var hr = DAY0 / 60; hr < DAY1 / 60; hr++) {
+        h += '<div class="tl-band"><span class="tl-num">' + hr + '</span></div>';
+      }
+      h += '</div><div class="tl-canvas' + (single ? ' tl-canvas--single' : '') + '">';
+      // hour hairlines 8:00–15:00 (16:00 shares the footer rule)
+      for (var i = 0; i < 8; i++) {
+        h += '<div class="tl-h" style="top:' + (i / 8 * 100) + '%"></div>';
+      }
+      if (!evs.length) {
+        h += '<p class="door-empty">V této místnosti dnes neprobíhá žádný bod programu — ' +
+             'celý program najdeš na QR kódu dole.</p>';
+      }
+      var evHtml = function (ev) {
+        return '<div class="ev-time"><span class="ev-start">' + P.esc(ev.start) + '</span>' +
+            '<br><span class="ev-end">— ' + P.esc(ev.end) + '</span></div>' +
+            '<div>' +
+              '<p class="ev-kick kicker">' + P.esc(P.typeKick(ev)) + '</p>' +
+              '<h3 class="ev-title">' + P.esc(ev.title) + '</h3>' +
+              (ev.speaker || ev.partner
+                ? '<p class="ev-meta">' + P.esc(ev.speaker || ev.partner) + '</p>' : '') +
+              (ev.desc ? '<p class="ev-desc">' + P.esc(ev.desc) + '</p>' : '') +
+              (ev.bring ? '<p class="ev-bring mono">S sebou: ' + P.esc(ev.bring) + '</p>' : '') +
+            '</div>';
+      };
+      evs.forEach(function (ev) {
+        var isBand = ev.type === 'zone' && spanMin(ev) > 120;
+        if (isBand) {
+          h += '<div class="tl-zone" data-top="' + frac(ev.start) + '" data-end="' + endFrac(ev.end) + '">' +
+                 '<article class="ev ev--' + P.esc(ev.type) + '">' + evHtml(ev) + '</article>' +
+               '</div>';
+        } else {
+          h += '<article class="ev ev--' + P.esc(ev.type) + '" data-top="' + frac(ev.start) + '">' +
+                 evHtml(ev) + '</article>';
+        }
+      });
+      h += '</div></div>';
+
+      // ---- bottom row: where-you-are line + QR flush corner (NO map —
+      // the person at the door knows where they are; the full programme
+      // gets the space instead) -------------------------------------------
+      h += '<div class="door-bottom">' +
+        '<p class="door-where">' + P.esc(floorLbl) + ' · zde se nacházíš · ' +
+          'celý program a mapa fakulty na QR kódu</p>' +
+        '<div class="door-qr">' + P.qrBlock(30, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
+      '</div></main>';
+
+      h += P.footerStrip();
+
+      root.innerHTML = h;
+      document.title = 'AI4Talents — dveře ' + room.id;
+
+      // ---- layout pass (needs real font metrics) ---------------------------
+      // 1. Rail numbers sized dynamically to the hour-band height.
+      // 2. Blocks anchored at start time; pushed down to clear earlier ones.
+      // 3. If the last block would cross the footer rule, shrink typography
+      //    in steps (long descriptions) and, as a last resort, pull blocks up.
+      var layout = function () {
+        var tl = root.querySelector('.door-tl');
+        var canvas = root.querySelector('.tl-canvas');
+        if (!tl || !canvas) return;
+        var H = canvas.clientHeight;
+
+        // 1. dynamic hour numbers — fill ~72% of an hour band's cap height
+        var nums = root.querySelectorAll('.tl-num');
+        var bandH = H / 8;
+        var fs = Math.max(13, Math.min(bandH * 0.72, 64));
+        for (var n = 0; n < nums.length; n++) nums[n].style.fontSize = fs.toFixed(1) + 'px';
+
+        // 2. blocks: anchor at nominal time, push past previous bottom
+        var blocks = [];
+        var arts = canvas.querySelectorAll('article.ev');
+        for (var a = 0; a < arts.length; a++) {
+          var el = arts[a];
+          if (el.parentElement.classList.contains('tl-zone')) continue; // band text
+          blocks.push({ el: el, frac: +el.getAttribute('data-top') });
+        }
+        if (!blocks.length) { sizeZones(); return; }
+        blocks.sort(function (x, y) { return x.frac - y.frac; });
+
+        var SELS = ['.ev-start', '.ev-end', '.ev-title', '.ev-meta', '.ev-desc', '.ev-bring', '.ev-kick'];
+        blocks.forEach(function (b) {
+          SELS.forEach(function (s) {
+            var el = b.el.querySelector(s);
+            if (el && !el.getAttribute('data-base')) {
+              el.setAttribute('data-base', parseFloat(getComputedStyle(el).fontSize));
+            }
+          });
+        });
+
+        var GAP = 3.78 * 4; // 4mm
+        var SC = [1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55];
+        var ok = false;
+        for (var s = 0; s < SC.length && !ok; s++) {
+          blocks.forEach(function (b) {
+            SELS.forEach(function (sel) {
+              var el = b.el.querySelector(sel);
+              if (el) el.style.fontSize = (+el.getAttribute('data-base') * SC[s]).toFixed(1) + 'px';
+            });
+          });
+          var prevBottom = 0;
+          blocks.forEach(function (b) {
+            var top = Math.max(b.frac * H, prevBottom + GAP);
+            b.el.style.top = top.toFixed(1) + 'px';
+            prevBottom = top + b.el.offsetHeight;
+          });
+          ok = prevBottom <= H - 2;
+        }
+        // 3. last resort: pull blocks up so nothing crosses the footer rule
+        if (!ok) {
+          var limit = H - 10;
+          for (var k = blocks.length - 1; k >= 0; k--) {
+            var b = blocks[k], bh = b.el.offsetHeight;
+            var bottom = Math.min(b.el.offsetTop + bh, limit);
+            var top = Math.max(0, bottom - bh);
+            b.el.style.top = top.toFixed(1) + 'px';
+            limit = top - GAP;
+          }
+        }
+        sizeZones();
+        drawLeads();
+      };
+
+      // leader lines: when a block sits off its start-time line (pushed by a
+      // tall neighbour or pulled up to fit), connect the hour line to the
+      // block's top edge through the rail gutter — the time stays readable.
+      var drawLeads = function () {
+        var tl = root.querySelector('.door-tl');
+        var canvas = root.querySelector('.tl-canvas');
+        if (!tl || !canvas) return;
+        root.querySelectorAll('.tl-lead').forEach(function (l) { l.remove(); });
+        var arts = canvas.querySelectorAll('article.ev:not(.tl-zone .ev)');
+        for (var a = 0; a < arts.length; a++) {
+          var el = arts[a];
+          var nominal = (+el.getAttribute('data-top')) * canvas.clientHeight;
+          var actual = el.offsetTop;
+          if (Math.abs(actual - nominal) < 8) continue; // on its line — no lead
+          var lead = document.createElement('div');
+          lead.className = 'tl-lead ' + (actual > nominal ? 'tl-lead--down' : 'tl-lead--up');
+          var top = Math.min(nominal, actual), bot = Math.max(nominal, actual);
+          // leads live in .door-tl (relative) — offset by the canvas position
+          lead.style.top = (canvas.offsetTop + top).toFixed(1) + 'px';
+          lead.style.height = Math.max(0, bot - top).toFixed(1) + 'px';
+          tl.appendChild(lead);
+        }
+      };
+
+      // gray bands span their nominal time span, extended to cover the
+      // blocks sitting on top of them (a pushed block may end past the band)
+      var sizeZones = function () {
+        var canvas = root.querySelector('.tl-canvas');
+        if (!canvas) return;
+        var H = canvas.clientHeight;
+        var placed = canvas.querySelectorAll('article.ev:not(.tl-zone .ev)');
+        root.querySelectorAll('.tl-zone').forEach(function (z) {
+          var zTop = +z.getAttribute('data-top') * H;
+          var zEnd = +z.getAttribute('data-end') * H;
+          for (var p = 0; p < placed.length; p++) {
+            var el = placed[p], f = +el.getAttribute('data-top');
+            if (f >= +z.getAttribute('data-top') && f < +z.getAttribute('data-end')) {
+              zEnd = Math.max(zEnd, el.offsetTop + el.offsetHeight + 15);
+            }
+          }
+          z.style.top = zTop.toFixed(1) + 'px';
+          // 16:00 = day end: the band may butt against the footer rule
+          z.style.height = Math.max(30, Math.min(H, zEnd) - zTop).toFixed(1) + 'px';
+        });
+      };
+
+      // Fonts load late (screenshot timing / cold cache): layout must re-run
+      // once real font metrics are in, or blocks pin to stale measurements.
+      // Re-run several times — each pass recomputes from scratch.
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(layout);
+      }
+      [400, 900, 1600, 2600].forEach(function (ms) { setTimeout(layout, ms); });
+      window.addEventListener('load', layout);
+    });
+  </script>
+</body>
+</html>

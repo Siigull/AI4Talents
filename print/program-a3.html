@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>AI4Talents — velký program (A3)</title>
+  <!-- Print mode guard: must be set BEFORE map.js loads (inline script). -->
+  <script>window.AI4T_PRINT_MODE = true;</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="../assets/css/print.css">
+  <style>
+    /* A3 portrait — exact sheet, for screenshotting at paper size. */
+    @page { size: 297mm 420mm; margin: 0; }
+    html, body { width: 297mm; height: 420mm; }
+
+    .page-a3 { padding: 0; }
+
+    /* --- big header band --- */
+    .a3-head { flex: none; padding: 7mm 14mm 5.5mm; }
+    .a3-kick {
+      font-family: var(--font-mono); font-size: 9pt; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--muted-on-dark);
+    }
+    .a3-kick .dot { color: var(--magenta); }
+    .a3-title {
+      font-family: var(--font-display); font-weight: 700; font-size: 44pt;
+      line-height: 0.98; letter-spacing: -0.015em; margin-top: 2mm;
+    }
+    .a3-title .wm-4 { color: var(--blue-bright); }
+    .a3-sub {
+      font-family: var(--font-mono); font-size: 11pt; color: var(--muted-on-dark);
+      margin-top: 2.5mm; letter-spacing: 0.02em;
+    }
+
+    /* --- THE programme: room × time grid (app v2 timetable, static) ------ */
+    .a3-main {
+      flex: 1; min-height: 0; display: flex; flex-direction: column;
+      padding: 5mm 14mm 3mm; gap: 5mm;
+    }
+
+    .pg { flex: none; border: 2px solid var(--ink); background: var(--paper); }
+    .pg-head { display: flex; border-bottom: 2px solid var(--ink); }
+    .pg-corner {
+      flex: none; width: 37mm; border-right: 1px solid var(--hairline);
+      display: flex; align-items: flex-end; padding: 1.6mm 2mm 1.2mm;
+      font-family: var(--font-mono); font-size: 8pt; color: var(--ink-soft);
+      letter-spacing: 0.05em;
+    }
+    .pg-hours { position: relative; flex: 1; height: 11mm; }
+    .pg-hour {
+      position: absolute; top: 4mm; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 9.5pt; color: var(--ink-soft);
+      font-variant-numeric: tabular-nums;
+    }
+    .pg-hour.is-edge-left { transform: none; }
+    .pg-hour.is-edge-right { transform: translateX(-100%); }
+    .pg-body { position: relative; }
+    .pg-lines { position: absolute; top: 0; bottom: 0; left: 37mm; right: 0; pointer-events: none; }
+    .pg-vline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--hairline); }
+    .pg-floor {
+      display: flex; align-items: center; gap: 3mm; padding: 1.8mm 2mm 1mm 37mm;
+      position: relative; background: var(--paper);
+    }
+    .pg-floor span {
+      font-family: var(--font-mono); font-size: 8.5pt; color: var(--ink-soft);
+      letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .pg-floor::after { content: ''; flex: 1; height: 1px; background: var(--hairline); }
+    .pg-row { display: flex; border-bottom: 1px solid var(--hairline); }
+    .pg-row:last-child { border-bottom: none; }
+    .pg-label {
+      flex: none; width: 37mm; display: flex; flex-direction: column; justify-content: center;
+      gap: 0.4mm; padding: 1.6mm 2mm 1.6mm 0; text-align: right;
+      border-right: 1px solid var(--hairline);
+    }
+    .pg-code { font-family: var(--font-mono); font-weight: 700; font-size: 15pt; line-height: 1; }
+    .pg-name {
+      font-size: 7pt; line-height: 1.2; color: var(--ink-soft);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .pg-track { position: relative; flex: 1; }
+
+    .pg-evt {
+      position: absolute; display: flex; flex-direction: column; gap: 0.7mm;
+      padding: 1.2mm 1.6mm; overflow: hidden;
+      background: var(--paper); border: 1.5px solid var(--ink);
+      border-left: 3px solid var(--evt-color, var(--ink)); border-radius: 1.2mm;
+    }
+    .pg-time { font-family: var(--font-mono); font-size: 8.5pt; line-height: 1; color: var(--ink-soft); white-space: nowrap; }
+    .pg-title {
+      font-weight: 600; font-size: 10.5pt; line-height: 1.12;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      hyphens: auto;
+    }
+    .pg-who { font-family: var(--font-mono); font-size: 8pt; line-height: 1.15; color: var(--ink-soft); }
+    .pg-evt.is-slim { flex-direction: row; align-items: center; gap: 2mm; padding: 0.8mm 1.6mm; }
+    .pg-evt.is-slim .pg-title {
+      order: -1; font-size: 10pt; font-weight: 600; -webkit-line-clamp: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 0 1 auto; min-width: 0;
+    }
+    .pg-evt.is-slim .pg-time { flex: none; margin-left: auto; }
+    .pg-evt.is-slim .pg-who { display: none; }
+
+    /* --- details strip: every event with speaker + description ----------- */
+    .a3-det-h {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 11pt; font-weight: 500; letter-spacing: 0.06em;
+      border-bottom: 2px solid var(--ink); padding-bottom: 1.4mm; flex: none;
+    }
+    .a3-det-h .sub { font-size: 8pt; color: var(--ink-soft); letter-spacing: 0.1em; }
+    .a3-det { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm 5mm; align-content: stretch; }
+    .ade { display: flex; flex-direction: column; min-height: 0; }
+    .ade-top { display: flex; align-items: baseline; gap: 2mm; }
+    .ade-time { font-family: var(--font-mono); font-size: 10pt; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .ade-who { margin-left: auto; font-family: var(--font-mono); font-size: 7.5pt; color: var(--ink-soft); }
+    .ade-title { font-family: var(--font-display); font-weight: 600; font-size: 11.5pt; line-height: 1.08; margin-top: 0.8mm; }
+    .ade-desc {
+      font-size: 8.5pt; line-height: 1.24; margin-top: 0.9mm; color: var(--ink);
+      display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .room-chip { font-size: 8pt; }
+
+    /* --- bottom: registration note + QR, then footer strip --- */
+    .a3-bottom { flex: none; display: flex; align-items: center; gap: 7mm; padding: 3mm 14mm 2.5mm; }
+    .a3-note { text-align: left; font-family: var(--font-mono); font-size: 9.5pt; line-height: 1.5; color: var(--ink); }
+    .a3-note .sub { color: var(--ink-soft); }
+    .a3-note .qr-cap { display: block; margin-top: 2mm; }
+    .a3-qr { margin-left: auto; }
+    .pfooter { padding: 1.8mm 14mm 2.6mm; }
+  </style>
+</head>
+<body class="pp page-a3">
+  <div id="page" class="pp-root"></div>
+
+  <script src="../assets/js/data.js" defer></script>
+  <script src="../assets/js/routing.js" defer></script>
+  <script src="../assets/js/map.js" defer></script>
+  <script src="../assets/js/print.js" defer></script>
+  <script>
+    // A3 poster boot — room × time grid (app v2 timetable structure, static)
+    // + a details strip with every event's speaker and description.
+    window.addEventListener('DOMContentLoaded', function () {
+      var P = window.AI4TPrint;
+      var root = document.getElementById('page');
+      if (!P) { root.textContent = 'Chybí data (AI4TPrint).'; return; }
+
+      var meta = (window.AI4T_DATA.events && window.AI4T_DATA.events.meta) || {};
+      var evs = P.allEvents();
+
+      var h =
+        '<header class="p-head a3-head">' +
+          '<p class="a3-kick">Pátek ' + P.esc(P.fmtDate(meta.date)) + ' · ' +
+            P.esc(meta.time || '9:00 — 14:00') + ' <span class="dot">●</span> ' +
+            P.esc(meta.festival || '') + '</p>' +
+          '<h1 class="a3-title">AI<span class="wm-4">4</span>Talents@FIT VUT</h1>' +
+          '<p class="a3-sub">' + P.esc(meta.tagline || '') + ' · ' + P.esc(meta.place || '') +
+            ' · Kachna (R212) do 16:00</p>' +
+        '</header>' +
+        '<main class="a3-main">' +
+          '<div class="a3-grid">' + P.programGrid({ laneH: 21, slimH: 10, gap: 1.5 }) + '</div>' +
+          '<h2 class="a3-det-h">Podrobnosti programu <span class="sub">· všechny akce dne</span></h2>' +
+          '<div class="a3-det">';
+
+      evs.forEach(function (ev) {
+        h +=
+          '<article class="ade">' +
+            '<div class="ade-top">' +
+              '<span class="ade-time">' + P.esc(ev.start) + '–' + P.esc(ev.end) + '</span>' +
+              '<span class="room-chip">' + P.esc(ev.room) + '</span>' +
+              (ev.speaker || ev.partner
+                ? '<span class="ade-who">' + P.esc(ev.speaker || ev.partner) + '</span>' : '') +
+            '</div>' +
+            '<h3 class="ade-title">' + P.esc(ev.title) + '</h3>' +
+            (ev.desc ? '<p class="ade-desc">' + P.esc(ev.desc) + '</p>' : '') +
+          '</article>';
+      });
+
+      h += '</div></main>';
+
+      // ---- bottom: registration note + QR (spec: 30 mm) + footer --------
+      h += '<div class="a3-bottom">' +
+        '<p class="a3-note">' + P.esc(meta.registration || '') + '<br>' +
+          '<span class="sub">' + P.esc(meta.audience || '') + '</span>' +
+          '<span class="qr-cap">Naskenuj pro interaktivní mapu a program</span></p>' +
+        '<div class="a3-qr">' + P.qrBlock(30) + '</div>' +
+      '</div>';
+
+      h += P.footerStrip();
+      root.innerHTML = h;
+    });
+  </script>
+</body>
+</html>

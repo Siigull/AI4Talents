@@ -1,0 +1,179 @@
+{
+  "meta": {
+    "name": "AI4Talents@FIT VUT",
+    "tagline": "Objev svět umělé inteligence na vlastní kůži",
+    "date": "2026-11-06",
+    "dateLabel": "pátek 6 . 11 . 2026",
+    "time": "8:30 — 16:00",
+    "place": "FIT VUT v Brně, Božetěchova 2",
+    "audience": "Akce pro studující SŠ se zájmem o IT a AI",
+    "festival": "Součást celorepublikového festivalu Dny AI 2026",
+    "registration": "Účast na akci je možná pouze po předchozí registraci.",
+    "officialUrl": "https://www.fit.vut.cz/fit/calendar/369120/.cs",
+    "kachnaUrl": "https://su.fit.vut.cz/kachna/"
+  },
+  "events": [
+    {
+      "id": "registrace",
+      "type": "milestone",
+      "start": "8:30",
+      "end": "9:00",
+      "title": "Registrace",
+      "room": "C106",
+      "floor": "1",
+      "desc": "Přivítáme tě, rozdáme program a připínáček. Vstup do fakulty se řídí značkami AI4Talents.",
+      "icon": "ticket"
+    },
+    {
+      "id": "nabidka-stanky",
+      "type": "zone",
+      "start": "9:00",
+      "end": "14:00",
+      "title": "Stánky firem NXP, SAP, RedHat a SolarWinds",
+      "room": "E103",
+      "floor": "1",
+      "desc": "Ukázky využití AI v praxi na stáních firem NXP, SAP, RedHat a SolarWinds. Kdykoli mezi přednáškami si přijď pokecat s lidmi, kteří s AI a moderními technologiemi pracují každý den.",
+      "icon": "stands"
+    },
+    {
+      "id": "prednaska-cernocky",
+      "type": "lecture",
+      "start": "9:00",
+      "end": "10:00",
+      "title": "Můj a možná i Váš život s AI",
+      "speaker": "prof. Jan „Honza“ Černocký",
+      "room": "E112",
+      "floor": "1",
+      "desc": "Program odstartuje profesor Jan „Honza“ Černocký a jeho pohled na to, jak AI mění svět kolem nás – a jaká v něm může být tvoje role.",
+      "icon": "mic"
+    },
+    {
+      "id": "prednaska-sekanina",
+      "type": "lecture",
+      "start": "10:10",
+      "end": "11:10",
+      "title": "Kolik energie potřebuje AI a co s tím?",
+      "speaker": "prof. Lukáš Sekanina",
+      "room": "E105",
+      "floor": "1",
+      "desc": "Kolik energie potřebuje AI a co můžeme dělat pro to, aby byla efektivnější.",
+      "icon": "bolt"
+    },
+    {
+      "id": "prednaska-bezpecnost",
+      "type": "lecture",
+      "start": "10:10",
+      "end": "11:10",
+      "title": "Bezpečnostní aspekty AI",
+      "room": "E104",
+      "floor": "1",
+      "desc": "Jak AI souvisí s kyberbezpečností a ochranou našich dat.",
+      "icon": "shield"
+    },
+    {
+      "id": "workshop-redhat",
+      "type": "workshop",
+      "start": "12:00",
+      "end": "13:30",
+      "title": "AI: Pravděpodobnostní budoucnost",
+      "partner": "RedHat",
+      "room": "A218",
+      "floor": "2",
+      "bring": "Vlastní notebook, tablet nebo mobil.",
+      "desc": "Proč se AI zásadně liší od tradičního softwaru a jak si vytvořit správnou představu o jejím fungování. Zaměříme se také na ekonomické a etické otázky spojené se soukromím. Zjistíte, proč to, co zadáte do cloudového AI nástroje, nemusí být nikdy skutečně smazáno – a proč vám schopnost provozovat lokální open-source modely dává mnohem větší kontrolu nad vlastními daty.",
+      "icon": "brain"
+    },
+    {
+      "id": "workshop-solarwinds",
+      "type": "workshop",
+      "start": "12:00",
+      "end": "13:00",
+      "title": "Skill Issue aneb Proč jeden prompt nestačí na celou hru",
+      "partner": "SolarWinds",
+      "room": "C228",
+      "floor": "2",
+      "bring": "Vlastní laptop + jeden z nástrojů Claude Code, GitHub Copilot, Codex nebo OpenCode (OpenCode stačí, pokud žádný jiný nemáš).",
+      "desc": "Velký úkol jedním zadáním AI nezvládne. Na workshopu si ukážeme, jak práci rozdělit mezi specializované AI agenty a každému dát vlastní „skill“ – jasně popsanou roli, pravidla a výstup, který předává dál. Vyzkoušíte si, jak dobré zadání a kontrola výsledků mění to, co AI dokáže. Výstupem bude malá hratelná videohra. Znalost programování není potřeba.",
+      "icon": "gamepad"
+    },
+    {
+      "id": "workshop-sap",
+      "type": "workshop",
+      "start": "13:00",
+      "end": "14:00",
+      "title": "(Ne)smazatelná digitální stopa",
+      "partner": "SAP",
+      "room": "C228",
+      "floor": "2",
+      "bring": "Vlastní laptop.",
+      "desc": "Chceš zjistit, co o tobě vědí platformy a aplikace, které používáš? Na tomto workshopu se dozvíš, jak jim o sobě neprozradit víc, jak se chovat v podvodných situacích a jak si ověřovat informace v době AI.",
+      "icon": "fingerprint"
+    },
+    {
+      "id": "workshop-security",
+      "type": "workshop",
+      "start": "13:00",
+      "end": "14:00",
+      "title": "Fact Injections: Bezpečnostní dopady Rank-One Model Editing (ROME) na jazykové modely",
+      "partner": "Security@FIT",
+      "room": "N105",
+      "floor": "1",
+      "desc": "Úprava jediného faktu ve velkém jazykovém modelu obvykle připomíná operaci srdce kladivem. Přetrénování je pomalé a drahé a často naruší chování, které s úpravou vůbec nesouvisí. ROME (Rank-One Model Editing) nabízí chirurgicky přesnější alternativu: s vahami modelu zachází jako s databází, kterou lze aktualizovat přímo na místě. V tomto praktickém workshopu si celou operaci provedete sami. Workshop vychází z probíhajícího výzkumu Red Hatu a FIT VUT v oblasti forenzní analýzy umělé inteligence a krok za krokem vás provede open-source nástrojem: nejprve přepíšeš fakt v modelu jedinou úpravou, poté pacienta vyšetříš, pak si zahraješ na útočníka, který do modelu podstrčí nepravdivý fakt – a nakonec vyzkoušíš prototyp pro detekci upravených modelů.",
+      "icon": "syringe"
+    },
+    {
+      "id": "prohlidky-1",
+      "type": "zone",
+      "start": "12:00",
+      "end": "13:00",
+      "title": "Prohlídka fakulty – 1. kolo",
+      "room": "E103",
+      "floor": "1",
+      "desc": "Prohlédni si fakultu s našimi studenty. Sraz u stánků v respiriu. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
+      "icon": "tour"
+    },
+    {
+      "id": "prohlidky-2",
+      "type": "zone",
+      "start": "13:00",
+      "end": "14:00",
+      "title": "Prohlídka fakulty – 2. kolo",
+      "room": "E103",
+      "floor": "1",
+      "desc": "Prohlédni si fakultu s našimi studenty. Sraz u stánků v respiriu. Během celé akce se také můžeš ptát studentských ambasadorů na všechno ohledně studia IT.",
+      "icon": "tour"
+    },
+    {
+      "id": "kachna",
+      "type": "zone",
+      "start": "11:00",
+      "end": "16:00",
+      "title": "Kachna",
+      "room": "R212",
+      "floor": "2",
+      "desc": "Studentský klub U Kachničky — toasty a točená Kofola za studentské ceny. Zbytek programu si můžeš vychutnat v klubu.",
+      "icon": "duck"
+    }
+  ],
+  "poiOrder": [
+    "registrace",
+    "nabidka-stanky",
+    "prednaska-cernocky",
+    "prednaska-sekanina",
+    "prednaska-bezpecnost",
+    "workshop-redhat",
+    "workshop-solarwinds",
+    "workshop-sap",
+    "workshop-security",
+    "prohlidky-1",
+    "prohlidky-2",
+    "kachna"
+  ],
+  "highlights": null,
+  "partners": [
+    "NXP",
+    "SAP",
+    "RedHat",
+    "SolarWinds"
+  ]
+}

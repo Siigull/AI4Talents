@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor tras — AI4Talents</title>
+<!--
+  Hand-editing of stand-poster routes (edit/paths.html).
+  Route corrections are saved as OVERRIDES in data/route-overrides.json
+  (empty file = computed A* paths everywhere; deleting a key restores it).
+  Workflow: pick a route -> drag the handles (snap to corridor grid) ->
+  Save override -> Copy JSON -> paste into data/route-overrides.json ->
+  `node tools/build-data.mjs`. The stand posters then use the edited path.
+  Working state lives in localStorage ('ai4t-route-overrides').
+-->
+<link rel="stylesheet" href="../assets/css/main.css">
+<style>
+  html, body { height: 100%; }
+  body { display: flex; overflow: hidden; }
+  aside {
+    width: 340px; flex: none; overflow-y: auto; padding: 14px;
+    border-right: 2px solid var(--ink); background: var(--paper);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  h1 { font: 700 20px var(--font-display); }
+  h2 { font: 600 13px var(--font-body); text-transform: none; letter-spacing: 0; margin-top: 8px; }
+  p.note { font: 12px/1.5 var(--font-body); color: var(--ink-soft); }
+  label { font: 700 11px var(--font-mono); color: var(--ink-soft); display: block; margin-bottom: 3px; }
+  select, textarea, input[type=text] {
+    width: 100%; font: 13px var(--font-mono); padding: 7px 8px;
+    border: 2px solid var(--ink); border-radius: 4px; background: #fff; color: var(--ink);
+  }
+  textarea { min-height: 110px; font-size: 11px; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  button {
+    font: 700 13px var(--font-mono); padding: 9px 12px; cursor: pointer;
+    border: 2px solid var(--ink); border-radius: 4px; background: #fff; color: var(--ink);
+  }
+  button:hover { background: var(--fill-lecture); }
+  button.primary { background: var(--blue); border-color: var(--ink); color: #fff; }
+  button.danger { color: #b00020; }
+  .legs { display: flex; flex-direction: column; gap: 6px; }
+  .leg {
+    text-align: left; padding: 8px 10px; border: 2px solid var(--ink);
+    border-radius: 4px; background: #fff; font: 12px var(--font-mono); cursor: pointer;
+  }
+  .leg.is-active { background: var(--fill-lecture); }
+  .leg small { display: block; color: var(--ink-soft); font-weight: 400; }
+  .status { font: 12px var(--font-mono); color: var(--ink-soft); min-height: 16px; }
+  #map-host { flex: 1; display: flex; flex-direction: column; padding: 12px; min-width: 0; }
+  #map-root { flex: 1; min-height: 0; max-width: none; }
+  /* editor overlay handles */
+  #map-root .pe-handle { fill: #fff; stroke: var(--magenta-deep); stroke-width: 2px; cursor: grab; }
+  #map-root .pe-handle.pe-end { fill: var(--magenta-deep); stroke: #fff; }
+  #map-root .pe-handle:hover { stroke-width: 3.5px; }
+  #map-root .pe-line { fill: none; stroke: var(--magenta); stroke-width: 3px;
+    stroke-dasharray: 8 5; stroke-linecap: round; pointer-events: stroke; cursor: copy; }
+  #map-root .pe-hint { font: 700 12px var(--font-mono); fill: var(--magenta-deep); }
+</style>
+</head>
+<body>
+<aside>
+  <h1>Editor tras</h1>
+  <p class="note">Opravy tras pro stojany „Jste tady“. Uchop bod a přesuň (přichytává se ke koridorové mřížce),
+    dvojklik na linii = nový bod, Alt+klik na bod = smazat. Hotovo? <b>Uložit úpravu</b> →
+    <b>Zkopírovat JSON</b> → vlož do <code>data/route-overrides.json</code> a spusť
+    <code>node tools/build-data.mjs</code>.</p>
+
+  <div class="row">
+    <div><label for="from">Odkud</label><select id="from"></select></div>
+    <div><label for="to">Kam</label><select id="to"></select></div>
+  </div>
+
+  <h2>Úseky trasy</h2>
+  <div class="legs" id="legs"></div>
+
+  <div class="row">
+    <button id="btn-save" class="primary">Uložit úpravu</button>
+    <button id="btn-reset" class="danger">Zrušit úpravu</button>
+  </div>
+
+  <h2>JSON (data/route-overrides.json)</h2>
+  <textarea id="json" spellcheck="false"></textarea>
+  <div class="row">
+    <button id="btn-copy">Zkopírovat JSON</button>
+    <button id="btn-import">Načíst z pole</button>
+  </div>
+  <p class="status" id="status"></p>
+
+  <h2>Předvolby stojanů</h2>
+  <div id="presets" class="legs"></div>
+</aside>
+<main id="map-host">
+  <div id="map-root"></div>
+</main>
+
+<script src="../assets/js/data.js" defer></script>
+<script src="../assets/js/routing.js" defer></script>
+<script src="../assets/js/map.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  var DATA = window.AI4T_DATA, RT = window.AI4TRoute, MAP = window.AI4TMap;
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  }); };
+
+  var LS_KEY = 'ai4t-route-overrides';
+  var overrides = {};
+  try { overrides = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {}; } catch (e) { overrides = {}; }
+  // bundled file (already applied via AI4T_DATA.routeOverrides) is the floor;
+  // localStorage holds the working edits on top
+  try {
+    var bundled = DATA.routeOverrides || {};
+    Object.keys(bundled).forEach(function (k) { if (!(k in overrides)) overrides[k] = bundled[k]; });
+  } catch (e) {}
+
+  var route = null;        // {roomId, legs:[{floor, stairs, points}]}
+  var activeLeg = 0;
+  var overlayG = null;
+
+  // ---------------- room selects (floors 1 + 2) ----------------
+  function rooms() {
+    var out = [];
+    ['1', '2'].forEach(function (f) {
+      (DATA.map[f].rooms || []).forEach(function (r) {
+        out.push({ id: r.id, name: r.name, floor: f });
+      });
+    });
+    return out;
+  }
+  function fillSelect(sel, val) {
+    var rs = rooms().sort(function (a, b) { return a.id < b.id ? -1 : 1; });
+    sel.innerHTML = rs.map(function (r) {
+      return '<option value="' + esc(r.id) + '">' + esc(r.id) + ' · ' + esc(r.name) +
+        ' (' + (r.floor === '1' ? '1. patro' : '2. patro') + ')</option>';
+    }).join('');
+    if (val) sel.value = val;
+  }
+
+  // ---------------- route lifecycle ----------------
+  function keyOf() { return $('#from').value + '->' + $('#to').value; }
+
+  function loadRoute() {
+    var k = keyOf();
+    route = overrides[k] ? JSON.parse(JSON.stringify(overrides[k]))
+                         : RT.computeRawRoute({ roomId: $('#from').value }, { roomId: $('#to').value });
+    activeLeg = 0;
+    if (route) {
+      // jump to the first leg's floor
+      MAP.setFloor(route.legs[0].floor);
+    }
+    renderSidebar(); drawOverlay();
+    setStatus(route ? (overrides[k] ? 'upravená trasa' : 'vypočtená trasa (A*)') : 'trasa nenalezena');
+  }
+
+  function saveOverride() {
+    if (!route) return;
+    overrides[keyOf()] = JSON.parse(JSON.stringify(route));
+    persist();
+    renderSidebar(); drawOverlay();
+    setStatus('uloženo jako úprava (' + keyOf() + ')');
+  }
+  function resetOverride() {
+    delete overrides[keyOf()];
+    persist();
+    loadRoute();
+  }
+  function persist() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(overrides)); } catch (e) {}
+    $('#json').value = JSON.stringify(overrides, null, 1);
+  }
+
+  // ---------------- sidebar ----------------
+  function renderSidebar() {
+    var box = $('#legs');
+    if (!route) { box.innerHTML = '<p class="note">—</p>'; return; }
+    box.innerHTML = route.legs.map(function (l, i) {
+      var lbl = (l.floor === '1' ? '1. patro' : l.floor === '2' ? '2. patro' : l.floor + '. podlaží/patro');
+      var st = l.stairs ? (' → ' + (l.stairs.kind === 'elevator' ? 'výtah ' : 'schodiště ') + l.stairs.roomId) : ' → cíl';
+      return '<button class="leg' + (i === activeLeg ? ' is-active' : '') + '" data-i="' + i + '">' +
+        'Úsek ' + (i + 1) + ': ' + esc(lbl) + esc(st) +
+        '<small>' + l.points.length + ' bodů</small></button>';
+    }).join('');
+    box.querySelectorAll('.leg').forEach(function (b) {
+      b.addEventListener('click', function () {
+        activeLeg = +b.dataset.i;
+        MAP.setFloor(route.legs[activeLeg].floor);
+        renderSidebar(); drawOverlay();
+      });
+    });
+  }
+  function setStatus(t) { $('#status').textContent = t; }
+
+  // ---------------- map overlay + editing ----------------
+  function svgEl() { return document.querySelector('#map-svg'); }
+  function worldEl() { return document.querySelector('#map-world'); }
+
+  // screen -> svg viewBox coords (viewBox attribute reflects the crop)
+  function clientToView(cx, cy) {
+    var svg = svgEl(); if (!svg) return null;
+    var rect = svg.getBoundingClientRect();
+    var vb = (svg.getAttribute('viewBox') || '0 0 720 1000').split(/\s+/).map(Number);
+    var s = Math.min(rect.width / vb[2], rect.height / vb[3]);
+    var ox = (rect.width - vb[2] * s) / 2, oy = (rect.height - vb[3] * s) / 2;
+    return [vb[0] + (cx - rect.left - ox) / s, vb[1] + (cy - rect.top - oy) / s];
+  }
+
+  function drawOverlay() {
+    var world = worldEl(); if (!world) return;
+    if (overlayG) overlayG.remove();
+    if (!route || !route.legs[activeLeg]) return;
+    var leg = route.legs[activeLeg];
+    var svgNS = 'http://www.w3.org/2000/svg';
+    overlayG = document.createElementNS(svgNS, 'g');
+    overlayG.setAttribute('class', 'pe-layer');
+
+    var pl = document.createElementNS(svgNS, 'polyline');
+    pl.setAttribute('class', 'pe-line');
+    pl.setAttribute('points', leg.points.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' '));
+    overlayG.appendChild(pl);
+    // insert-point on double click over the line
+    pl.addEventListener('dblclick', function (e) {
+      var v = clientToView(e.clientX, e.clientY); if (!v) return;
+      // insert after the closest segment point
+      var best = 1, bestD = 1e18;
+      for (var i = 1; i < leg.points.length; i++) {
+        var d = distToSeg(v, leg.points[i - 1], leg.points[i]);
+        if (d < bestD) { bestD = d; best = i; }
+      }
+      leg.points.splice(best, 0, [Math.round(v[0] * 2) / 2, Math.round(v[1] * 2) / 2]);
+      drawOverlay(); renderSidebar();
+    });
+
+    leg.points.forEach(function (p, i) {
+      var c = document.createElementNS(svgNS, 'circle');
+      c.setAttribute('class', 'pe-handle' + (i === 0 || i === leg.points.length - 1 ? ' pe-end' : ''));
+      c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', 7);
+      c.dataset.i = i;
+      overlayG.appendChild(c);
+
+      c.addEventListener('pointerdown', function (e) {
+        if (e.altKey) { // delete point (never the endpoints)
+          if (i > 0 && i < leg.points.length - 1) { leg.points.splice(i, 1); drawOverlay(); renderSidebar(); }
+          return;
+        }
+        e.preventDefault(); c.setPointerCapture(e.pointerId);
+        var move = function (ev) {
+          var v = clientToView(ev.clientX, ev.clientY); if (!v) return;
+          // snap to the corridor grid (4 svg units) for clean manhattan lines
+          p[0] = Math.round(v[0] / 4) * 4; p[1] = Math.round(v[1] / 4) * 4;
+          c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]);
+          pl.setAttribute('points', leg.points.map(function (q) { return q[0].toFixed(1) + ',' + q[1].toFixed(1); }).join(' '));
+        };
+        var up = function () {
+          c.removeEventListener('pointermove', move); c.removeEventListener('pointerup', up);
+          renderSidebar();
+        };
+        c.addEventListener('pointermove', move); c.addEventListener('pointerup', up);
+      });
+    });
+    world.appendChild(overlayG);
+  }
+
+  function distToSeg(p, a, b) {
+    var dx = b[0] - a[0], dy = b[1] - a[1];
+    var l2 = dx * dx + dy * dy;
+    var t = l2 ? ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+  }
+
+  // ---------------- presets (stand routes) ----------------
+  var STANDS = ['A101', 'C106', 'E103', 'C228', 'N105', 'R212'];
+  var TARGETS = ['C106', 'E103'];
+  function renderPresets() {
+    var box = $('#presets');
+    box.innerHTML = [];
+    STANDS.forEach(function (s) {
+      TARGETS.forEach(function (t) {
+        if (s === t) return;
+        var k = s + '->' + t;
+        var b = document.createElement('button');
+        b.className = 'leg';
+        b.textContent = k + (overrides[k] ? ' (upraveno)' : '');
+        b.addEventListener('click', function () { $('#from').value = s; $('#to').value = t; loadRoute(); });
+        box.appendChild(b);
+      });
+    });
+  }
+
+  // ---------------- boot ----------------
+  MAP.init('#map-root');
+  fillSelect($('#from'), 'R212');
+  fillSelect($('#to'), 'C106');
+  $('#from').addEventListener('change', loadRoute);
+  $('#to').addEventListener('change', loadRoute);
+  $('#btn-save').addEventListener('click', saveOverride);
+  $('#btn-reset').addEventListener('click', resetOverride);
+  $('#btn-copy').addEventListener('click', function () {
+    persist();
+    $('#json').select();
+    try { document.execCommand('copy'); setStatus('JSON zkopírován do schránky'); } catch (e) {}
+  });
+  $('#btn-import').addEventListener('click', function () {
+    try {
+      var v = JSON.parse($('#json').value || '{}');
+      overrides = v; persist(); setStatus('JSON načten'); loadRoute();
+    } catch (e) { setStatus('neplatný JSON: ' + e.message); }
+  });
+  persist(); renderPresets(); loadRoute();
+});
+</script>
+</body>
+</html>

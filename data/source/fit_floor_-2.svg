@@ -1,0 +1,295 @@
+<svg id="map" width="100%" preserveAspectRatio="xMidYMin slice" style="position:relative;width:100%;min-width:800px;" viewBox="0 0 720 1000" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <pattern id="striped-room" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-office" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-laboratory" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-lecture" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-study" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-library" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-common" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-toilets" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-cellar" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-corridor" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-stairs" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-elevator" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-su-duck" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+    </defs>
+    <style>
+        text {font-family: Vafle,Open Sans,Arial,Helvetica,sans-serif;cursor:default;stroke:none;}
+        text.building {font-size:28px;fill:#00a9e0;}
+        text.main-entrance {font-size:15px;fill:#808080;}
+        text.street {font-size:15px;fill:#808080;}
+        text.room-label {font-size:8px;fill:#000000;font-family:Open Sans,Arial,Helvetica,sans-serif;}
+        text.ap {font-size:8px;font-family:Open Sans,Arial,Helvetica,sans-serif;text-anchor:middle;stroke:none;cursor:default;pointer-events:none;}        
+        text.ap-on {fill:red;}
+        text.ap-off {fill:black;}
+        circle.ap {stroke-width:1;fill:none;pointer-events:none;}
+        circle.ap-on {stroke:red;}
+        circle.ap-off {stroke:black;}
+        circle.ap-in {stroke-opacity:0.2;}
+        circle.ap-mid {stroke-opacity:0.3;}
+        circle.ap-out {stroke-opacity:0.4;}
+        
+        rect.building, polygon.building {fill:#e8eaea;stroke:#e8eaea;}
+        
+        .room {fill-opacity:1;fill:#ed913f;stroke:#000000;stroke-opacity:1;stroke-width:1px;vector-effect:non-scaling-stroke;} /*ed913f*/
+        #striped-room rect {fill:#ed913f;} /*ed913f*/
+        .room.office, #striped-office rect {fill:#ffff7f;}
+        .room.laboratory, #striped-laboratory rect {fill:#80D3F0;} /*7fffff*/
+        .room.lecture, #striped-lecture rect {fill:#80D3F0;}
+        .room.study, #striped-study rect {fill:#80D3F0;}
+        .room.library, #striped-library rect {fill:#80D3F0;}
+        .room.common, #striped-common rect {fill:#ed913f;}
+        .room.toilets, #striped-toilets rect {fill:#3fbf3f;} /*3fbf3f*/
+        .room.cellar, #striped-cellar rect {fill:#ed913f;}
+        .room.corridor, #striped-corridor rect {fill:#8d8d8d;} /*808080*/
+        .room.stairs, #striped-stairs rect {fill:#4d4d4d;} /*3f3f3f*/
+        .room.elevator, #striped-elevator rect {fill:#676767;}
+        .room.su-duck, #striped-su-duck rect {fill:#0a7dab;}
+        
+        line.door {stroke:#FFC0FF;stroke-width:3px;vector-effect:non-scaling-stroke;pointer-events:none;}
+        line.door.invisible {stroke:#a199a1;}
+        line.red {stroke:#ff5757;stroke-width:2px;pointer-events:none;vector-effect: non-scaling-stroke}
+        #arrow {fill:red;stroke:white;pointer-events:none;filter:drop-shadow(2px 5px 2px rgb(0 0 0 / 0.6));}
+        
+        .water {stroke-width:1px;stroke:#2b51b5;fill:white;fill-opacity:0;}
+        
+        [data-show-accessibility] g:not([data-accessible]) > .room {fill:url(#striped-room) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .office {fill:url(#striped-office) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .laboratory {fill:url(#striped-laboratory) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .lecture {fill:url(#striped-lecture) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .study {fill:url(#striped-study) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .library {fill:url(#striped-library) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .common {fill:url(#striped-common) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .toilets {fill:url(#striped-toilets) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .cellar {fill:url(#striped-cellar) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .corridor {fill:url(#striped-corridor) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .stairs {fill:url(#striped-stairs) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .elevator {fill:url(#striped-elevator) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .su-duck {fill:url(#striped-su-duck) !important;}
+    </style>
+        <g id="buildings" style="display:inline">
+        <text class="building" x="463" y="492" id="text-a">A</text>
+        <text class="building" x="309" y="413" id="text-b">B</text>
+        <text class="building" x="479" y="351" id="text-c">C</text>
+        <text class="building" x="546" y="428" id="text-d">D</text>
+        <text class="building" x="586" y="147" id="text-e">E</text>
+        <text class="building" x="278" y="170" id="text-f">F</text>
+        <text class="building" x="220" y="163" id="text-g">G</text>
+        <text class="building" x="293" y="25" id="text-h">H</text>
+        <text class="building" x="66" y="150" id="text-i">I</text>
+        <text class="building" x="580" y="25" id="text-j">J</text>
+        <text class="building" x="446" y="731" id="text-l">L</text>
+        <text class="building" x="346" y="786" id="text-m">M</text>
+        <text class="building" x="222" y="786" id="text-n">N</text>
+        <text class="building" x="98" y="786" id="text-o">O</text>
+        <text class="building" x="140" y="906" id="text-p">P</text>
+        <text class="building" x="579" y="884" id="text-q">Q</text>
+        <text class="building" x="345" y="906" id="text-r">R</text>
+        <text class="building" x="594" y="750" id="text-s">S</text>
+        
+        <!-- A -->
+        <polygon class="building" id="building-a" points="305,519 366,519 366,546 361,549 358,556 361,563 368,566 375,563 378,556 697,556 697,558 700,563 707,566 714,563 717,556 714,549 707,546 702,547 702,530 720,530 720,501 436,501 420,484 305,484"/>
+        <!-- B -->
+        <polygon class="building" id="building-b" points="241,308 241,370 180,370 180,414 241,414 241,519 305,519 305,308"/>
+        <!-- C -->
+        <polygon class="building" id="building-c" points="220,260 220,275 241,275 241,308 702,308 702,246 703,246 710,243 713,236 710,229 703,226 702,226 702,195 654,195 654,235 426,235 426,240 336,240 336,264 266,264 266,260"/>
+        <!-- D -->
+        <polygon class="building" id="building-d" points="584,346 584,462 633,462 633,501 653,501 653,462 719,462 719,346 653,346 653,308 633,308 633,346"/>
+        <!-- E -->
+        <polygon class="building" id="building-e" points="498,235 498,214 543,214 543,177 564,177 564,80 543,80 543,45 428,45 428,214 475,214 475,235"/>
+        <!-- F -->
+        <polygon class="building" id="building-f" points="336,221 336,210 377,210 377,170 336,170 336,149 377,149 377,109 336,109 336,90 377,90 377,45 318,45 318,63 272,63 272,129 318,129 318,221"/>
+        <!-- G -->
+        <polygon class="building" id="building-g" points="60,234 215,234 215,260 266,260 266,264 336,264 336,221 336,240 336,221 232,221 232,199 213,199 213,121 167,121 167,199 167,121 167,221 60,221"/>
+        <!-- H -->
+        <rect class="building" id="building-h" x="327" y="1" width="30" height="31"/>
+        <!-- I -->
+        <polygon class="building" id="building-i" points="86,0 86,55 0,55 0,95 43,95 43,110 0,110 0,150 43,150 43,169 0,169 0,209 43,209 43,238 0,238 0,279 60,279 60,76 126,76 126,0"/>
+        <!-- J -->
+        <rect class="building" id="building-j" x="600" y="1" width="119" height="39"/>
+
+        <!-- Bridge over the troubled waters -->
+        <polygon class="building" id="building-bridge" points="307,519 322,519 282,607 267,607"/>
+        
+        <!-- L -->
+        <polygon class="building" id="building-l" points="30,607 572,607 572,680 561,680 561,690 364,690 364,678 30,678"/>
+        <!-- M -->
+        <polygon class="building" id="building-m" points="342,678 342,910 220,910 220,895 326,895 326,872 279,872 279,716 326,716 326,678"/>
+        <!-- N -->
+        <polygon class="building" id="building-n" points="279,746 218,746 218,844 203,844 203,872 155,872  155,716 203,716 203,730 279,730"/>
+        <!-- O -->
+        <polygon class="building" id="building-o" points="155,746 95,746 95,844 78,844 78,872 31,872 31,716 78,716 78,730 155,730"/>
+        <!-- P -->
+        <rect class="building" id="building-p" x="5" y="910" width="255" height="75"/>
+        <!-- Q -->
+        <polygon class="building" id="building-q"  points="684,985 712,910 654,910 654,865 669,865 669,850 654,850 654,845 637,845 637,895 438,895 342,860 342,877 410,901 410,985"/>
+        <!-- R -->
+        <rect class="building" id="building-r" x="260" y="910" width="150" height="75"/>
+        <!-- S -->
+        <polygon class="building" id="building-s" points="637,845 719,845 719,656 637,656 610,640 582,691 637,723"/>
+        
+        <text transform="rotate(-90 15 776)" class="street" x="15" y="776" id="text41544">Metodějova</text>
+        <text class="street" x="361" y="592" id="text41545">Božetěchova</text>
+        <text class="street" x="30" y="705" id="text41545a">vjezd</text>
+        <text class="street" x="30" y="900" id="text41545b">vchod</text>
+        <text class="street" x="650" y="100" id="text41546"><tspan x="650" y="120">vjezd</tspan><tspan x="650" y="140">Křižíkova</tspan></text>
+        <text class="street" x="655" y="880" id="text41547">vchod<tspan x="655" y="900">Kollárova</tspan></text>
+    </g>
+    <g id="rooms">
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D006/.cs', '_self');" data-type='81' data-planek-id='271' >
+            <title>D006 Schodiště</title>
+            <polygon class='room stairs' id='D006' points='623,346 645,346 645,370 632,370 632,356 623,356'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D008/.cs', '_self');" data-type='81' data-planek-id='274' >
+            <title>D008 Schodiště</title>
+            <rect class='room stairs' id='D008' x='633' y='450' width='12' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D0201/.cs', '_self');" data-type='78' data-planek-id='276' data-accessible>
+            <title>D0201 Foyer</title>
+            <polygon class='room corridor' id='D0201' points='623,370 645,370 645,346 660,346 660,462 645,462 645,430 623,430'/>
+            <text class='room-label' x='625' y='378' id='text-D0201'>Foyer</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D0202/.cs', '_self');" data-type='129' data-planek-id='277' data-accessible>
+            <title>D0202 Vzduchotechnika</title>
+            <rect class='room other' id='D0202' x='584' y='346' width='39' height='116'/>
+            <text class='room-label' x='586' y='354' id='text-D0202'>D0202</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D0203/.cs', '_self');" data-type='51' data-planek-id='278' data-accessible>
+            <title>D0203 Místnost technika</title>
+            <polygon class='room other' id='D0203' points='623,440 633,440 633,430 645,430 645,450 633,450 633,462 623,462'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D0205/.cs', '_self');" data-type='87' data-planek-id='280' data-accessible>
+            <title>D0205 Výtah</title>
+            <rect class='room elevator' id='D0205' x='623' y='430' width='10' height='10'/>
+            <text class='room-label' x='625' y='438' id='text-D0205'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D0206/.cs', '_self');" data-type='70' data-planek-id='281' data-accessible>
+            <title>D0206 Posluchárna 154</title>
+            <rect class='room lecture' id='D0206' x='660' y='385' width='59' height='77'/>
+            <text class='room-label' x='662' y='393' id='text-D0206'>D0206</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D0207/.cs', '_self');" data-type='70' data-planek-id='282' data-accessible>
+            <title>D0207 Posluchárna 90</title>
+            <rect class='room lecture' id='D0207' x='660' y='346' width='59' height='39'/>
+            <text class='room-label' x='662' y='354' id='text-D0207'>D0207</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D0209/.cs', '_self');" data-type='112' data-planek-id='285' data-accessible>
+            <title>D0209 Úklid</title>
+            <rect class='room other' id='D0209' x='623' y='356' width='9' height='14'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q0201/.cs', '_self');" data-type='81' data-planek-id='863' >
+            <title>Q0201 Schodiště</title>
+            <rect class='room stairs' id='Q0201' x='600' y='895' width='10' height='35'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q0202/.cs', '_self');" data-type='17' data-planek-id='864' >
+            <title>Q0202 Sklep</title>
+            <rect class='room cellar' id='Q0202' x='550' y='860' width='90' height='35'/>
+            <text class='room-label' x='552' y='868' id='text-Q0202'>Q0202</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q0203/.cs', '_self');" data-type='17' data-planek-id='865' >
+            <title>Q0203 Sklep</title>
+            <rect class='room cellar' id='Q0203' x='450' y='860' width='100' height='35'/>
+            <text class='room-label' x='452' y='868' id='text-Q0203'>Q0203</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q0204/.cs', '_self');" data-type='17' data-planek-id='866' >
+            <title>Q0204 Sklep</title>
+            <rect class='room cellar' id='Q0204' x='400' y='855' width='50' height='35'/>
+            <text class='room-label' x='402' y='863' id='text-Q0204'>Q0204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q0205/.cs', '_self');" data-type='79' data-planek-id='867' >
+            <title>Q0205 Chodba</title>
+            <rect class='room corridor' id='Q0205' x='490' y='895' width='15' height='70'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q0206/.cs', '_self');" data-type='81' data-planek-id='869' >
+            <title>Q0206 Schodiště</title>
+            <rect class='room stairs' id='Q0206' x='505' y='955' width='35' height='10'/>
+        </g>
+    </g>
+    <g id='doors'>
+        <line class='door ' x1='634.5' y1='370' x2='642.5' y2='370' />
+        <line class='door ' x1='645' y1='452' x2='645' y2='460' />
+        <line class='door ' x1='623' y1='422' x2='623' y2='414' />
+        <line class='door ' x1='623' y1='378' x2='623' y2='386' />
+        <line class='door ' x1='645' y1='436' x2='645' y2='444' />
+        <line class='door ' x1='624' y1='430' x2='632' y2='430' />
+        <line class='door ' x1='660' y1='454' x2='660' y2='446' />
+        <line class='door ' x1='660' y1='393' x2='660' y2='401' />
+        <line class='door ' x1='660' y1='382' x2='660' y2='374' />
+        <line class='door ' x1='623.5' y1='370' x2='631.5' y2='370' />
+        <line class='door ' x1='601' y1='895' x2='609' y2='895' />
+        <line class='door ' x1='550' y1='873.5' x2='550' y2='881.5' />
+        <line class='door ' x1='550' y1='873.5' x2='550' y2='881.5' />
+        <line class='door ' x1='450' y1='858' x2='450' y2='887' />
+        <line class='door ' x1='493.5' y1='895' x2='501.5' y2='895' />
+        <line class='door ' x1='505' y1='956' x2='505' y2='964' />
+    </g>
+    <g id='objects'>
+    </g>
+    <g id='AP'>
+        <circle class="ap ap-in ap-on" cx="699" cy="366" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="699" cy="366" r="9"/>
+        <circle class="ap ap-out ap-on" cx="699" cy="366" r="12"/>
+        <text class="ap ap-on" x="699" y="369">11</text>
+        <text class="ap ap-on" x="699" y="359">ac</text>
+        <text class="ap ap-on" x="699" y="377">n</text>
+        <circle class="ap ap-in ap-on" cx="699" cy="408" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="699" cy="408" r="9"/>
+        <circle class="ap ap-out ap-on" cx="699" cy="408" r="12"/>
+        <text class="ap ap-on" x="699" y="411">1</text>
+        <text class="ap ap-on" x="699" y="401">ac</text>
+        <text class="ap ap-on" x="699" y="419">n</text>
+        <circle class="ap ap-in ap-on" cx="699" cy="438" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="699" cy="438" r="9"/>
+        <circle class="ap ap-out ap-on" cx="699" cy="438" r="12"/>
+        <text class="ap ap-on" x="699" y="441">6</text>
+        <text class="ap ap-on" x="699" y="431">ac</text>
+        <text class="ap ap-on" x="699" y="449">n</text>
+        <circle class="ap ap-in ap-on" cx="25" cy="538" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="25" cy="538" r="9"/>
+        <circle class="ap ap-out ap-on" cx="25" cy="538" r="12"/>
+        <text class="ap ap-on" x="25" y="541">X</text>
+        <text class="ap ap-on" x="25" y="531">ax</text>
+        <text class="ap ap-on" x="25" y="549">ax</text>
+        <text class="ap ap-off" x="85" y="540">WiFi AP na kanálu X</text>
+    </g>
+</svg>

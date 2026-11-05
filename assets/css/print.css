@@ -1,0 +1,313 @@
+/* ==========================================================================
+   AI4Talents@FIT VUT — print.css (SPEC 4, first half: door / handout / A3)
+   Shared styles for the standalone print pages in /print. Pages are opened
+   at EXACT paper sizes (mm) for screenshotting — no scrolling, no responsive
+   reflow. Same design tokens as main.css; flat light only, no gradients.
+   Page-specific layout lives in each page's own <style> block; this file
+   holds tokens, base, and the shared components (header band, footer strip,
+   QR slot, chips, event rows, static mini-map SVG classes).
+   Comments in English, user-facing copy is Czech (from data/events.json).
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Tokens (mirrors main.css)
+   -------------------------------------------------------------------------- */
+:root {
+  --ground: #f6f5f1;
+  --ground-dark: #0d0c0b;
+  --panel-dark: #17161a;
+  --paper: #ffffff;
+
+  --ink: #14120f;
+  --ink-soft: #6f6b64;
+  --ink-on-dark: #f4f2ec;
+  --muted-on-dark: #9a948a;
+
+  --blue: #1761cc;
+  --blue-bright: #1987ef;
+  --magenta: #ff2fd6;
+  --magenta-deep: #c21f9f;
+  --yellow: #ffff7f;
+
+  --fill-lecture: #dbe7fa;
+  --fill-lab: #d4eefb;
+  --fill-office: #fff3c4;
+  --fill-circ: #ececec;
+  --fill-stairs: #dcdcdc;
+  --fill-building: #e8eaea;
+
+  --hairline: #d8d5cf;
+  --edge-dark: #2c2424;
+
+  --font-display: 'Space Grotesk', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
+/* --------------------------------------------------------------------------
+   2. Base — every print page is exactly one paper sheet
+   -------------------------------------------------------------------------- */
+* ,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body.pp {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 12pt;
+  line-height: 1.3;
+  overflow: hidden;                 /* hard guarantee: never scroll */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Root wrapper filled by the page boot script: stretches to the full sheet
+   so flex:1 sections and margin-top:auto rows pin to the sheet edges. */
+body.pp > .pp-root {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pp h1, .pp h2, .pp h3, .pp h4, .pp p { margin: 0; }
+
+/* Mono helper — every time / room code / label uses it (design spine). */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Uppercase micro label (kicker / chip / legend). Never below 6pt in print. */
+.kicker {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   3. Shared components
+   -------------------------------------------------------------------------- */
+
+/* --- dark header band (door / A3 / handout) --- */
+.pp .p-head {
+  background: var(--ground-dark);
+  color: var(--ink-on-dark);
+}
+.pp .p-head .sub { color: var(--muted-on-dark); }
+.pp .p-head .dot { color: var(--magenta); } /* pin-prick accent on dark */
+
+/* Wordmark — "4" in Dny AI blue, like the site topbar. */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink-on-dark);
+}
+.wordmark .wm-4 { color: var(--blue-bright); }
+
+/* --- room code chip (mono, hairline border) --- */
+.room-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  border: 1.5px solid var(--ink);
+  border-radius: 3px;
+  padding: 0 0.32em;
+  line-height: 1.55;
+  white-space: nowrap;
+}
+.room-chip--dark { border-color: var(--ink-on-dark); color: var(--ink-on-dark); }
+
+/* --- footer strip: 2px ink top border, mono 7pt, left + right --- */
+.pfooter {
+  border-top: 2px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6mm;
+  font-family: var(--font-mono);
+  font-size: 7pt;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink);
+  flex: none;
+}
+.pfooter .pf-url { font-weight: 500; }
+
+/* --- QR placeholder slot -----------------------------------------------
+   Square frame, 2px ink border, subtle diagonal cross + mono "QR" caption
+   inside. The real QR code is pasted over it later (print studio workflow).
+   Size is set per page via inline style / utility class (width = height). */
+.qr-slot {
+  position: relative;
+  width: 30mm;
+  height: 30mm;                     /* default A4 size; pages override */
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  flex: none;
+}
+.qr-slot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.qr-slot .qr-cross { stroke: var(--hairline); stroke-width: 1.5; }
+.qr-slot .qr-word {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 8pt;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  background: var(--paper);        /* knocks out the cross behind the word */
+  padding: 0 0.2em;
+}
+.qr-slot--dark {
+  border-color: var(--ink-on-dark);
+  background: var(--panel-dark);
+}
+.qr-slot--dark svg .qr-cross { stroke: var(--edge-dark); }
+.qr-slot--dark .qr-word { color: var(--muted-on-dark); background: var(--panel-dark); }
+
+/* Caption under a QR slot. */
+.qr-cap {
+  margin-top: 1.6mm;
+  font-family: var(--font-mono);
+  font-size: 6.5pt;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  max-width: 34mm;
+}
+
+/* --- map block: framed white canvas for the static mini-map SVG ---
+   The svg is absolutely positioned so its intrinsic viewBox aspect can
+   NEVER inflate a parent's flex basis (that made the door-poster programme
+   section shrink on busy rooms like C228). The box itself is sized by the
+   page layout; the svg then fills it 1:1 (viewBox pre-expanded to the
+   measured box aspect in print.js). */
+.mapbox {
+  position: relative;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  background: var(--paper);
+  overflow: hidden;
+  flex: none;
+}
+.mapbox svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.map-cap {
+  font-family: var(--font-mono);
+  font-size: 6.5pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 1.4mm;
+}
+
+/* --------------------------------------------------------------------------
+   4. Static mini-map SVG classes (rendered by assets/js/print.js miniMap)
+   PRINT V2: same decluttered style as the app v2 map — neutral white rooms
+   with hairline ink strokes, event rooms blue-tinted with bold mono labels,
+   subject room yellow. NO type colors, no letters, no pins.
+   Strokes use vector-effect: non-scaling-stroke (set per-shape in print.js)
+   so widths below are true print pixels.
+   -------------------------------------------------------------------------- */
+.pm-svg { background: var(--paper); display: block; }
+
+/* building base (app v2: light gray so white rooms read as rooms) */
+.pm-svg .pm-building {
+  fill: var(--fill-building);
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+}
+
+/* neutral rooms: white fill, hairline ink */
+.pm-svg .pm-room {
+  fill: #ffffff;
+  stroke: var(--ink);
+  stroke-width: 1.2px;
+}
+
+/* event rooms: blue tint + 2px ink stroke */
+.pm-svg .pm-room--ev {
+  fill: var(--fill-lecture);
+  stroke: var(--ink);
+  stroke-width: 2px;
+}
+
+/* subject room (the page's room): yellow + 3px stroke */
+.pm-svg .pm-room--subj {
+  fill: var(--yellow);
+  stroke: var(--ink);
+  stroke-width: 3px;
+}
+
+/* bold mono room-code labels — event rooms only (app v2 rule) */
+.pm-svg .pm-evlabel {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  fill: var(--ink);
+  stroke: var(--paper);
+  stroke-width: 3px;
+  paint-order: stroke;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* YOU-ARE-HERE crosshair on the subject room (door posters) */
+.pm-svg .pm-xh-line { stroke: var(--blue); stroke-width: 1.6px; }
+.pm-svg .pm-xh-ring { fill: none; stroke: var(--blue); stroke-width: 1.6px; }
+.pm-svg .pm-xh-dot  { fill: var(--blue); stroke: var(--paper); stroke-width: 1.6px; }
+
+/* --------------------------------------------------------------------------
+   5. Shared event row fragments (sized per page from the page styles)
+   -------------------------------------------------------------------------- */
+.ev { display: grid; grid-template-columns: auto 1fr; column-gap: 5mm; }
+.ev-time {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  line-height: 1.05;
+}
+.ev-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.ev-desc { color: var(--ink); }
+.ev-bring {
+  font-family: var(--font-mono);
+  color: var(--blue);
+}
+
+/* Multi-line clamp helper for condensed descriptions (Chrome print pages). */
+.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Hidden until JS builds the page; prevents empty-shell flash on screenshots. */
+.pp .js-wait[hidden] { display: none; }

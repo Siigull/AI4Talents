@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>AI4Talents — kapesní program (A5)</title>
+  <!-- Print mode guard: must be set BEFORE map.js loads (inline script). -->
+  <script>window.AI4T_PRINT_MODE = true;</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="../assets/css/print.css">
+  <style>
+    /* A5 landscape — exact sheet, for screenshotting at paper size. */
+    @page { size: 210mm 148mm; margin: 0; }
+    html, body { width: 210mm; height: 148mm; }
+
+    .page-handout { padding: 0; }
+
+    /* --- compact header band --- */
+    .hd-head {
+      flex: none; display: flex; justify-content: space-between; align-items: center;
+      gap: 6mm; padding: 2.8mm 6mm;
+    }
+    .hd-head .wordmark { font-size: 16pt; letter-spacing: -0.01em; }
+    .hd-meta { text-align: right; font-family: var(--font-mono); font-size: 7.5pt; line-height: 1.45; }
+    .hd-meta .sub { color: var(--muted-on-dark); }
+
+    /* --- two zones: programme list | maps + registration + QR --- */
+    .hd-main {
+      flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 72mm;
+      gap: 5mm; padding: 2.5mm 6mm 2mm;
+    }
+
+    /* programme rows — brutal density, ledger rules between rows */
+    .hd-list { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+    .hde {
+      display: grid; grid-template-columns: 13.5mm 1fr; column-gap: 2.5mm;
+      padding: 0.8mm 0; border-top: 1px solid var(--hairline); align-items: start;
+    }
+    .hde:first-child { border-top: 0; }
+    .hde-time { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 8.5pt; line-height: 1.15; padding-top: 0.2mm; }
+    .hde-time .end { display: block; font-size: 6.5pt; color: var(--ink-soft); }
+    .hde-title { font-family: var(--font-body); font-weight: 600; font-size: 9.5pt; line-height: 1.15; }
+    .hde-meta { margin-top: 0.35mm; font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 1mm 2mm; align-items: center; }
+    .hde--zone .hde-title { font-weight: 500; }
+    .hde--zone { border-top-style: dashed; }
+    .room-chip { font-size: 7pt; border-width: 1px; padding: 0 0.9mm; line-height: 1.4; }
+
+    /* --- right column: mini maps (fill), registration, QR --- */
+    .hd-side { display: flex; flex-direction: column; gap: 2.5mm; min-height: 0; }
+    .hd-maps { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; }
+    .hd-map { display: flex; flex-direction: column; min-height: 0; }
+    .hd-map .mapbox { flex: 1; min-height: 0; width: 100%; }
+    .hd-map .map-cap { text-align: center; margin-top: 1mm; flex: none; }
+
+    /* registration callout — blue field (Dny AI motif) */
+    .hd-reg { background: var(--blue); color: var(--paper); border-radius: 4px; padding: 2.4mm 3mm; flex: none; }
+    .hd-reg .kicker { font-size: 7.5pt; color: var(--paper); }
+    .hd-reg p { font-size: 9pt; font-weight: 500; margin-top: 0.8mm; line-height: 1.25; }
+    .hd-reg .mono { font-weight: 500; }
+
+    .hd-qr { flex: none; display: flex; align-items: flex-end; gap: 3mm; }
+    .hd-qr .qr-slot { width: 21mm; height: 21mm; }
+    .hd-qr .qr-cap { margin-top: 0; margin-bottom: 0.6mm; font-size: 6pt; max-width: 46mm; }
+
+    .pfooter { padding: 1.4mm 6mm 2mm; }
+  </style>
+</head>
+<body class="pp page-handout">
+  <div id="page" class="pp-root"></div>
+
+  <script src="../assets/js/data.js" defer></script>
+  <script src="../assets/js/routing.js" defer></script>
+  <script src="../assets/js/map.js" defer></script>
+  <script src="../assets/js/print.js" defer></script>
+  <script>
+    // Handout boot — A5 pocket programme: dense list + v2 mini maps.
+    window.addEventListener('DOMContentLoaded', function () {
+      var P = window.AI4TPrint;
+      var root = document.getElementById('page');
+      if (!P) { root.textContent = 'Chybí data (AI4TPrint).'; return; }
+
+      var meta = (window.AI4T_DATA.events && window.AI4T_DATA.events.meta) || {};
+      var evs = P.allEvents();
+
+      var h =
+        '<header class="p-head hd-head">' +
+          '<p class="wordmark">AI<span class="wm-4">4</span>Talents</p>' +
+          '<p class="hd-meta">' +
+            'PÁ ' + P.esc(P.fmtDate(meta.date)) + ' · ' + P.esc(meta.time || '9:00 — 14:00') + '<br>' +
+            '<span class="sub">' + P.esc(meta.place || 'FIT VUT v Brně') +
+              ' · KACHNA DO 16:00 — R212</span>' +
+          '</p>' +
+        '</header>' +
+        '<main class="hd-main">';
+
+      // ---- compact programme list ------------------------------------------
+      h += '<section class="hd-list" aria-label="Program dne">';
+      evs.forEach(function (ev) {
+        h +=
+          '<div class="hde hde--' + P.esc(ev.type) + '">' +
+            '<div class="hde-time">' + P.esc(ev.start) +
+              '<span class="end">— ' + P.esc(ev.end) + '</span></div>' +
+            '<div>' +
+              '<p class="hde-title">' + P.esc(ev.title) + '</p>' +
+              '<p class="hde-meta">' +
+                '<span class="room-chip">' + P.esc(ev.room) + '</span>' +
+                (ev.speaker || ev.partner ? '<span>' + P.esc(ev.speaker || ev.partner) + '</span>' : '') +
+                (ev.type === 'zone' ? '<span>průběžně</span>' : '') +
+              '</p>' +
+            '</div>' +
+          '</div>';
+      });
+      h += '</section>';
+
+      // ---- right column: v2 mini maps + registration + QR ------------------
+      h += '<aside class="hd-side">' +
+        '<div class="hd-maps">' +
+          '<div class="hd-map"><div class="mapbox" id="map-f1"></div>' +
+            '<p class="map-cap">1. patro · žlutá = registrace</p></div>' +
+          '<div class="hd-map"><div class="mapbox" id="map-f2"></div>' +
+            '<p class="map-cap">2. patro</p></div>' +
+        '</div>' +
+        '<div class="hd-reg">' +
+          '<p class="kicker">Zde se registruješ</p>' +
+          '<p>Registrace a info: <span class="mono">C106</span> (vchod do E)</p>' +
+        '</div>' +
+        '<div class="hd-qr">' + P.qrBlock(21, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
+      '</aside>';
+
+      h += '</main>' + P.footerStrip();
+      root.innerHTML = h;
+
+      // v2 mini maps: every event room of the floor, tinted + labelled
+      // (pocket overview), expanded to the measured box aspect so each SVG
+      // fills its box. C106 = yellow registration marker on floor 1.
+      function renderMaps() {
+        var byFloor = {};
+        P.eventRooms().forEach(function (p) {
+          (byFloor[p.floor] = byFloor[p.floor] || []).push(p.roomId);
+        });
+        [['map-f1', '1', 'C106'], ['map-f2', '2', null]].forEach(function (m) {
+          var box = document.getElementById(m[0]);
+          if (!box) return;
+          var rect = box.getBoundingClientRect();
+          if (rect.width < 10 || rect.height < 10) return;
+          var svg = P.miniMap({
+            floor: m[1],
+            subject: m[2],
+            crop: { rooms: byFloor[m[1]] || [], margin: 30 },
+            aspect: rect.width / rect.height,
+            boxMm: rect.width * 25.4 / 96,
+            labelPx: 9,   // pocket overview: tiny map, codes stay legible
+          });
+          if (svg) {
+            box.innerHTML = '';
+            box.appendChild(svg);
+          }
+        });
+      }
+      var done = false;
+      function run() {
+        if (done) return;
+        done = true;
+        requestAnimationFrame(renderMaps);
+      }
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(run);
+        setTimeout(run, 900);
+      } else {
+        run();
+      }
+    });
+  </script>
+</body>
+</html>

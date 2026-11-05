@@ -1,0 +1,14 @@
+.taste-skill/
+.ralph/
+.DS_Store
+.pi/
+.agents/
+notes.txt
+timetable.txt
+workshops_email.txt
+skills-lock.json
+DECISIONS.md
+DESIGN-BRIEF.md
+PROGRESS.md
+README.md
+spec/

@@ -1,0 +1,2275 @@
+<svg id="map" width="100%" preserveAspectRatio="xMidYMin slice" style="position:relative;width:100%;min-width:800px;" viewBox="0 0 720 1000" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <pattern id="striped-room" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-office" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-laboratory" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-lecture" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-study" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-library" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-common" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-toilets" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-cellar" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-corridor" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-stairs" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-elevator" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+        <pattern id="striped-su-duck" x="15" y="4" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)" >
+            <rect x="0" y="0" height="4" width="4"></rect>
+            <line class="red" x1="0" y1="1" x2="4" y2="1"/>
+        </pattern>
+    </defs>
+    <style>
+        text {font-family: Vafle,Open Sans,Arial,Helvetica,sans-serif;cursor:default;stroke:none;}
+        text.building {font-size:28px;fill:#00a9e0;}
+        text.main-entrance {font-size:15px;fill:#808080;}
+        text.street {font-size:15px;fill:#808080;}
+        text.room-label {font-size:8px;fill:#000000;font-family:Open Sans,Arial,Helvetica,sans-serif;}
+        text.ap {font-size:8px;font-family:Open Sans,Arial,Helvetica,sans-serif;text-anchor:middle;stroke:none;cursor:default;pointer-events:none;}        
+        text.ap-on {fill:red;}
+        text.ap-off {fill:black;}
+        circle.ap {stroke-width:1;fill:none;pointer-events:none;}
+        circle.ap-on {stroke:red;}
+        circle.ap-off {stroke:black;}
+        circle.ap-in {stroke-opacity:0.2;}
+        circle.ap-mid {stroke-opacity:0.3;}
+        circle.ap-out {stroke-opacity:0.4;}
+        
+        rect.building, polygon.building {fill:#e8eaea;stroke:#e8eaea;}
+        
+        .room {fill-opacity:1;fill:#ed913f;stroke:#000000;stroke-opacity:1;stroke-width:1px;vector-effect:non-scaling-stroke;} /*ed913f*/
+        #striped-room rect {fill:#ed913f;} /*ed913f*/
+        .room.office, #striped-office rect {fill:#ffff7f;}
+        .room.laboratory, #striped-laboratory rect {fill:#80D3F0;} /*7fffff*/
+        .room.lecture, #striped-lecture rect {fill:#80D3F0;}
+        .room.study, #striped-study rect {fill:#80D3F0;}
+        .room.library, #striped-library rect {fill:#80D3F0;}
+        .room.common, #striped-common rect {fill:#ed913f;}
+        .room.toilets, #striped-toilets rect {fill:#3fbf3f;} /*3fbf3f*/
+        .room.cellar, #striped-cellar rect {fill:#ed913f;}
+        .room.corridor, #striped-corridor rect {fill:#8d8d8d;} /*808080*/
+        .room.stairs, #striped-stairs rect {fill:#4d4d4d;} /*3f3f3f*/
+        .room.elevator, #striped-elevator rect {fill:#676767;}
+        .room.su-duck, #striped-su-duck rect {fill:#0a7dab;}
+        
+        line.door {stroke:#FFC0FF;stroke-width:3px;vector-effect:non-scaling-stroke;pointer-events:none;}
+        line.door.invisible {stroke:#a199a1;}
+        line.red {stroke:#ff5757;stroke-width:2px;pointer-events:none;vector-effect: non-scaling-stroke}
+        #arrow {fill:red;stroke:white;pointer-events:none;filter:drop-shadow(2px 5px 2px rgb(0 0 0 / 0.6));}
+        
+        .water {stroke-width:1px;stroke:#2b51b5;fill:white;fill-opacity:0;}
+        
+        [data-show-accessibility] g:not([data-accessible]) > .room {fill:url(#striped-room) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .office {fill:url(#striped-office) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .laboratory {fill:url(#striped-laboratory) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .lecture {fill:url(#striped-lecture) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .study {fill:url(#striped-study) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .library {fill:url(#striped-library) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .common {fill:url(#striped-common) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .toilets {fill:url(#striped-toilets) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .cellar {fill:url(#striped-cellar) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .corridor {fill:url(#striped-corridor) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .stairs {fill:url(#striped-stairs) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .elevator {fill:url(#striped-elevator) !important;}
+        [data-show-accessibility] g:not([data-accessible]) > .su-duck {fill:url(#striped-su-duck) !important;}
+    </style>
+        <g id="buildings" style="display:inline">
+        <text class="building" x="463" y="492" id="text-a">A</text>
+        <text class="building" x="309" y="413" id="text-b">B</text>
+        <text class="building" x="479" y="351" id="text-c">C</text>
+        <text class="building" x="546" y="428" id="text-d">D</text>
+        <text class="building" x="586" y="147" id="text-e">E</text>
+        <text class="building" x="278" y="170" id="text-f">F</text>
+        <text class="building" x="220" y="163" id="text-g">G</text>
+        <text class="building" x="293" y="25" id="text-h">H</text>
+        <text class="building" x="66" y="150" id="text-i">I</text>
+        <text class="building" x="580" y="25" id="text-j">J</text>
+        <text class="building" x="446" y="731" id="text-l">L</text>
+        <text class="building" x="346" y="786" id="text-m">M</text>
+        <text class="building" x="222" y="786" id="text-n">N</text>
+        <text class="building" x="98" y="786" id="text-o">O</text>
+        <text class="building" x="140" y="906" id="text-p">P</text>
+        <text class="building" x="579" y="884" id="text-q">Q</text>
+        <text class="building" x="345" y="906" id="text-r">R</text>
+        <text class="building" x="594" y="750" id="text-s">S</text>
+        
+        <!-- A -->
+        <polygon class="building" id="building-a" points="305,519 366,519 366,546 361,549 358,556 361,563 368,566 375,563 378,556 697,556 697,558 700,563 707,566 714,563 717,556 714,549 707,546 702,547 702,530 720,530 720,501 436,501 420,484 305,484"/>
+        <!-- B -->
+        <polygon class="building" id="building-b" points="241,308 241,370 180,370 180,414 241,414 241,519 305,519 305,308"/>
+        <!-- C -->
+        <polygon class="building" id="building-c" points="220,260 220,275 241,275 241,308 702,308 702,246 703,246 710,243 713,236 710,229 703,226 702,226 702,195 654,195 654,235 426,235 426,240 336,240 336,264 266,264 266,260"/>
+        <!-- D -->
+        <polygon class="building" id="building-d" points="584,346 584,462 633,462 633,501 653,501 653,462 719,462 719,346 653,346 653,308 633,308 633,346"/>
+        <!-- E -->
+        <polygon class="building" id="building-e" points="498,235 498,214 543,214 543,177 564,177 564,80 543,80 543,45 428,45 428,214 475,214 475,235"/>
+        <!-- F -->
+        <polygon class="building" id="building-f" points="336,221 336,210 377,210 377,170 336,170 336,149 377,149 377,109 336,109 336,90 377,90 377,45 318,45 318,63 272,63 272,129 318,129 318,221"/>
+        <!-- G -->
+        <polygon class="building" id="building-g" points="60,234 215,234 215,260 266,260 266,264 336,264 336,221 336,240 336,221 232,221 232,199 213,199 213,121 167,121 167,199 167,121 167,221 60,221"/>
+        <!-- H -->
+        <rect class="building" id="building-h" x="327" y="1" width="30" height="31"/>
+        <!-- I -->
+        <polygon class="building" id="building-i" points="86,0 86,55 0,55 0,95 43,95 43,110 0,110 0,150 43,150 43,169 0,169 0,209 43,209 43,238 0,238 0,279 60,279 60,76 126,76 126,0"/>
+        <!-- J -->
+        <rect class="building" id="building-j" x="600" y="1" width="119" height="39"/>
+
+        <!-- Bridge over the troubled waters -->
+        <polygon class="building" id="building-bridge" points="307,519 322,519 282,607 267,607"/>
+        
+        <!-- L -->
+        <polygon class="building" id="building-l" points="30,607 572,607 572,680 561,680 561,690 364,690 364,678 30,678"/>
+        <!-- M -->
+        <polygon class="building" id="building-m" points="342,678 342,910 220,910 220,895 326,895 326,872 279,872 279,716 326,716 326,678"/>
+        <!-- N -->
+        <polygon class="building" id="building-n" points="279,746 218,746 218,844 203,844 203,872 155,872  155,716 203,716 203,730 279,730"/>
+        <!-- O -->
+        <polygon class="building" id="building-o" points="155,746 95,746 95,844 78,844 78,872 31,872 31,716 78,716 78,730 155,730"/>
+        <!-- P -->
+        <rect class="building" id="building-p" x="5" y="910" width="255" height="75"/>
+        <!-- Q -->
+        <polygon class="building" id="building-q"  points="684,985 712,910 654,910 654,865 669,865 669,850 654,850 654,845 637,845 637,895 438,895 342,860 342,877 410,901 410,985"/>
+        <!-- R -->
+        <rect class="building" id="building-r" x="260" y="910" width="150" height="75"/>
+        <!-- S -->
+        <polygon class="building" id="building-s" points="637,845 719,845 719,656 637,656 610,640 582,691 637,723"/>
+        
+        <text transform="rotate(-90 15 776)" class="street" x="15" y="776" id="text41544">Metodějova</text>
+        <text class="street" x="361" y="592" id="text41545">Božetěchova</text>
+        <text class="street" x="30" y="705" id="text41545a">vjezd</text>
+        <text class="street" x="30" y="900" id="text41545b">vchod</text>
+        <text class="street" x="650" y="100" id="text41546"><tspan x="650" y="120">vjezd</tspan><tspan x="650" y="140">Křižíkova</tspan></text>
+        <text class="street" x="655" y="880" id="text41547">vchod<tspan x="655" y="900">Kollárova</tspan></text>
+    </g>
+    <g id="rooms">
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A201/.cs', '_self');" data-type='79' data-planek-id='93' data-accessible>
+            <title>A201 Chodba</title>
+            <polygon class='room corridor' id='A201' points='385,484 420,484 437,501 439,501 439,515 405,515 366,542 366,519 365,519 365,500 385,500'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A202/.cs', '_self');" data-type='85' data-planek-id='94' data-accessible>
+            <title>A202 Rampa</title>
+            <rect class='room corridor' id='A202' x='276' y='484' width='109' height='16'/>
+            <text class='room-label' x='278' y='492' id='text-A202'>rampa</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A203/.cs', '_self');" data-type='24' data-planek-id='95' data-accessible>
+            <title>A203 Respirium</title>
+            <rect class='room corridor' id='A203' x='241' y='428' width='35' height='72'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A204/.cs', '_self');" data-type='62' data-planek-id='96' data-accessible>
+            <title>A204 Kancelář
+Kočí Radek, Ing., Ph.D. +420 54114 1171</title>
+            <rect class='room office' id='A204' x='276' y='460' width='29' height='24'/>
+            <text class='room-label' x='278' y='468' id='text-A204'>A204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A205/.cs', '_self');" data-type='62' data-planek-id='97' data-accessible>
+            <title>A205 Vedoucí ústavu</title>
+            <rect class='room office' id='A205' x='276' y='428' width='29' height='32'/>
+            <text class='room-label' x='278' y='436' id='text-A205'>A205</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A206/.cs', '_self');" data-type='63' data-planek-id='98' data-accessible>
+            <title>A206 Kancelář</title>
+            <rect class='room office' id='A206' x='241' y='500' width='35' height='19'/>
+            <text class='room-label' x='243' y='508' id='text-A206'>A206</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A207/.cs', '_self');" data-type='63' data-planek-id='99' data-accessible>
+            <title>A207 Kancelář
+Šůstek Martin, Ing. +420 54114 1334
+Vídeňský František, Ing., Ph.D. 
+Vymazal Jan, Ing.</title>
+            <rect class='room office' id='A207' x='276' y='500' width='29' height='19'/>
+            <text class='room-label' x='278' y='508' id='text-A207'>A207</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A208/.cs', '_self');" data-type='24' data-planek-id='100' data-accessible>
+            <title>A208 Respirium</title>
+            <polygon class='room corridor' id='A208' points='305,500 355,500 355,514 365,514 365,519 305,519'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A211/.cs', '_self');" data-type='47' data-planek-id='106' data-accessible>
+            <title>A211 Obhajovací laboratoř</title>
+            <polygon class='room study' id='A211' points='366,542 387,527 387,556 378,556 375,563 368,566 361,563 358,556 361,549 366,546'/>
+            <text class='room-label' x='368' y='550' id='text-A211'>A211</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A212/.cs', '_self');" data-type='62' data-planek-id='107' data-accessible>
+            <title>A212 Kancelář
+Zbořil František, doc. Ing., CSc. +420 54114 1237</title>
+            <polygon class='room office' id='A212' points='387,527 405,515 405,528 416,528 416,556 387,556'/>
+            <text class='room-label' x='389' y='535' id='text-A212'>A212</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A213/.cs', '_self');" data-type='87' data-planek-id='108' data-accessible>
+            <title>A213 Výtah</title>
+            <rect class='room elevator' id='A213' x='405' y='515' width='11' height='13'/>
+            <text class='room-label' x='407' y='523' id='text-A213'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A214/.cs', '_self');" data-type='81' data-planek-id='109' >
+            <title>A214 Schodiště</title>
+            <rect class='room stairs' id='A214' x='416' y='515' width='23' height='41'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A215/.cs', '_self');" data-type='63' data-planek-id='110' data-accessible>
+            <title>A215 Kancelář
+Vojnar Tomáš, prof. Ing., Ph.D. +420 54114 1202</title>
+            <rect class='room office' id='A215' x='439' y='515' width='22' height='41'/>
+            <text class='room-label' x='441' y='523' id='text-A215'>215</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A216/.cs', '_self');" data-type='63' data-planek-id='111' data-accessible>
+            <title>A216 Kancelář</title>
+            <rect class='room office' id='A216' x='461' y='515' width='21' height='41'/>
+            <text class='room-label' x='463' y='523' id='text-A216'>216</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A217/.cs', '_self');" data-type='57' data-planek-id='112' data-accessible>
+            <title>A217 Kuchyňka</title>
+            <rect class='room other' id='A217' x='482' y='515' width='11' height='41'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A218/.cs', '_self');" data-type='67' data-planek-id='113' data-accessible>
+            <title>A218 Seminární místnost</title>
+            <rect class='room laboratory' id='A218' x='493' y='515' width='35' height='41'/>
+            <text class='room-label' x='495' y='523' id='text-A218'>A218</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A219/.cs', '_self');" data-type='63' data-planek-id='114' data-accessible>
+            <title>A219 Pracovna
+Andriushchenko Roman, Ing. +420 54114 1178
+Češka Milan, doc. RNDr., Ph.D. +420 54114 1178
+Fiedor Tomáš, Ing., Ph.D. +420 54114 1178
+Havlena Vojtěch, Ing., Ph.D. +420 54114 1178
+Holíková Lenka, Ing., Ph.D. +420 54114 1178
+Hudák David, Ing. +420 54114 1178
+Koumar Ondřej, Ing. 
+Lengál Ondřej, doc. Ing., Ph.D. +420 54114 1178
+Macák Filip, Ing. +420 54114 1178
+Malík Viktor, Ing., Ph.D. +420 54114 1178
+Pavela Jiří, Ing. +420 54114 1178
+Rozsíval Michal, Ing. 
+Šoková Veronika, Ing., Ph.D. +420 54114 1178
+Vašíček Ondřej, Ing. +420 54114 1178</title>
+            <rect class='room office' id='A219' x='528' y='515' width='35' height='41'/>
+            <text class='room-label' x='530' y='523' id='text-A219'>A219</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A220/.cs', '_self');" data-type='63' data-planek-id='115' data-accessible>
+            <title>A220 Pracovna
+Dacík Tomáš, Ing. 
+Hečko Michal, Ing. 
+Holík Lukáš, doc. Mgr., Ph.D. +420 54114 1331
+Hruška Martin, Ing., Ph.D. +420 54114 1331
+Chocholatý David, Ing. +420 54114 1331
+Kozák David, Ing., Ph.D. 
+Matyáš Jiří, Ing., Ph.D. 
+Nguyen Le Duy, Ing. 
+Síč Juraj, Mgr. +420 54114 1331
+Vargovčík Pavol, Ing.</title>
+            <rect class='room office' id='A220' x='563' y='515' width='36' height='41'/>
+            <text class='room-label' x='565' y='523' id='text-A220'>A220</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A221/.cs', '_self');" data-type='63' data-planek-id='116' data-accessible>
+            <title>A221 Pracovna
+Holop Patrik, Ing. 
+Reš Jakub, Ing. +420 54114 1335
+Snášel Daniel, Ing. +420 54114 1184
+Stančíková Ivana, Ing. 
+Staněk Vojtěch, Ing. +420 54114 1335
+Šalko Milan, Ing.</title>
+            <rect class='room office' id='A221' x='599' y='515' width='35' height='41'/>
+            <text class='room-label' x='601' y='523' id='text-A221'>A221</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A222/.cs', '_self');" data-type='63' data-planek-id='117' data-accessible>
+            <title>A222 Pracovna
+Firc Anton, Ing., Ph.D. +420 54114 1342
+Lička Zbyněk, Ing. +420 54114 1335; +420 54114 1342
+Malinka Kamil, doc. Mgr., Ph.D. +420 54114 1179
+Perešíni Martin, Ing., Ph.D. +420 54114 1179</title>
+            <rect class='room office' id='A222' x='634' y='515' width='35' height='41'/>
+            <text class='room-label' x='636' y='523' id='text-A222'>A222</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A223/.cs', '_self');" data-type='63' data-planek-id='118' data-accessible>
+            <title>A223 Pracovna
+Homoliak Ivan, doc. Ing., Ph.D. +420 54114 1185
+Mariani Juraj, Ing. +420 54114 1344
+Rozman Jaroslav, Ing., Ph.D. +420 54114 1190</title>
+            <polygon class='room office' id='A223' points='669,515 702,515 702,547 697,556 669,556'/>
+            <text class='room-label' x='671' y='523' id='text-A223'>A223</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A223.1/.cs', '_self');" data-type='112' data-planek-id='119' data-accessible>
+            <title>A223.1 Laboratoř</title>
+            <polygon class='room other' id='A223.1' points='702,547 707,546 714,549 717,556 714,563 707,566 700,563 697,558 697,556'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A224/.cs', '_self');" data-type='26' data-planek-id='120' data-accessible>
+            <title>A224 WC ženy</title>
+            <rect class='room toilets' id='A224' x='702' y='501' width='17' height='9'/>
+            <text class='room-label' x='704' y='509' id='text-A224'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A224.1/.cs', '_self');" data-type='150' data-planek-id='121' data-accessible>
+            <title>A224.1 WC muži</title>
+            <rect class='room toilets' id='A224.1' x='702' y='510' width='10' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A224.2/.cs', '_self');" data-type='26' data-planek-id='122' data-accessible>
+            <title>A224.2 WC invalidé</title>
+            <rect class='room toilets' id='A224.2' x='712' y='510' width='7' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A224.3/.cs', '_self');" data-type='36' data-planek-id='123' data-accessible>
+            <title>A224.3 WC muži</title>
+            <rect class='room toilets' id='A224.3' x='702' y='520' width='17' height='10'/>
+            <text class='room-label' x='704' y='528' id='text-A224.3'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A225/.cs', '_self');" data-type='79' data-planek-id='124' data-accessible>
+            <title>A225 Chodba</title>
+            <rect class='room corridor' id='A225' x='439' y='501' width='263' height='14'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/A301/.cs', '_self');" data-type='81' data-planek-id='126' >
+            <title>A301 Schodiště</title>
+            <rect class='room stairs' id='A301' x='267' y='452' width='9' height='22'/>
+        </g>
+        <g data-type='' data-planek-id='103' >
+            <title>Schodiště</title>
+            <rect class='room stairs other' id='' x='355' y='500' width='10' height='7'/>
+        </g>
+        <g data-type='' data-planek-id='105' data-accessible>
+            <title>Výtah</title>
+            <rect class='room elevator other' id='' x='355' y='507' width='10' height='7'/>
+            <text class='room-label' x='357' y='515' id='text-'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C201/.cs', '_self');" data-type='24' data-planek-id='205' data-accessible>
+            <title>C201 Respirium</title>
+            <rect class='room corridor' id='C201' x='472' y='283' width='186' height='25'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C202/.cs', '_self');" data-type='24' data-planek-id='206' data-accessible>
+            <title>C202 Respirium</title>
+            <rect class='room corridor' id='C202' x='426' y='272' width='46' height='36'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C203/.cs', '_self');" data-type='24' data-planek-id='207' data-accessible>
+            <title>C203 Respirium</title>
+            <polygon class='room corridor' id='C203' points='262,283 342,283 342,268 356,268 356,283 426,283 426,308 262,308'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C203.1/.cs', '_self');" data-type='24' data-planek-id='208' data-accessible>
+            <title>C203.1 Respirium</title>
+            <rect class='room corridor' id='C203.1' x='241' y='258' width='21' height='170'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C204/.cs', '_self');" data-type='62' data-planek-id='209' data-accessible>
+            <title>C204 Děkan
+Hanáček Petr, doc. Dr. Ing. +420 54114 1150; +420 54114 1216; +420 54114 1216, 5205; +420 54114 5205</title>
+            <rect class='room office' id='C204' x='262' y='308' width='43' height='22'/>
+            <text class='room-label' x='264' y='316' id='text-C204'>C204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C205/.cs', '_self');" data-type='22' data-planek-id='210' data-accessible>
+            <title>C205 Sekretariát děkana
+Hájková Gabriela, Mgr. Bc. +420 54114 1151
+Poledňová Pavla +420 54114 1144; +420 731 182 138</title>
+            <rect class='room office' id='C205' x='262' y='330' width='43' height='18'/>
+            <text class='room-label' x='264' y='338' id='text-C205'>C205</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C206/.cs', '_self');" data-type='22' data-planek-id='211' data-accessible>
+            <title>C206 Tajemník
+Hajduk Petr, Ing. +420 54114 1148</title>
+            <rect class='room office' id='C206' x='272' y='348' width='33' height='22'/>
+            <text class='room-label' x='274' y='356' id='text-C206'>C206</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C206.1/.cs', '_self');" data-type='93' data-planek-id='212' data-accessible>
+            <title>C206.1 Kuchyňka</title>
+            <rect class='room other' id='C206.1' x='262' y='348' width='10' height='22'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C207/.cs', '_self');" data-type='81' data-planek-id='213' >
+            <title>C207 Schodiště</title>
+            <rect class='room stairs' id='C207' x='262' y='370' width='43' height='22'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C208/.cs', '_self');" data-type='22' data-planek-id='214' data-accessible>
+            <title>C208 Organizační oddělení ústavů
+Bílková Michaela +420 54114 1119
+Malásková Věra +420 54114 1139</title>
+            <rect class='room office' id='C208' x='262' y='392' width='43' height='36'/>
+            <text class='room-label' x='264' y='400' id='text-C208'>C208</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C209/.cs', '_self');" data-type='67' data-planek-id='215' data-accessible>
+            <title>C209 Zasedací místnost
+Talavera Marc Arvie, MSc</title>
+            <rect class='room laboratory' id='C209' x='180' y='369' width='38' height='45'/>
+            <text class='room-label' x='182' y='377' id='text-C209'>C209</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C209.1/.cs', '_self');" data-type='8' data-planek-id='216' data-accessible>
+            <title>C209.1 Kuchyňka</title>
+            <rect class='room corridor' id='C209.1' x='218' y='369' width='23' height='23'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C209.2/.cs', '_self');" data-type='20' data-planek-id='217' data-accessible>
+            <title>C209.2 Sklad</title>
+            <rect class='room other' id='C209.2' x='218' y='392' width='23' height='22'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C210/.cs', '_self');" data-type='150' data-planek-id='218' data-accessible>
+            <title>C210 WC</title>
+            <rect class='room toilets' id='C210' x='220' y='260' width='21' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C210.1/.cs', '_self');" data-type='88' data-planek-id='219' data-accessible>
+            <title>C210.1 WC</title>
+            <rect class='room toilets' id='C210.1' x='215' y='238' width='26' height='22'/>
+            <text class='room-label' x='217' y='246' id='text-C210.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C211/.cs', '_self');" data-type='47' data-planek-id='220' data-accessible>
+            <title>C211 Obhajovací laboratoř</title>
+            <rect class='room study' id='C211' x='241' y='238' width='21' height='20'/>
+            <text class='room-label' x='243' y='246' id='text-C211'>C211</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C212/.cs', '_self');" data-type='81' data-planek-id='221' >
+            <title>C212 Schodiště</title>
+            <rect class='room stairs' id='C212' x='262' y='238' width='18' height='30'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C213/.cs', '_self');" data-type='112' data-planek-id='222' data-accessible>
+            <title>C213 Technická místnost</title>
+            <rect class='room other' id='C213' x='262' y='268' width='18' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C214/.cs', '_self');" data-type='54' data-planek-id='223' data-accessible>
+            <title>C214 Kopírka</title>
+            <rect class='room other' id='C214' x='280' y='268' width='12' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C215/.cs', '_self');" data-type='62' data-planek-id='224' data-accessible>
+            <title>C215 Kancelář
+Burget Radek, doc. Ing., Ph.D. +420 54114 1320</title>
+            <rect class='room office' id='C215' x='280' y='238' width='18' height='30'/>
+            <text class='room-label' x='282' y='246' id='text-C215'>215</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C216/.cs', '_self');" data-type='62' data-planek-id='225' data-accessible>
+            <title>C216 Kancelář
+Meduna Alexandr, prof. RNDr., CSc. +420 54114 1232</title>
+            <rect class='room office' id='C216' x='298' y='238' width='17' height='30'/>
+            <text class='room-label' x='300' y='246' id='text-C216'>216</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C217/.cs', '_self');" data-type='91' data-planek-id='226' data-accessible>
+            <title>C217 Úklid</title>
+            <rect class='room other' id='C217' x='302' y='268' width='13' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C218/.cs', '_self');" data-type='79' data-planek-id='227' data-accessible>
+            <title>C218 Chodba</title>
+            <rect class='room corridor' id='C218' x='292' y='268' width='10' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C219/.cs', '_self');" data-type='150' data-planek-id='228' data-accessible>
+            <title>C219 WC ženy</title>
+            <rect class='room toilets' id='C219' x='333' y='268' width='9' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C219.1/.cs', '_self');" data-type='35' data-planek-id='229' data-accessible>
+            <title>C219.1 WC ženy</title>
+            <rect class='room toilets' id='C219.1' x='315' y='268' width='18' height='15'/>
+            <text class='room-label' x='317' y='276' id='text-C219.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C220/.cs', '_self');" data-type='63' data-planek-id='230' data-accessible>
+            <title>C220 Kancelář
+Bučko Filip, Ing. 
+Havel Martin, Ing. 
+Klembara Radovan, Ing. +420 54114 1324
+Kocman Radim, Ing., Ph.D. +420 54114 1324</title>
+            <rect class='room office' id='C220' x='315' y='238' width='35' height='30'/>
+            <text class='room-label' x='317' y='246' id='text-C220'>C220</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C221/.cs', '_self');" data-type='63' data-planek-id='231' data-accessible>
+            <title>C221 Kancelář
+Anderson Enock +420 54114 1314
+Imanov Ganjali, MSc. 
+Mehavilla Martín Lorena 
+Mutua Nelson Makau, M.Sc. +420 54114 1316; +420 608 388 148
+Vondráček Martin, Ing. +420 54114 1314</title>
+            <rect class='room office' id='C221' x='350' y='238' width='32' height='30'/>
+            <text class='room-label' x='352' y='246' id='text-C221'>C221</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C222/.cs', '_self');" data-type='150' data-planek-id='232' data-accessible>
+            <title>C222 WC muži</title>
+            <rect class='room toilets' id='C222' x='356' y='268' width='9' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C222.1/.cs', '_self');" data-type='36' data-planek-id='233' data-accessible>
+            <title>C222.1 WC muži</title>
+            <rect class='room toilets' id='C222.1' x='365' y='268' width='17' height='15'/>
+            <text class='room-label' x='367' y='276' id='text-C222.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C223/.cs', '_self');" data-type='63' data-planek-id='234' data-accessible>
+            <title>C223 Kancelář
+Bartík Vladimír, Ing., Ph.D. +420 54114 1319
+Musil Miloš, Ing., Ph.D. +420 54114 1319</title>
+            <rect class='room office' id='C223' x='382' y='238' width='20' height='45'/>
+            <text class='room-label' x='384' y='246' id='text-C223'>223</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C224/.cs', '_self');" data-type='57' data-planek-id='235' data-accessible>
+            <title>C224 Kuchyňka</title>
+            <rect class='room other' id='C224' x='402' y='262' width='16' height='21'/>
+            <text class='room-label' x='404' y='270' id='text-C224'>224</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C224.1/.cs', '_self');" data-type='29' data-planek-id='236' data-accessible>
+            <title>C224.1 Kuchyňka</title>
+            <rect class='room other' id='C224.1' x='418' y='262' width='8' height='21'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C225/.cs', '_self');" data-type='93' data-planek-id='237' data-accessible>
+            <title>C225 Denní místnost</title>
+            <rect class='room other' id='C225' x='402' y='238' width='24' height='24'/>
+            <text class='room-label' x='404' y='246' id='text-C225'>225</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C226/.cs', '_self');" data-type='63' data-planek-id='238' data-accessible>
+            <title>C226 Kancelář
+Kolář Dušan, doc. Dr. Ing. +420 54114 1238</title>
+            <rect class='room office' id='C226' x='426' y='235' width='27' height='37'/>
+            <text class='room-label' x='428' y='243' id='text-C226'>C226</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C227/.cs', '_self');" data-type='63' data-planek-id='239' data-accessible>
+            <title>C227 Kancelář
+Honzík Jan M., prof. Ing., CSc. +420 54114 1242
+Regéciová Dominika, Ing. +420 54114 1242</title>
+            <rect class='room office' id='C227' x='452' y='235' width='20' height='37'/>
+            <text class='room-label' x='454' y='243' id='text-C227'>227</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C228/.cs', '_self');" data-type='67' data-planek-id='240' data-accessible>
+            <title>C228 Seminární místnost</title>
+            <rect class='room laboratory' id='C228' x='472' y='235' width='43' height='48'/>
+            <text class='room-label' x='474' y='243' id='text-C228'>C228</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C229/.cs', '_self');" data-type='63' data-planek-id='241' data-accessible>
+            <title>C229 Kancelář
+Křivka Zbyněk, Ing., Ph.D. +420 54114 1313
+Poliakov Daniel, Ing. +420 54114 1323
+Rychlý Marek, RNDr., Ph.D. +420 54114 1240; +420 778 723 439</title>
+            <rect class='room office' id='C229' x='515' y='235' width='24' height='48'/>
+            <text class='room-label' x='517' y='243' id='text-C229'>C229</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C230/.cs', '_self');" data-type='81' data-planek-id='242' >
+            <title>C230 Schodiště</title>
+            <rect class='room stairs' id='C230' x='539' y='235' width='24' height='48'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C231/.cs', '_self');" data-type='62' data-planek-id='243' data-accessible>
+            <title>C231 Kancelář
+Burgetová Ivana, Ing., Ph.D. +420 54114 1317
+Květoňová Šárka, Ing., Ph.D. +420 54114 1328</title>
+            <rect class='room office' id='C231' x='563' y='235' width='28' height='48'/>
+            <text class='room-label' x='565' y='243' id='text-C231'>C231</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C232/.cs', '_self');" data-type='62' data-planek-id='244' data-accessible>
+            <title>C232 Kancelář
+Hruška Tomáš, prof. Ing., CSc. +420 54114 1239</title>
+            <rect class='room office' id='C232' x='591' y='235' width='28' height='48'/>
+            <text class='room-label' x='593' y='243' id='text-C232'>C232</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C233/.cs', '_self');" data-type='62' data-planek-id='245' data-accessible>
+            <title>C233 Kancelář
+Kreslíková Jitka, doc. RNDr., CSc. +420 54114 1260</title>
+            <rect class='room office' id='C233' x='619' y='235' width='26' height='48'/>
+            <text class='room-label' x='621' y='243' id='text-C233'>C233</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C234/.cs', '_self');" data-type='62' data-planek-id='246' data-accessible>
+            <title>C234 Kancelář</title>
+            <rect class='room office' id='C234' x='645' y='235' width='30' height='48'/>
+            <text class='room-label' x='647' y='243' id='text-C234'>C234</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C235/.cs', '_self');" data-type='63' data-planek-id='247' data-accessible>
+            <title>C235 Kancelář
+Hranický Radek, Ing., Ph.D. +420 54114 1288; +420 54114 1315
+Hynek Jiří, Ing., Ph.D. +420 54114 1441
+Imeri Arbnor, M.Eng., MSc 
+Lazúr Juraj, Ing. +420 771 528 081; +420771528081
+Ondryáš Ondřej, Ing. +420 54114 1441
+Pastushenko Olena, Ing. 
+Polišenský Jan, Ing. 
+Smažinka Petr, Ing. 
+Škarvada Libor, RNDr. +420 54114 1441</title>
+            <polygon class='room office' id='C235' points='675,235 693,235 696,229 703,226 710,229 713,236 710,243 703,246 702,246 702,283 675,283'/>
+            <text class='room-label' x='677' y='243' id='text-C235'>C235</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/C236/.cs', '_self');" data-type='47' data-planek-id='248' data-accessible>
+            <title>C236 Obhajovací laboratoř</title>
+            <rect class='room study' id='C236' x='658' y='283' width='44' height='25'/>
+            <text class='room-label' x='660' y='291' id='text-C236'>C236</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D106/.cs', '_self');" data-type='81' data-planek-id='291' >
+            <title>D106 Schodiště</title>
+            <polygon class='room stairs' id='D106' points='600,360 610,360 610,370 633,370 633,380 600,380'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D201/.cs', '_self');" data-type='86' data-planek-id='293' data-accessible>
+            <title>D201 Chodba</title>
+            <rect class='room corridor' id='D201' x='633' y='346' width='20' height='116'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D202/.cs', '_self');" data-type='25' data-planek-id='294' data-accessible>
+            <title>D202 Chodba</title>
+            <rect class='room corridor' id='D202' x='633' y='462' width='20' height='39'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D203/.cs', '_self');" data-type='86' data-planek-id='295' data-accessible>
+            <title>D203 Balkon</title>
+            <polygon class='room corridor' id='D203' points='653,450 660,450 664,462 653,462'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D204/.cs', '_self');" data-type='86' data-planek-id='296' data-accessible>
+            <title>D204 Balkon</title>
+            <polygon class='room corridor' id='D204' points='653,346 664,346 660,358 653,358'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D205/.cs', '_self');" data-type='25' data-planek-id='297' data-accessible>
+            <title>D205 Chodba</title>
+            <rect class='room corridor' id='D205' x='633' y='308' width='20' height='38'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/D206/.cs', '_self');" data-type='87' data-planek-id='298' data-accessible>
+            <title>D206 Výtah</title>
+            <rect class='room elevator' id='D206' x='623' y='430' width='10' height='10'/>
+            <text class='room-label' x='625' y='438' id='text-D206'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F121/.cs', '_self');" data-type='81' data-planek-id='366' >
+            <title>F121 Schodiště</title>
+            <rect class='room stairs' id='F121' x='346' y='203' width='10' height='7'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F200/.cs', '_self');" data-type='81' data-planek-id='368' >
+            <title>F200 Schodiště</title>
+            <rect class='room stairs' id='F200' x='336' y='141' width='15' height='8'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F201/.cs', '_self');" data-type='79' data-planek-id='369' >
+            <title>F201 Chodba</title>
+            <rect class='room corridor' id='F201' x='336' y='132' width='15' height='9'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F202/.cs', '_self');" data-type='79' data-planek-id='370' >
+            <title>F202 Foyer</title>
+            <rect class='room corridor' id='F202' x='351' y='132' width='26' height='17'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F203/.cs', '_self');" data-type='22' data-planek-id='371' >
+            <title>F203 Ekonomické oddělení
+Svobodová Monika +420 54114 1142</title>
+            <rect class='room office' id='F203' x='357' y='109' width='20' height='23'/>
+            <text class='room-label' x='359' y='117' id='text-F203'>F203</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F204/.cs', '_self');" data-type='22' data-planek-id='372' >
+            <title>F204 Kancelář
+Hynková Renata +420 54114 1154</title>
+            <rect class='room office' id='F204' x='336' y='109' width='21' height='23'/>
+            <text class='room-label' x='338' y='117' id='text-F204'>F204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F205/.cs', '_self');" data-type='79' data-planek-id='373' >
+            <title>F205 Chodba</title>
+            <rect class='room corridor' id='F205' x='318' y='118' width='18' height='23'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F206/.cs', '_self');" data-type='36' data-planek-id='374' >
+            <title>F206 WC muži</title>
+            <rect class='room toilets' id='F206' x='318' y='141' width='18' height='8'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F207/.cs', '_self');" data-type='35' data-planek-id='375' >
+            <title>F207 WC ženy</title>
+            <rect class='room toilets' id='F207' x='318' y='109' width='18' height='9'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F208/.cs', '_self');" data-type='91' data-planek-id='376' >
+            <title>F208 Úklid</title>
+            <rect class='room other' id='F208' x='330' y='109' width='6' height='9'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F209/.cs', '_self');" data-type='81' data-planek-id='378' >
+            <title>F209 Schodiště</title>
+            <rect class='room stairs' id='F209' x='310' y='96' width='8' height='20'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F210/.cs', '_self');" data-type='79' data-planek-id='379' >
+            <title>F210 Chodba</title>
+            <polygon class='room corridor' id='F210' points='297,63 318,63 318,96 310,96 310,116 318,116 318,129 297,129'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F211/.cs', '_self');" data-type='22' data-planek-id='380' >
+            <title>F211 Ekonomické oddělení
+Štursová Markéta, Ing. +420 54114 1146</title>
+            <rect class='room office' id='F211' x='272' y='111' width='25' height='18'/>
+            <text class='room-label' x='274' y='119' id='text-F211'>F211</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F212/.cs', '_self');" data-type='22' data-planek-id='381' >
+            <title>F212 Ekonomické oddělení
+Ventrubová Hana +420 54114 1175</title>
+            <rect class='room office' id='F212' x='272' y='92' width='25' height='19'/>
+            <text class='room-label' x='274' y='100' id='text-F212'>F212</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F213/.cs', '_self');" data-type='22' data-planek-id='382' >
+            <title>F213 Kancelář
+Kapplerová Eva +420 54114 1147</title>
+            <rect class='room office' id='F213' x='272' y='63' width='25' height='29'/>
+            <text class='room-label' x='274' y='71' id='text-F213'>F213</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F214/.cs', '_self');" data-type='140' data-planek-id='383' >
+            <title>F214 Foyer</title>
+            <rect class='room corridor' id='F214' x='318' y='64' width='16' height='26'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F215/.cs', '_self');" data-type='22' data-planek-id='384' >
+            <title>F215 Vedoucí ekonomického odd.
+Oravcová Marcela, Ing. +420 54114 1257</title>
+            <rect class='room office' id='F215' x='318' y='45' width='30' height='19'/>
+            <text class='room-label' x='320' y='53' id='text-F215'>F215</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F216/.cs', '_self');" data-type='22' data-planek-id='385' >
+            <title>F216 Ekonomické oddělení
+Pirová Zuzana, Ing. +420 54114 1256
+Štanclová Eva +420 54114 1266</title>
+            <rect class='room office' id='F216' x='348' y='45' width='29' height='45'/>
+            <text class='room-label' x='350' y='53' id='text-F216'>F216</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F218/.cs', '_self');" data-type='57' data-planek-id='386' >
+            <title>F218 Kuchyňka</title>
+            <rect class='room other' id='F218' x='334' y='64' width='14' height='26'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F219/.cs', '_self');" data-type='81' data-planek-id='387' >
+            <title>F219 Schodiště</title>
+            <rect class='room stairs' id='F219' x='336' y='203' width='10' height='7'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F220/.cs', '_self');" data-type='186' data-planek-id='388' >
+            <title>F220 Spisovna personálního oddělení</title>
+            <rect class='room other' id='F220' x='318' y='193' width='18' height='17'/>
+            <text class='room-label' x='320' y='201' id='text-F220'>220</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F221/.cs', '_self');" data-type='22' data-planek-id='389' >
+            <title>F221 Personální oddělení
+Mrazíková Libuše, Mgr. +420 54114 1244
+Valová Marie +420 54114 1241</title>
+            <rect class='room office' id='F221' x='318' y='170' width='31' height='23'/>
+            <text class='room-label' x='320' y='178' id='text-F221'>F221</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F222/.cs', '_self');" data-type='22' data-planek-id='390' >
+            <title>F222 Právník
+Paulíková Barbora, Mgr. +420 54114 1174</title>
+            <rect class='room office' id='F222' x='349' y='170' width='30' height='23'/>
+            <text class='room-label' x='351' y='178' id='text-F222'>F222</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/F223/.cs', '_self');" data-type='79' data-planek-id='391' >
+            <title>F223 Foyer</title>
+            <polygon class='room corridor' id='F223' points='354,193 379,193 379,210 356,210 356,203 336,203 336,193'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/G106/.cs', '_self');" data-type='81' data-planek-id='405' >
+            <title>G106 Schodiště</title>
+            <rect class='room stairs' id='G106' x='205' y='199' width='27' height='11'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/G201/.cs', '_self');" data-type='79' data-planek-id='409' >
+            <title>G201 Respirium</title>
+            <rect class='room corridor' id='G201' x='167' y='199' width='38' height='22'/>
+            <text class='room-label' x='169' y='207' id='text-G201'>G201</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/G202/.cs', '_self');" data-type='67' data-planek-id='410' >
+            <title>G202 Posluchárna 80</title>
+            <rect class='room laboratory' id='G202' x='167' y='121' width='46' height='78'/>
+            <text class='room-label' x='169' y='129' id='text-G202'>G202</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/G203/.cs', '_self');" data-type='81' data-planek-id='411' >
+            <title>G203 Schodiště</title>
+            <rect class='room stairs' id='G203' x='205' y='210' width='27' height='11'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I105/.cs', '_self');" data-type='81' data-planek-id='427' >
+            <title>I105 Schodiště</title>
+            <rect class='room stairs' id='I105' x='25' y='260' width='18' height='18'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I109/.cs', '_self');" data-type='81' data-planek-id='432' >
+            <title>I109 Schodiště</title>
+            <rect class='room stairs' id='I109' x='24' y='201' width='11' height='7'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I113/.cs', '_self');" data-type='81' data-planek-id='437' >
+            <title>I113 Schodiště</title>
+            <rect class='room stairs' id='I113' x='24' y='143' width='11' height='7'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I117/.cs', '_self');" data-type='81' data-planek-id='442' >
+            <title>I117 Schodiště</title>
+            <rect class='room stairs' id='I117' x='24' y='87' width='11' height='7'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I121/.cs', '_self');" data-type='81' data-planek-id='448' >
+            <title>I121 Schodiště</title>
+            <rect class='room stairs' id='I121' x='119' y='38' width='8' height='16'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I201/.cs', '_self');" data-type='79' data-planek-id='449' >
+            <title>I201 Chodba</title>
+            <rect class='room corridor' id='I201' x='25' y='238' width='18' height='22'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I202/.cs', '_self');" data-type='83' data-planek-id='450' >
+            <title>I202 Hala</title>
+            <rect class='room corridor' id='I202' x='10' y='238' width='15' height='19'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I202.1/.cs', '_self');" data-type='160' data-planek-id='451' >
+            <title>I202.1 Pokoj</title>
+            <rect class='room other' id='I202.1' x='1' y='257' width='24' height='21'/>
+            <text class='room-label' x='3' y='265' id='text-I202.1'>I202.1</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I202.2/.cs', '_self');" data-type='90' data-planek-id='452' >
+            <title>I202.2 Koupelna</title>
+            <rect class='room toilets' id='I202.2' x='1' y='238' width='9' height='19'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I203/.cs', '_self');" data-type='79' data-planek-id='453' >
+            <title>I203 Chodba</title>
+            <rect class='room corridor' id='I203' x='43' y='208' width='17' height='70'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I204/.cs', '_self');" data-type='83' data-planek-id='454' >
+            <title>I204 Hala</title>
+            <rect class='room corridor' id='I204' x='47' y='193' width='13' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I204.1/.cs', '_self');" data-type='160' data-planek-id='455' >
+            <title>I204.1 Pokoj</title>
+            <rect class='room other' id='I204.1' x='30' y='169' width='30' height='24'/>
+            <text class='room-label' x='32' y='177' id='text-I204.1'>204.1</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I204.2/.cs', '_self');" data-type='90' data-planek-id='456' >
+            <title>I204.2 Koupelna</title>
+            <rect class='room toilets' id='I204.2' x='35' y='193' width='12' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I205/.cs', '_self');" data-type='79' data-planek-id='457' >
+            <title>I205 Chodba</title>
+            <polygon class='room corridor' id='I205' points='18,193 35,193 35,201 24,201 24,208 18,208'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I206/.cs', '_self');" data-type='160' data-planek-id='458' >
+            <title>I206 Pokoj</title>
+            <rect class='room other' id='I206' x='1' y='169' width='29' height='24'/>
+            <text class='room-label' x='3' y='177' id='text-I206'>I206</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I206.1/.cs', '_self');" data-type='90' data-planek-id='459' >
+            <title>I206.1 Koupelna</title>
+            <rect class='room toilets' id='I206.1' x='1' y='193' width='17' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I207/.cs', '_self');" data-type='79' data-planek-id='460' >
+            <title>I207 Chodba</title>
+            <polygon class='room corridor' id='I207' points='18,135 42,135 42,150 35,150 35,143 24,143 24,150 18,150'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I208/.cs', '_self');" data-type='160' data-planek-id='461' >
+            <title>I208 Pokoj</title>
+            <rect class='room other' id='I208' x='1' y='111' width='29' height='24'/>
+            <text class='room-label' x='3' y='119' id='text-I208'>I208</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I208.1/.cs', '_self');" data-type='90' data-planek-id='462' >
+            <title>I208.1 Koupelna</title>
+            <rect class='room toilets' id='I208.1' x='1' y='135' width='17' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I209/.cs', '_self');" data-type='160' data-planek-id='463' >
+            <title>I209 Pokoj</title>
+            <rect class='room other' id='I209' x='30' y='111' width='30' height='24'/>
+            <text class='room-label' x='32' y='119' id='text-I209'>I209</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I209.1/.cs', '_self');" data-type='90' data-planek-id='464' >
+            <title>I209.1 Koupelna</title>
+            <rect class='room toilets' id='I209.1' x='42' y='135' width='18' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I210/.cs', '_self');" data-type='79' data-planek-id='465' >
+            <title>I210 Chodba</title>
+            <polygon class='room corridor' id='I210' points='18,79 42,79 42,94 35,94 35,87 24,87 24,94 18,94'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I211/.cs', '_self');" data-type='160' data-planek-id='466' >
+            <title>I211 Pokoj</title>
+            <rect class='room other' id='I211' x='1' y='55' width='29' height='24'/>
+            <text class='room-label' x='3' y='63' id='text-I211'>I211</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I211.1/.cs', '_self');" data-type='90' data-planek-id='467' >
+            <title>I211.1 Koupelna</title>
+            <rect class='room toilets' id='I211.1' x='1' y='78' width='17' height='16'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I212/.cs', '_self');" data-type='160' data-planek-id='468' >
+            <title>I212 Pokoj</title>
+            <rect class='room other' id='I212' x='30' y='55' width='30' height='24'/>
+            <text class='room-label' x='32' y='63' id='text-I212'>I212</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I212.1/.cs', '_self');" data-type='90' data-planek-id='469' >
+            <title>I212.1 Koupelna</title>
+            <rect class='room toilets' id='I212.1' x='42' y='79' width='18' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I213/.cs', '_self');" data-type='79' data-planek-id='470' >
+            <title>I213 Chodba</title>
+            <polygon class='room corridor' id='I213' points='109,23 127,23 127,38 119,38 119,54 109,54'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I214/.cs', '_self');" data-type='160' data-planek-id='471' >
+            <title>I214 Pokoj</title>
+            <rect class='room other' id='I214' x='87' y='0' width='22' height='35'/>
+            <text class='room-label' x='89' y='8' id='text-I214'>I214</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I214.1/.cs', '_self');" data-type='90' data-planek-id='472' >
+            <title>I214.1 Koupelna</title>
+            <rect class='room toilets' id='I214.1' x='109' y='0' width='18' height='23'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I215/.cs', '_self');" data-type='160' data-planek-id='473' >
+            <title>I215 Pokoj</title>
+            <rect class='room other' id='I215' x='87' y='35' width='22' height='41'/>
+            <text class='room-label' x='89' y='43' id='text-I215'>I215</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/I215.1/.cs', '_self');" data-type='90' data-planek-id='474' >
+            <title>I215.1 Koupelna</title>
+            <rect class='room toilets' id='I215.1' x='109' y='54' width='18' height='22'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L103.1/.cs', '_self');" data-type='81' data-planek-id='530' >
+            <title>L103.1 Schodiště</title>
+            <rect class='room stairs' id='L103.1' x='328' y='607' width='32' height='23'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L201/.cs', '_self');" data-type='79' data-planek-id='571' data-accessible>
+            <title>L201 Chodba</title>
+            <polygon class='room corridor' id='L201' points='360,607 406,607 406,650 364,650 364,678 328,678 328,630 360,630'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L202/.cs', '_self');" data-type='79' data-planek-id='572' data-accessible>
+            <title>L202 Chodba</title>
+            <rect class='room corridor' id='L202' x='406' y='635' width='148' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L203/.cs', '_self');" data-type='22' data-planek-id='573' data-accessible>
+            <title>L203 Pracovna doktorandů
+Bařina David, Ing., Ph.D. +420 54114 1404
+Klíma Ondřej, Ing., Ph.D. +420 54114 1402
+Matýšek Michal, Ing. +420 54114 1404
+Šolony Marek, Ing., Ph.D. +420 54114 1404
+Zachariáš Michal, Ing., Ph.D. +420 54114 1430</title>
+            <rect class='room office' id='L203' x='364' y='650' width='42' height='40'/>
+            <text class='room-label' x='366' y='658' id='text-L203'>L203</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L204/.cs', '_self');" data-type='63' data-planek-id='574' data-accessible>
+            <title>L204 Pracovna doktorandů
+Dobeš Petr, Ing. +420 54114 1412
+Havrila Marek 
+Juránek Roman, Ing., Ph.D. +420 54114 1414
+Juránková Markéta, Ing., Ph.D. +420 54114 1412
+Šilling Petr, Ing. +420 54114 1414
+Vaško Marek, Ing. +420 54114 1414</title>
+            <rect class='room office' id='L204' x='406' y='650' width='42' height='40'/>
+            <text class='room-label' x='408' y='658' id='text-L204'>L204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L205/.cs', '_self');" data-type='63' data-planek-id='575' data-accessible>
+            <title>L205 Pracovna doktorandů
+Špaňhel Jakub, Ing., Ph.D. +420 54114 1298</title>
+            <rect class='room office' id='L205' x='448' y='650' width='42' height='40'/>
+            <text class='room-label' x='450' y='658' id='text-L205'>L205</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L206/.cs', '_self');" data-type='63' data-planek-id='576' data-accessible>
+            <title>L206 Pracovna doktorandů
+Bambušek Daniel, Ing. +420 54114 1406
+Kapinus Michal, Ing., Ph.D. +420 54114 1406
+Materna Zdeněk, Ing., Ph.D. +420 54114 1406; +420 775 056 058</title>
+            <rect class='room office' id='L206' x='490' y='650' width='42' height='40'/>
+            <text class='room-label' x='492' y='658' id='text-L206'>L206</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L207/.cs', '_self');" data-type='63' data-planek-id='577' data-accessible>
+            <title>L207 Pracovna doktorandů
+Grézl František, Ing., Ph.D. +420 54114 1280
+Kocour Martin, Ing. +420 54114 1292
+Li Jin, Msc. +420 54114 1275
+Pavlus Ján, Ing. +420 54114 1292
+Žižka Josef, Ing. +420 54114 1050</title>
+            <rect class='room office' id='L207' x='532' y='650' width='41' height='29'/>
+            <text class='room-label' x='534' y='658' id='text-L207'>L207</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L208/.cs', '_self');" data-type='81' data-planek-id='578' >
+            <title>L208 Požární schodiště</title>
+            <rect class='room stairs' id='L208' x='554' y='635' width='26' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L209/.cs', '_self');" data-type='63' data-planek-id='579' data-accessible>
+            <title>L209 Pracovna doktorandů</title>
+            <rect class='room office' id='L209' x='532' y='607' width='41' height='28'/>
+            <text class='room-label' x='534' y='615' id='text-L209'>L209</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L210/.cs', '_self');" data-type='63' data-planek-id='580' data-accessible>
+            <title>L210 Pracovna doktorandů
+Behúň Kamil, Ing. +420 54114 1052
+Bobák Petr, Ing., Ph.D. +420 54114 1410
+Polášek Tomáš, Ing. +420 54114 1052
+Tomešek Jan, Ing. +420 54114 1052</title>
+            <rect class='room office' id='L210' x='490' y='607' width='42' height='28'/>
+            <text class='room-label' x='492' y='615' id='text-L210'>L210</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L211/.cs', '_self');" data-type='78' data-planek-id='581' data-accessible>
+            <title>L211 Foyer</title>
+            <rect class='room corridor' id='L211' x='448' y='607' width='42' height='28'/>
+            <text class='room-label' x='450' y='615' id='text-L211'>foyer</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L212/.cs', '_self');" data-type='22' data-planek-id='582' data-accessible>
+            <title>L212 Sekretariát UPGM
+Otáhalová Sylva +420 54114 1296
+Slámová Jana +420 54114 1295</title>
+            <rect class='room office' id='L212' x='406' y='607' width='42' height='28'/>
+            <text class='room-label' x='408' y='615' id='text-L212'>L212</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L213/.cs', '_self');" data-type='79' data-planek-id='583' data-accessible>
+            <title>L213 Chodba</title>
+            <rect class='room corridor' id='L213' x='262' y='635' width='66' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L214/.cs', '_self');" data-type='81' data-planek-id='584' >
+            <title>L214 Schodiště</title>
+            <polygon class='room stairs' id='L214' points='284,607 328,607 328,635 316,635 316,622 284,622'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L215/.cs', '_self');" data-type='87' data-planek-id='585' data-accessible>
+            <title>L215 Výtah</title>
+            <rect class='room elevator' id='L215' x='297' y='622' width='19' height='13'/>
+            <text class='room-label' x='299' y='630' id='text-L215'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L216/.cs', '_self');" data-type='91' data-planek-id='586' data-accessible>
+            <title>L216 Úklid</title>
+            <rect class='room other' id='L216' x='284' y='622' width='13' height='13'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L217/.cs', '_self');" data-type='79' data-planek-id='587' data-accessible>
+            <title>L217 Chodba</title>
+            <rect class='room corridor' id='L217' x='30' y='635' width='232' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L218/.cs', '_self');" data-type='79' data-planek-id='588' data-accessible>
+            <title>L218 Chodba</title>
+            <rect class='room corridor' id='L218' x='262' y='607' width='22' height='28'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L218.1/.cs', '_self');" data-type='25' data-planek-id='589' data-accessible>
+            <title>L218.1 Lávka z 2. patra L do 3. patra A</title>
+            <polygon class='room corridor' id='L218.1' points='307,519 322,519 282,607 267,607'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L219/.cs', '_self');" data-type='57' data-planek-id='591' data-accessible>
+            <title>L219 Kuchyňka</title>
+            <rect class='room other' id='L219' x='241' y='607' width='21' height='28'/>
+            <text class='room-label' x='243' y='615' id='text-L219'>L219</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L220/.cs', '_self');" data-type='47' data-planek-id='592' data-accessible>
+            <title>L220 Zasedací místnost UPGM</title>
+            <rect class='room study' id='L220' x='199' y='607' width='42' height='28'/>
+            <text class='room-label' x='201' y='615' id='text-L220'>L220</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L221.1/.cs', '_self');" data-type='22' data-planek-id='593' data-accessible>
+            <title>L221.1 Kancelář
+Zemčík Pavel, prof. Dr. Ing., dr. h. c. +420 54114 1150; +420 54114 1217</title>
+            <rect class='room office' id='L221.1' x='178' y='607' width='21' height='28'/>
+            <text class='room-label' x='180' y='615' id='text-L221.1'>221.1</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L221.2/.cs', '_self');" data-type='22' data-planek-id='594' data-accessible>
+            <title>L221.2 Kancelář
+Černocký Jan, prof. Dr. Ing. +420 54114 1284</title>
+            <rect class='room office' id='L221.2' x='157' y='607' width='21' height='28'/>
+            <text class='room-label' x='159' y='615' id='text-L221.2'>221.2</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L222/.cs', '_self');" data-type='22' data-planek-id='595' data-accessible>
+            <title>L222 Kancelář
+Kohlová Renata, Ing. +420 54114 1278
+Kudla Radim, Ing. +420 54114 1214
+Najman Ondřej, Mgr. +420 54114 1223
+Silnova Anna, M.Sc., Ph.D. +420 54114 1214</title>
+            <rect class='room office' id='L222' x='136' y='607' width='21' height='28'/>
+            <text class='room-label' x='138' y='615' id='text-L222'>L222</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L223/.cs', '_self');" data-type='22' data-planek-id='596' data-accessible>
+            <title>L223 Kancelář
+Smrž Pavel, doc. RNDr., Ph.D. +420 54114 1282</title>
+            <rect class='room office' id='L223' x='115' y='607' width='21' height='28'/>
+            <text class='room-label' x='117' y='615' id='text-L223'>L223</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L224/.cs', '_self');" data-type='22' data-planek-id='597' data-accessible>
+            <title>L224 Kancelář
+Herout Adam, prof. Ing., Ph.D. +420 54114 1261</title>
+            <rect class='room office' id='L224' x='94' y='607' width='21' height='28'/>
+            <text class='room-label' x='96' y='615' id='text-L224'>L224</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L225/.cs', '_self');" data-type='22' data-planek-id='598' data-accessible>
+            <title>L225 Kancelář
+Beran Vítězslav, doc. Ing., Ph.D. +420 54114 1281; +420 777 286 075
+Španěl Michal, doc. Ing., Ph.D. +420 54114 1294</title>
+            <rect class='room office' id='L225' x='73' y='607' width='21' height='28'/>
+            <text class='room-label' x='75' y='615' id='text-L225'>L225</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L226/.cs', '_self');" data-type='22' data-planek-id='599' data-accessible>
+            <title>L226 Kancelář
+Diez Sánchez Mireia, M.Sc., Ph.D. +420 54114 1289
+Karafiát Martin, Ing., Ph.D. +420 54114 1279
+Klement Dominik, Ing. +420 54114 1289
+Odehnal Ondřej, Ing. 
+Pešán Jan, Ing. +420 54114 1279
+Szőke Igor, Ing., Ph.D. +420 54114 1287
+Švec Ján, Ing. +420 54114 1283</title>
+            <rect class='room office' id='L226' x='30' y='607' width='43' height='28'/>
+            <text class='room-label' x='32' y='615' id='text-L226'>L226</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L227/.cs', '_self');" data-type='81' data-planek-id='600' >
+            <title>L227 Požární schodiště</title>
+            <rect class='room stairs' id='L227' x='30' y='650' width='18' height='35'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L228/.cs', '_self');" data-type='116' data-planek-id='601' data-accessible>
+            <title>L228 Archív</title>
+            <rect class='room other' id='L228' x='48' y='650' width='8' height='28'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L229/.cs', '_self');" data-type='62' data-planek-id='602' data-accessible>
+            <title>L229 Kancelář
+Burget Lukáš, doc. Ing., Ph.D. +420 54114 1269</title>
+            <rect class='room office' id='L229' x='56' y='650' width='17' height='28'/>
+            <text class='room-label' x='58' y='658' id='text-L229'>229</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L230.1/.cs', '_self');" data-type='22' data-planek-id='603' data-accessible>
+            <title>L230.1 Kancelář
+Beneš Karel, Ing., Ph.D. 
+Mošner Ladislav, Ing., Ph.D. +420 54114 1271
+Peng Junyi +420 54114 1291
+Polok Alexander, Ing. +420 54114 1271
+Sedláček Šimon, Ing. +420 54114 1291
+Vendrame Katia, Ing. +420 54114 1291
+Yusuf Bolaji +420 54114 1297</title>
+            <rect class='room office' id='L230.1' x='157' y='650' width='42' height='28'/>
+            <text class='room-label' x='159' y='658' id='text-L230.1'>L230.1</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L230.2/.cs', '_self');" data-type='63' data-planek-id='604' data-accessible>
+            <title>L230.2 Kancelář
+Aparovich Maksim +420 54114 1422
+Dočekal Martin, Ing. +420 54114 1422
+Doležal Jan, Ing. +420 54114 1424
+Fajčík Martin, Ing., Ph.D. +420 54114 1421
+Jarolím Antonín, Ing. +420 54114 1422
+Makaiová Lucia, Ing. +420 54114 1421
+Šmahel Michal, Ing. +420 54114 1424; +420 774 912 670
+Švec Tomáš, Ing.</title>
+            <rect class='room office' id='L230.2' x='115' y='650' width='42' height='28'/>
+            <text class='room-label' x='117' y='658' id='text-L230.2'>L230.2</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L230.3/.cs', '_self');" data-type='63' data-planek-id='605' data-accessible>
+            <title>L230.3 Kancelář
+Kesiraju Santosh, Ph.D. +420 54114 1425
+Pálka Petr, Ing. +420 54114 1300
+Plchot Oldřich, Ing., Ph.D. +420 54114 1273; +420 54114 1425
+Schwarz Petr, Ing., Ph.D. +420 54114 1300
+Udupa Sathvik, Ing. +420 54114 1274
+Veselý Karel, Ing., Ph.D. +420 54114 1300</title>
+            <rect class='room office' id='L230.3' x='73' y='650' width='42' height='28'/>
+            <text class='room-label' x='75' y='658' id='text-L230.3'>L230.3</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L231/.cs', '_self');" data-type='22' data-planek-id='606' data-accessible>
+            <title>L231 Kancelář
+Čadík Martin, prof. Ing., Ph.D. +420 54114 1272</title>
+            <rect class='room office' id='L231' x='199' y='650' width='21' height='28'/>
+            <text class='room-label' x='201' y='658' id='text-L231'>L231</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L232/.cs', '_self');" data-type='62' data-planek-id='607' data-accessible>
+            <title>L232 Kancelář
+Heřmanský Hynek, prof. Ing., Dr. Eng. +420 54114 1326
+Motlíček Petr, doc. Ing., Ph.D. +420 54114 1279; +420 54114 1326</title>
+            <rect class='room office' id='L232' x='220' y='650' width='21' height='28'/>
+            <text class='room-label' x='222' y='658' id='text-L232'>L232</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L233/.cs', '_self');" data-type='22' data-planek-id='608' data-accessible>
+            <title>L233 Kancelář
+Brukner Jan, Ing. +420 54114 1311
+Han Jiangyu +420 54114 1431
+Rohdin Johan Andréas, M.Sc., Ph.D. +420 54114 1311
+Singh Prachi, B.Tech., Ph.D. +420 54114 1311</title>
+            <rect class='room office' id='L233' x='241' y='650' width='21' height='28'/>
+            <text class='room-label' x='243' y='658' id='text-L233'>L233</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L234/.cs', '_self');" data-type='112' data-planek-id='609' data-accessible>
+            <title>L234 Technická místnost</title>
+            <rect class='room other' id='L234' x='262' y='650' width='22' height='28'/>
+            <text class='room-label' x='264' y='658' id='text-L234'>L234</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L235/.cs', '_self');" data-type='36' data-planek-id='610' data-accessible>
+            <title>L235 Umývárna</title>
+            <rect class='room toilets' id='L235' x='284' y='650' width='10' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L235.1/.cs', '_self');" data-type='36' data-planek-id='611' data-accessible>
+            <title>L235.1 WC muži</title>
+            <rect class='room toilets' id='L235.1' x='284' y='662' width='22' height='16'/>
+            <text class='room-label' x='286' y='670' id='text-L235.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L235.2/.cs', '_self');" data-type='26' data-planek-id='612' data-accessible>
+            <title>L235.2 WC invalidé</title>
+            <rect class='room toilets' id='L235.2' x='294' y='650' width='12' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L236/.cs', '_self');" data-type='150' data-planek-id='613' data-accessible>
+            <title>L236 Umývárna</title>
+            <rect class='room toilets' id='L236' x='317' y='650' width='11' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L236.1/.cs', '_self');" data-type='35' data-planek-id='614' data-accessible>
+            <title>L236.1 WC ženy</title>
+            <rect class='room toilets' id='L236.1' x='306' y='662' width='22' height='16'/>
+            <text class='room-label' x='308' y='670' id='text-L236.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/L236.2/.cs', '_self');" data-type='26' data-planek-id='615' data-accessible>
+            <title>L236.2 WC invalidé</title>
+            <rect class='room toilets' id='L236.2' x='306' y='650' width='11' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M107/.cs', '_self');" data-type='81' data-planek-id='670' >
+            <title>M107 Schodiště</title>
+            <rect class='room stairs' id='M107' x='279' y='716' width='47' height='14'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M201/.cs', '_self');" data-type='79' data-planek-id='671' data-accessible>
+            <title>M201 Spojovací lávka</title>
+            <rect class='room corridor' id='M201' x='326' y='678' width='16' height='52'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M202/.cs', '_self');" data-type='79' data-planek-id='672' data-accessible>
+            <title>M202 Chodba</title>
+            <polygon class='room corridor' id='M202' points='326,730 342,730 342,910 220,910 220,895 326,895'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M203/.cs', '_self');" data-type='70' data-planek-id='673' data-accessible>
+            <title>M203 Posluchárna</title>
+            <rect class='room lecture' id='M203' x='279' y='788' width='47' height='84'/>
+            <text class='room-label' x='281' y='796' id='text-M203'>M203</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M204/.cs', '_self');" data-type='79' data-planek-id='674' data-accessible>
+            <title>M204 Chodba</title>
+            <polygon class='room corridor' id='M204' points='279,730 326,730 326,746 295,746 295,788 279,788'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M205/.cs', '_self');" data-type='150' data-planek-id='675' data-accessible>
+            <title>M205 Umývárna</title>
+            <rect class='room toilets' id='M205' x='295' y='774' width='10' height='14'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M205.1/.cs', '_self');" data-type='35' data-planek-id='676' data-accessible>
+            <title>M205.1 WC ženy</title>
+            <rect class='room toilets' id='M205.1' x='305' y='774' width='21' height='14'/>
+            <text class='room-label' x='307' y='782' id='text-M205.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M206/.cs', '_self');" data-type='91' data-planek-id='677' data-accessible>
+            <title>M206 Úklid</title>
+            <rect class='room other' id='M206' x='295' y='768' width='10' height='6'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M207/.cs', '_self');" data-type='150' data-planek-id='678' data-accessible>
+            <title>M207 Umývárna</title>
+            <rect class='room toilets' id='M207' x='295' y='758' width='10' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M207.1/.cs', '_self');" data-type='36' data-planek-id='679' data-accessible>
+            <title>M207.1 WC muži</title>
+            <rect class='room toilets' id='M207.1' x='305' y='758' width='21' height='16'/>
+            <text class='room-label' x='307' y='766' id='text-M207.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M208/.cs', '_self');" data-type='20' data-planek-id='680' data-accessible>
+            <title>M208 Soc. zázemí recepce</title>
+            <rect class='room other' id='M208' x='295' y='746' width='10' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/M209/.cs', '_self');" data-type='71' data-planek-id='681' data-accessible>
+            <title>M209 Mini Space</title>
+            <rect class='room laboratory' id='M209' x='305' y='746' width='21' height='12'/>
+            <text class='room-label' x='307' y='754' id='text-M209'>209</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N102/.cs', '_self');" data-type='81' data-planek-id='683' >
+            <title>N102 Schodiště</title>
+            <rect class='room stairs' id='N102' x='210' y='746' width='8' height='49'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N201/.cs', '_self');" data-type='79' data-planek-id='693' data-accessible>
+            <title>N201 Spojovací lávka</title>
+            <rect class='room corridor' id='N201' x='218' y='730' width='61' height='16'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N202/.cs', '_self');" data-type='79' data-planek-id='694' data-accessible>
+            <title>N202 Chodba</title>
+            <polygon class='room corridor' id='N202' points='155,730 218,730 218,746 210,746 210,795 218,795 218,844 203,844 203,746 155,746'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N203/.cs', '_self');" data-type='69' data-planek-id='695' data-accessible>
+            <title>N203 Počítačová laboratoř</title>
+            <rect class='room laboratory' id='N203' x='155' y='830' width='48' height='42'/>
+            <text class='room-label' x='157' y='838' id='text-N203'>N203</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N204/.cs', '_self');" data-type='69' data-planek-id='696' data-accessible>
+            <title>N204 Počítačová laboratoř</title>
+            <rect class='room laboratory' id='N204' x='155' y='788' width='48' height='42'/>
+            <text class='room-label' x='157' y='796' id='text-N204'>N204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N205/.cs', '_self');" data-type='69' data-planek-id='697' data-accessible>
+            <title>N205 Počítačová laboratoř</title>
+            <rect class='room laboratory' id='N205' x='155' y='746' width='48' height='42'/>
+            <text class='room-label' x='157' y='754' id='text-N205'>N205</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N207/.cs', '_self');" data-type='51' data-planek-id='698' data-accessible>
+            <title>N207 Rozvodná místnost</title>
+            <rect class='room other' id='N207' x='185' y='716' width='18' height='14'/>
+            <text class='room-label' x='187' y='724' id='text-N207'>207</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N207.1/.cs', '_self');" data-type='79' data-planek-id='699' >
+            <title>N207.1 Vstup na střechu</title>
+            <rect class='room corridor' id='N207.1' x='179' y='716' width='6' height='14'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/N208/.cs', '_self');" data-type='20' data-planek-id='700' data-accessible>
+            <title>N208 Místnost technika</title>
+            <rect class='room other' id='N208' x='155' y='716' width='24' height='14'/>
+            <text class='room-label' x='157' y='724' id='text-N208'>N208</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O102/.cs', '_self');" data-type='81' data-planek-id='702' >
+            <title>O102 Schodiště</title>
+            <rect class='room stairs' id='O102' x='87' y='746' width='8' height='49'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O201/.cs', '_self');" data-type='79' data-planek-id='712' data-accessible>
+            <title>O201 Spojovací lávka</title>
+            <rect class='room corridor' id='O201' x='95' y='730' width='60' height='16'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O202/.cs', '_self');" data-type='79' data-planek-id='713' data-accessible>
+            <title>O202 Chodba</title>
+            <polygon class='room corridor' id='O202' points='31,730 95,730 95,746 87,746 87,795 95,795 95,844 78,844 78,746 31,746'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O203/.cs', '_self');" data-type='69' data-planek-id='714' data-accessible>
+            <title>O203 Laboratoř Cisco</title>
+            <rect class='room laboratory' id='O203' x='31' y='830' width='47' height='42'/>
+            <text class='room-label' x='33' y='838' id='text-O203'>O203</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O204/.cs', '_self');" data-type='69' data-planek-id='715' data-accessible>
+            <title>O204 Laboratoř 3D grafiky</title>
+            <rect class='room laboratory' id='O204' x='31' y='788' width='47' height='42'/>
+            <text class='room-label' x='33' y='796' id='text-O204'>O204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O205/.cs', '_self');" data-type='69' data-planek-id='716' data-accessible>
+            <title>O205 Síťová laboratoř</title>
+            <rect class='room laboratory' id='O205' x='31' y='746' width='47' height='42'/>
+            <text class='room-label' x='33' y='754' id='text-O205'>O205</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O207/.cs', '_self');" data-type='51' data-planek-id='717' data-accessible>
+            <title>O207 Rozvodná místnost</title>
+            <rect class='room other' id='O207' x='54' y='716' width='24' height='14'/>
+            <text class='room-label' x='56' y='724' id='text-O207'>O207</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/O208/.cs', '_self');" data-type='62' data-planek-id='718' data-accessible>
+            <title>O208 Místnost technika</title>
+            <rect class='room office' id='O208' x='31' y='716' width='23' height='14'/>
+            <text class='room-label' x='33' y='724' id='text-O208'>O208</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P201/.cs', '_self');" data-type='79' data-planek-id='755' data-accessible>
+            <title>P201 Hala</title>
+            <polygon class='room corridor' id='P201' points='220,910 250,910 250,945 200,945 200,932 220,932'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P202/.cs', '_self');" data-type='91' data-planek-id='756' data-accessible>
+            <title>P202 Úklid</title>
+            <rect class='room other' id='P202' x='250' y='910' width='10' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P203/.cs', '_self');" data-type='2' data-planek-id='757' data-accessible>
+            <title>P203 Technická místnost</title>
+            <rect class='room other' id='P203' x='250' y='920' width='10' height='13'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P204/.cs', '_self');" data-type='87' data-planek-id='758' data-accessible>
+            <title>P204 Výtah</title>
+            <rect class='room elevator' id='P204' x='250' y='933' width='10' height='12'/>
+            <text class='room-label' x='252' y='941' id='text-P204'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P205/.cs', '_self');" data-type='81' data-planek-id='760' >
+            <title>P205 Schodiště</title>
+            <polygon class='room stairs' id='P205' points='241,945 250,945 260,945 260,985 241,985'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P206/.cs', '_self');" data-type='71' data-planek-id='761' data-accessible>
+            <title>P206 Kancelář</title>
+            <rect class='room laboratory' id='P206' x='220' y='945' width='21' height='30'/>
+            <text class='room-label' x='222' y='953' id='text-P206'>P206</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P206.1/.cs', '_self');" data-type='108' data-planek-id='762' data-accessible>
+            <title>P206.1 Sklad</title>
+            <rect class='room other' id='P206.1' x='220' y='975' width='21' height='10'/>
+            <text class='room-label' x='222' y='983' id='text-P206.1'>206.1</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P207.1/.cs', '_self');" data-type='150' data-planek-id='763' data-accessible>
+            <title>P207.1 WC muži</title>
+            <rect class='room toilets' id='P207.1' x='200' y='945' width='12' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P207.2/.cs', '_self');" data-type='36' data-planek-id='764' data-accessible>
+            <title>P207.2 WC muži</title>
+            <rect class='room toilets' id='P207.2' x='212' y='945' width='8' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P207.3/.cs', '_self');" data-type='36' data-planek-id='765' data-accessible>
+            <title>P207.3 WC muži</title>
+            <rect class='room toilets' id='P207.3' x='200' y='960' width='20' height='25'/>
+            <text class='room-label' x='202' y='968' id='text-P207.3'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P208.1/.cs', '_self');" data-type='150' data-planek-id='766' data-accessible>
+            <title>P208.1 WC ženy</title>
+            <rect class='room toilets' id='P208.1' x='208' y='920' width='12' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P208.2/.cs', '_self');" data-type='35' data-planek-id='767' data-accessible>
+            <title>P208.2 WC ženy</title>
+            <rect class='room toilets' id='P208.2' x='200' y='920' width='8' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P208.3/.cs', '_self');" data-type='35' data-planek-id='768' data-accessible>
+            <title>P208.3 WC ženy</title>
+            <rect class='room toilets' id='P208.3' x='200' y='910' width='20' height='10'/>
+            <text class='room-label' x='202' y='918' id='text-P208.3'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P209/.cs', '_self');" data-type='94' data-planek-id='769' data-accessible>
+            <title>P209 Jídelna studentů</title>
+            <rect class='room other' id='P209' x='85' y='910' width='115' height='75'/>
+            <text class='room-label' x='87' y='918' id='text-P209'>P209 Menza</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P210/.cs', '_self');" data-type='97' data-planek-id='770' data-accessible>
+            <title>P210 Výdej jídel</title>
+            <polygon class='room other' id='P210' points='60,915 70,915 70,910 85,910 85,965 60,965'/>
+            <text class='room-label' x='62' y='923' id='text-P210'>P210</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P210.1/.cs', '_self');" data-type='87' data-planek-id='771' data-accessible>
+            <title>P210.1 Nákladní výtah</title>
+            <rect class='room elevator' id='P210.1' x='60' y='910' width='10' height='5'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P211/.cs', '_self');" data-type='101' data-planek-id='772' data-accessible>
+            <title>P211 Stolní nádobí</title>
+            <polygon class='room other' id='P211' points='30,965 85,965 85,985 40,985 40,980 30,980'/>
+            <text class='room-label' x='32' y='973' id='text-P211'>P211</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P211.1/.cs', '_self');" data-type='87' data-planek-id='773' data-accessible>
+            <title>P211.1 Nákladní výtah</title>
+            <rect class='room elevator' id='P211.1' x='30' y='980' width='10' height='5'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P212/.cs', '_self');" data-type='96' data-planek-id='774' data-accessible>
+            <title>P212 Chladírna</title>
+            <rect class='room other' id='P212' x='5' y='965' width='25' height='20'/>
+            <text class='room-label' x='7' y='973' id='text-P212'>P212</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P213/.cs', '_self');" data-type='87' data-planek-id='775' data-accessible>
+            <title>P213 Výtah</title>
+            <rect class='room elevator' id='P213' x='5' y='955' width='10' height='10'/>
+            <text class='room-label' x='7' y='963' id='text-P213'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P214/.cs', '_self');" data-type='91' data-planek-id='776' data-accessible>
+            <title>P214 Úklid</title>
+            <rect class='room other' id='P214' x='10' y='945' width='5' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P215/.cs', '_self');" data-type='81' data-planek-id='780' >
+            <title>P215 Schodiště</title>
+            <rect class='room stairs' id='P215' x='5' y='910' width='10' height='35'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P215.1/.cs', '_self');" data-type='91' data-planek-id='777' data-accessible>
+            <title>P215.1 Úklid</title>
+            <rect class='room other' id='P215.1' x='5' y='945' width='5' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P216/.cs', '_self');" data-type='79' data-planek-id='778' data-accessible>
+            <title>P216 Chodba</title>
+            <polygon class='room corridor' id='P216' points='15,935 30,935 30,955 60,955 60,965 15,965'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P217/.cs', '_self');" data-type='73' data-planek-id='779' data-accessible>
+            <title>P217 Přípravna</title>
+            <rect class='room other' id='P217' x='30' y='935' width='20' height='20'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P219/.cs', '_self');" data-type='150' data-planek-id='781' data-accessible>
+            <title>P219 WC personál</title>
+            <rect class='room toilets' id='P219' x='50' y='945' width='10' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P219.1/.cs', '_self');" data-type='88' data-planek-id='782' data-accessible>
+            <title>P219.1 WC personál</title>
+            <rect class='room toilets' id='P219.1' x='50' y='935' width='10' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/P220/.cs', '_self');" data-type='95' data-planek-id='783' data-accessible>
+            <title>P220 Přípravna</title>
+            <rect class='room other' id='P220' x='15' y='910' width='45' height='25'/>
+            <text class='room-label' x='17' y='918' id='text-P220'>P220</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q201/.cs', '_self');" data-type='71' data-planek-id='898' data-accessible>
+            <title>Q201 Pracovna UPGM
+Hradiš Michal, Ing., Ph.D. +420 54114 1411
+Kišš Martin, Ing. +420 54114 1337
+Kohút Jan, Ing. +420 54114 1337
+Kostelník Martin, Ing. +420 54114 1411
+Kula Michal, Ing., Ph.D. +420 54114 1337</title>
+            <rect class='room laboratory' id='Q201' x='482' y='910' width='43' height='65'/>
+            <text class='room-label' x='484' y='918' id='text-Q201'>Q201</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q202/.cs', '_self');" data-type='71' data-planek-id='899' data-accessible>
+            <title>Q202 Laboratoř UPGM
+Čižmarik Roman, Ing. +420 54114 1477
+Chlubna Tomáš, Ing., Ph.D. +420 54114 1477
+Milet Tomáš, Ing., Ph.D. +420 54114 1414; +420 54114 1477
+Pečiva Jan, Ing., Ph.D. +420 54114 1477
+Starka Tomáš, Ing. +420 54114 1474
+Vlnas Michal, Ing. +420 54114 1477</title>
+            <rect class='room laboratory' id='Q202' x='525' y='910' width='43' height='65'/>
+            <text class='room-label' x='527' y='918' id='text-Q202'>Q202</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q203/.cs', '_self');" data-type='71' data-planek-id='900' data-accessible>
+            <title>Q203 Laboratoř
+Hanák Jiří, Ing., Ph.D. +420 54114 1476
+Mořkovský Vít, Ing. +420 54114 1476
+Novák Jiří, Ing., Ph.D. +420 54114 1476; +420 608 960 219
+Orava Vojtěch, Ing. +420 54114 1476</title>
+            <rect class='room laboratory' id='Q203' x='568' y='910' width='43' height='65'/>
+            <text class='room-label' x='570' y='918' id='text-Q203'>Q203</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q204/.cs', '_self');" data-type='71' data-planek-id='901' data-accessible>
+            <title>Q204 Laboratoř
+Klepárník Petr, Ing., Ph.D. +420 54114 1442
+Maršík Lukáš, Ing. +420 54114 1481
+Musil Martin, Ing., Ph.D. +420 54114 1411; +420 54114 1481
+Nosko Matúš, Ing. 
+Nosko Svetozár, Ing., Ph.D. +420 54114 1411; +420 54114 1442</title>
+            <polygon class='room laboratory' id='Q204' points='611,910 640,910 640,922 654,922 654,975 611,975'/>
+            <text class='room-label' x='613' y='918' id='text-Q204'>Q204</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q205/.cs', '_self');" data-type='71' data-planek-id='902' data-accessible>
+            <title>Q205 Laboratoř
+Algasov Aleksandr +420 54114 1312
+Dubovec Pavol, Ing. +420 54114 1312
+Kroupa Dominik, Ing. +420 54114 1312
+Kubík Tibor, Ing. +420 54114 1312
+Liška Jakub, Ing. +420 54114 1312
+Otrusina Lubomír, Ing. 
+Pukanec Dávid, Ing. +420 54114 1312
+Reich Bořek, Ing. +420 54114 1312
+Repka Samuel, Ing. +420 54114 1312
+Strýček Šimon, Ing. +420 54114 1312</title>
+            <polygon class='room laboratory' id='Q205' points='654,910 712,910 684,985 672,985 672,975 654,975 654,922'/>
+            <text class='room-label' x='656' y='918' id='text-Q205'>Q205</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q220/.cs', '_self');" data-type='81' data-planek-id='903' >
+            <title>Q220 Schodiště</title>
+            <rect class='room stairs' id='Q220' x='410' y='935' width='28' height='20'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q221/.cs', '_self');" data-type='79' data-planek-id='904' data-accessible>
+            <title>Q221 Chodba</title>
+            <rect class='room corridor' id='Q221' x='438' y='910' width='22' height='75'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q222/.cs', '_self');" data-type='22' data-planek-id='905' data-accessible>
+            <title>Q222 Organizační oddělení VCIT
+Jelínková Sabina, Ing. 
+Opletal Matyáš +420 54114 1467
+Svatošová Helena, JUDr. Ing. +420 54114 1470</title>
+            <rect class='room office' id='Q222' x='460' y='910' width='22' height='35'/>
+            <text class='room-label' x='462' y='918' id='text-Q222'>Q222</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q223/.cs', '_self');" data-type='57' data-planek-id='906' data-accessible>
+            <title>Q223 Sekretariát - kuchyňka</title>
+            <rect class='room other' id='Q223' x='460' y='945' width='22' height='13'/>
+            <text class='room-label' x='462' y='953' id='text-Q223'>Q223</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q224/.cs', '_self');" data-type='18' data-planek-id='907' data-accessible>
+            <title>Q224 Technická místnost</title>
+            <rect class='room other' id='Q224' x='460' y='958' width='22' height='17'/>
+            <text class='room-label' x='462' y='966' id='text-Q224'>Q224</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q225/.cs', '_self');" data-type='86' data-planek-id='908' data-accessible>
+            <title>Q225 Lodžie</title>
+            <rect class='room corridor' id='Q225' x='460' y='975' width='212' height='10'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q226/.cs', '_self');" data-type='150' data-planek-id='909' data-accessible>
+            <title>Q226 WC ženy</title>
+            <rect class='room toilets' id='Q226' x='428' y='973' width='10' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q226.1/.cs', '_self');" data-type='35' data-planek-id='910' data-accessible>
+            <title>Q226.1 WC ženy</title>
+            <rect class='room toilets' id='Q226.1' x='410' y='975' width='18' height='10'/>
+            <text class='room-label' x='412' y='983' id='text-Q226.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q227/.cs', '_self');" data-type='150' data-planek-id='911' data-accessible>
+            <title>Q227 WC muži</title>
+            <rect class='room toilets' id='Q227' x='428' y='964' width='10' height='9'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q227.1/.cs', '_self');" data-type='36' data-planek-id='912' data-accessible>
+            <title>Q227.1 WC muži</title>
+            <rect class='room toilets' id='Q227.1' x='410' y='955' width='18' height='15'/>
+            <text class='room-label' x='412' y='963' id='text-Q227.1'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q227.3/.cs', '_self');" data-type='91' data-planek-id='913' data-accessible>
+            <title>Q227.3 Úklid</title>
+            <rect class='room other' id='Q227.3' x='410' y='970' width='18' height='5'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q228/.cs', '_self');" data-type='26' data-planek-id='914' data-accessible>
+            <title>Q228 WC invalidé</title>
+            <rect class='room toilets' id='Q228' x='428' y='955' width='10' height='9'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q229/.cs', '_self');" data-type='87' data-planek-id='915' data-accessible>
+            <title>Q229 Výtah</title>
+            <rect class='room elevator' id='Q229' x='425' y='925' width='13' height='10'/>
+            <text class='room-label' x='427' y='933' id='text-Q229'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q230/.cs', '_self');" data-type='57' data-planek-id='916' data-accessible>
+            <title>Q230 Denní místnost</title>
+            <polygon class='room other' id='Q230' points='410,910 410,901 438,910 438,925 425,925 425,935 410,935'/>
+            <text class='room-label' x='412' y='918' id='text-Q230'>Q230</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q231/.cs', '_self');" data-type='79' data-planek-id='917' data-accessible>
+            <title>Q231 Chodba</title>
+            <polygon class='room corridor' id='Q231' points='342,860 438,895 460,895 460,910 438,910 342,877'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q232/.cs', '_self');" data-type='79' data-planek-id='918' data-accessible>
+            <title>Q232 Chodba</title>
+            <polygon class='room corridor' id='Q232' points='460,895 654,895 654,922 640,922 640,910 460,910'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q233/.cs', '_self');" data-type='79' data-planek-id='919' data-accessible>
+            <title>Q233 Chodba</title>
+            <rect class='room corridor' id='Q233' x='637' y='845' width='17' height='50'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/Q234/.cs', '_self');" data-type='87' data-planek-id='920' data-accessible>
+            <title>Q234 Výtah</title>
+            <rect class='room elevator' id='Q234' x='654' y='850' width='15' height='15'/>
+            <text class='room-label' x='656' y='858' id='text-Q234'>V</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R201/.cs', '_self');" data-type='79' data-planek-id='957' data-accessible>
+            <title>R201 Chodba</title>
+            <rect class='room corridor' id='R201' x='390' y='940' width='20' height='20'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R202/.cs', '_self');" data-type='81' data-planek-id='958' >
+            <title>R202 Schodiště</title>
+            <rect class='room stairs' id='R202' x='390' y='960' width='20' height='25'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R203/.cs', '_self');" data-type='29' data-planek-id='959' data-accessible>
+            <title>R203 Šatna</title>
+            <rect class='room other' id='R203' x='375' y='960' width='15' height='25'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R204/.cs', '_self');" data-type='20' data-planek-id='960' data-accessible>
+            <title>R204 Sklad</title>
+            <rect class='room other' id='R204' x='365' y='972' width='10' height='13'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R205/.cs', '_self');" data-type='88' data-planek-id='961' data-accessible>
+            <title>R205 WC</title>
+            <rect class='room toilets' id='R205' x='365' y='960' width='10' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R206/.cs', '_self');" data-type='116' data-planek-id='962' data-accessible>
+            <title>R206 Zázemí baru</title>
+            <rect class='room other' id='R206' x='345' y='960' width='20' height='25'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R207/.cs', '_self');" data-type='88' data-planek-id='963' data-accessible>
+            <title>R207 WC</title>
+            <rect class='room toilets' id='R207' x='330' y='960' width='15' height='12'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R208/.cs', '_self');" data-type='20' data-planek-id='964' data-accessible>
+            <title>R208 Sklad</title>
+            <rect class='room other' id='R208' x='390' y='910' width='20' height='30'/>
+            <text class='room-label' x='392' y='918' id='text-R208'>R208</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R209/.cs', '_self');" data-type='81' data-planek-id='965' >
+            <title>R209 Schodiště</title>
+            <rect class='room stairs' id='R209' x='385' y='920' width='5' height='30'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R210/.cs', '_self');" data-type='81' data-planek-id='967' >
+            <title>R210 Schodiště</title>
+            <rect class='room stairs' id='R210' x='330' y='920' width='5' height='30'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R211/.cs', '_self');" data-type='47' data-planek-id='969' data-accessible>
+            <title>R211 Malý sál</title>
+            <polygon class='room study' id='R211' points='330,910 390,910 390,920 385,920 385,950 390,950 390,960 330,960 330,950 335,950 335,920 330,920'/>
+            <text class='room-label' x='332' y='918' id='text-R211'>R211</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R212/.cs', '_self');" data-type='47' data-planek-id='970' data-accessible>
+            <title>R212 Studentský klub U Kachničky</title>
+            <polygon class='room su-duck study' id='R212' points='260,910 330,910 330,972 285,972 285,985 260,985'/>
+            <image x='278' y='940' width='26' height='35' href='https://www.fit.vut.cz/img/su/logo-kachnicka-mapa.png' />            <text class='room-label' x='262' y='918' id='text-R212'>R212 U Kachničky</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/R213/.cs', '_self');" data-type='99' data-planek-id='971' data-accessible>
+            <title>R213 Bar</title>
+            <rect class='room other' id='R213' x='285' y='972' width='60' height='13'/>
+            <text class='room-label' x='287' y='980' id='text-R213'>bar</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S201/.cs', '_self');" data-type='81' data-planek-id='1041' >
+            <title>S201 Schodiště</title>
+            <polygon class='room stairs' id='S201' points='606,705 633,654 637,656 637,723'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S202/.cs', '_self');" data-type='62' data-planek-id='1042' >
+            <title>S202 Kancelář
+Orság Filip, Ing., Ph.D. +420 54114 1195</title>
+            <polygon class='room office' id='S202' points='596,666 610,640 633,654 606,705 582,691'/>
+            <text class='room-label' x='598' y='674' id='text-S202'>S202</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S203/.cs', '_self');" data-type='79' data-planek-id='1043' data-accessible>
+            <title>S203 Chodba</title>
+            <rect class='room corridor' id='S203' x='637' y='656' width='17' height='189'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S204/.cs', '_self');" data-type='79' data-planek-id='1044' data-accessible>
+            <title>S204 chodba</title>
+            <rect class='room corridor' id='S204' x='654' y='692' width='24' height='13'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S205/.cs', '_self');" data-type='62' data-planek-id='1045' data-accessible>
+            <title>S205 Kancelář
+Juříček Zdeněk +420 54114 1192</title>
+            <rect class='room office' id='S205' x='654' y='656' width='24' height='36'/>
+            <text class='room-label' x='656' y='664' id='text-S205'>S205</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S206/.cs', '_self');" data-type='47' data-planek-id='1046' data-accessible>
+            <title>S206 Zasedací místnost</title>
+            <rect class='room study' id='S206' x='678' y='656' width='41' height='53'/>
+            <text class='room-label' x='680' y='664' id='text-S206'>S206</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S207/.cs', '_self');" data-type='74' data-planek-id='1047' data-accessible>
+            <title>S207 Jednací místnost</title>
+            <rect class='room study' id='S207' x='654' y='705' width='24' height='36'/>
+            <text class='room-label' x='656' y='713' id='text-S207'>S207</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S208/.cs', '_self');" data-type='63' data-planek-id='1048' data-accessible>
+            <title>S208 kancelář</title>
+            <rect class='room office' id='S208' x='678' y='709' width='41' height='32'/>
+            <text class='room-label' x='680' y='717' id='text-S208'>S208</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S209/.cs', '_self');" data-type='79' data-planek-id='1049' data-accessible>
+            <title>S209 Hala</title>
+            <rect class='room corridor' id='S209' x='654' y='756' width='24' height='15'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S210/.cs', '_self');" data-type='47' data-planek-id='1050' data-accessible>
+            <title>S210 kancelář
+Dvořák Jan, Mgr. +420 54114 1157
+Horná Petra, Mgr. +420 54114 1153
+Kozubová Hana, Mgr. +420 54114 1158
+Petrušková Hana, Ing. +420 54114 1155
+Škrob Ondřej, Mgr. +420 54114 1138
+Vyškovská Terezie, Mgr. +420 54114 1156</title>
+            <rect class='room study' id='S210' x='678' y='741' width='41' height='47'/>
+            <text class='room-label' x='680' y='749' id='text-S210'>S210</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S211/.cs', '_self');" data-type='35' data-planek-id='1051' data-accessible>
+            <title>S211 WC ženy</title>
+            <rect class='room toilets' id='S211' x='654' y='741' width='24' height='15'/>
+            <text class='room-label' x='656' y='749' id='text-S211'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S212/.cs', '_self');" data-type='36' data-planek-id='1052' data-accessible>
+            <title>S212 WC muži</title>
+            <rect class='room toilets' id='S212' x='654' y='771' width='24' height='17'/>
+            <text class='room-label' x='656' y='779' id='text-S212'>WC</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S213/.cs', '_self');" data-type='81' data-planek-id='1053' >
+            <title>S213 Schodiště</title>
+            <rect class='room stairs' id='S213' x='654' y='788' width='14' height='25'/>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S214/.cs', '_self');" data-type='71' data-planek-id='1054' data-accessible>
+            <title>S214 Laboratoř biometrických systémů</title>
+            <rect class='room laboratory' id='S214' x='654' y='813' width='65' height='32'/>
+            <text class='room-label' x='656' y='821' id='text-S214'>S214</text>
+        </g>
+        <g onclick="window.open('https://www.fit.vut.cz/fit/room/S215/.cs', '_self');" data-type='47' data-planek-id='1055' data-accessible>
+            <title>S215 zasedací místnost</title>
+            <rect class='room study' id='S215' x='668' y='788' width='51' height='25'/>
+            <text class='room-label' x='670' y='796' id='text-S215'>S215</text>
+        </g>
+    </g>
+    <g id='doors'>
+        <line class='door invisible' x1='385' y1='485' x2='385' y2='499' />
+        <line class='door invisible' x1='276' y1='485' x2='276' y2='499' />
+        <line class='door ' x1='276' y1='481' x2='276' y2='473' />
+        <line class='door ' x1='276' y1='440' x2='276' y2='448' />
+        <line class='door ' x1='244' y1='500' x2='252' y2='500' />
+        <line class='door ' x1='276' y1='505.5' x2='276' y2='513.5' />
+        <line class='door ' x1='313' y1='500' x2='321' y2='500' />
+        <line class='door ' x1='365' y1='514' x2='365' y2='519' />
+        <line class='door ' x1='373.5' y1='536.64285714286' x2='379.5' y2='532.35714285714' />
+        <line class='door ' x1='393' y1='523' x2='399' y2='519' />
+        <line class='door ' x1='406.5' y1='515' x2='414.5' y2='515' />
+        <line class='door ' x1='419' y1='515' x2='427' y2='515' />
+        <line class='door ' x1='436' y1='515' x2='428' y2='515' />
+        <line class='door ' x1='446' y1='515' x2='454' y2='515' />
+        <line class='door ' x1='467.5' y1='515' x2='475.5' y2='515' />
+        <line class='door ' x1='483.5' y1='515' x2='491.5' y2='515' />
+        <line class='door ' x1='525' y1='515' x2='517' y2='515' />
+        <line class='door ' x1='541.5' y1='515' x2='549.5' y2='515' />
+        <line class='door ' x1='596' y1='515' x2='588' y2='515' />
+        <line class='door ' x1='612.5' y1='515' x2='620.5' y2='515' />
+        <line class='door ' x1='647.5' y1='515' x2='655.5' y2='515' />
+        <line class='door ' x1='681.5' y1='515' x2='689.5' y2='515' />
+        <line class='door ' x1='697.83333333333' y1='554.5' x2='701.16666666667' y2='548.5' />
+        <line class='door ' x1='702' y1='501.5' x2='702' y2='509.5' />
+        <line class='door ' x1='712' y1='511' x2='712' y2='519' />
+        <line class='door ' x1='703' y1='520' x2='711' y2='520' />
+        <line class='door ' x1='702' y1='511' x2='702' y2='519' />
+        <line class='door invisible' x1='439' y1='502' x2='439' y2='514' />
+        <line class='door ' x1='267.5' y1='452' x2='275.5' y2='452' />
+        <line class='door ' x1='365' y1='500' x2='365' y2='507' />
+        <line class='door ' x1='365' y1='507' x2='365' y2='514' />
+        <line class='door invisible' x1='472' y1='286' x2='472' y2='305' />
+        <line class='door invisible' x1='343' y1='268' x2='355' y2='268' />
+        <line class='door invisible' x1='426' y1='286' x2='426' y2='305' />
+        <line class='door invisible' x1='262' y1='286' x2='262' y2='305' />
+        <line class='door invisible' x1='244' y1='428' x2='259' y2='428' />
+        <line class='door ' x1='262' y1='315' x2='262' y2='323' />
+        <line class='door ' x1='279.5' y1='330' x2='287.5' y2='330' />
+        <line class='door ' x1='279.5' y1='348' x2='287.5' y2='348' />
+        <line class='door ' x1='262' y1='335' x2='262' y2='343' />
+        <line class='door ' x1='263' y1='348' x2='271' y2='348' />
+        <line class='door ' x1='262' y1='355' x2='262' y2='363' />
+        <line class='door ' x1='262' y1='373' x2='262' y2='381' />
+        <line class='door ' x1='262' y1='389' x2='262' y2='381' />
+        <line class='door ' x1='262' y1='425' x2='262' y2='417' />
+        <line class='door ' x1='241' y1='376.5' x2='241' y2='384.5' />
+        <line class='door ' x1='218' y1='376.5' x2='218' y2='384.5' />
+        <line class='door ' x1='225.5' y1='392' x2='233.5' y2='392' />
+        <line class='door ' x1='241' y1='263.5' x2='241' y2='271.5' />
+        <line class='door ' x1='224' y1='260' x2='232' y2='260' />
+        <line class='door ' x1='247.5' y1='258' x2='255.5' y2='258' />
+        <line class='door ' x1='262' y1='265' x2='262' y2='257' />
+        <line class='door ' x1='262' y1='271.5' x2='262' y2='279.5' />
+        <line class='door ' x1='277' y1='268' x2='269' y2='268' />
+        <line class='door ' x1='282' y1='283' x2='290' y2='283' />
+        <line class='door ' x1='293' y1='268' x2='301' y2='268' />
+        <line class='door ' x1='302' y1='271.5' x2='302' y2='279.5' />
+        <line class='door invisible' x1='293' y1='283' x2='301' y2='283' />
+        <line class='door ' x1='292' y1='271.5' x2='292' y2='279.5' />
+        <line class='door ' x1='342' y1='271.5' x2='342' y2='279.5' />
+        <line class='door ' x1='333' y1='271.5' x2='333' y2='279.5' />
+        <line class='door ' x1='356' y1='271.5' x2='356' y2='279.5' />
+        <line class='door ' x1='365' y1='271.5' x2='365' y2='279.5' />
+        <line class='door ' x1='388' y1='283' x2='396' y2='283' />
+        <line class='door ' x1='406' y1='262' x2='414' y2='262' />
+        <line class='door ' x1='406' y1='283' x2='414' y2='283' />
+        <line class='door ' x1='418' y1='262' x2='426' y2='262' />
+        <line class='door ' x1='418' y1='283' x2='426' y2='283' />
+        <line class='door ' x1='435.5' y1='272' x2='443.5' y2='272' />
+        <line class='door ' x1='458' y1='272' x2='466' y2='272' />
+        <line class='door ' x1='489.5' y1='283' x2='497.5' y2='283' />
+        <line class='door ' x1='523' y1='283' x2='531' y2='283' />
+        <line class='door ' x1='560' y1='283' x2='552' y2='283' />
+        <line class='door ' x1='542' y1='283' x2='550' y2='283' />
+        <line class='door ' x1='573' y1='283' x2='581' y2='283' />
+        <line class='door ' x1='601' y1='283' x2='609' y2='283' />
+        <line class='door ' x1='628' y1='283' x2='636' y2='283' />
+        <line class='door ' x1='648' y1='283' x2='656' y2='283' />
+        <line class='door ' x1='684.5' y1='283' x2='692.5' y2='283' />
+        <line class='door ' x1='658' y1='291.5' x2='658' y2='299.5' />
+        <line class='door ' x1='633' y1='371' x2='633' y2='379' />
+        <line class='door ' x1='639' y1='462' x2='647' y2='462' />
+        <line class='door ' x1='639' y1='501' x2='647' y2='501' />
+        <line class='door ' x1='653' y1='452' x2='653' y2='460' />
+        <line class='door ' x1='653' y1='348' x2='653' y2='356' />
+        <line class='door ' x1='639' y1='308' x2='647' y2='308' />
+        <line class='door ' x1='639' y1='346' x2='647' y2='346' />
+        <line class='door ' x1='633' y1='431' x2='633' y2='439' />
+        <line class='door ' x1='356' y1='203' x2='356' y2='210' />
+        <line class='door ' x1='351' y1='141' x2='351' y2='149' />
+        <line class='door invisible' x1='351' y1='133' x2='351' y2='140' />
+        <line class='door invisible' x1='336' y1='133' x2='336' y2='140' />
+        <line class='door ' x1='363' y1='132' x2='371' y2='132' />
+        <line class='door ' x1='342.5' y1='132' x2='350.5' y2='132' />
+        <line class='door ' x1='323' y1='141' x2='331' y2='141' />
+        <line class='door ' x1='323' y1='118' x2='331' y2='118' />
+        <line class='door ' x1='330' y1='109.5' x2='330' y2='117.5' />
+        <line class='door ' x1='310' y1='96' x2='318' y2='96' />
+        <line class='door ' x1='318' y1='118.5' x2='318' y2='126.5' />
+        <line class='door ' x1='297' y1='116' x2='297' y2='124' />
+        <line class='door ' x1='297' y1='97.5' x2='297' y2='105.5' />
+        <line class='door ' x1='297' y1='73.5' x2='297' y2='81.5' />
+        <line class='door ' x1='318' y1='67' x2='318' y2='75' />
+        <line class='door ' x1='348' y1='50.5' x2='348' y2='58.5' />
+        <line class='door ' x1='321' y1='64' x2='329' y2='64' />
+        <line class='door ' x1='348' y1='87' x2='348' y2='79' />
+        <line class='door ' x1='334' y1='87' x2='334' y2='79' />
+        <line class='door ' x1='337' y1='203' x2='345' y2='203' />
+        <line class='door ' x1='346' y1='193' x2='338' y2='193' />
+        <line class='door ' x1='360' y1='193' x2='368' y2='193' />
+        <line class='door ' x1='336' y1='194' x2='336' y2='202' />
+        <line class='door ' x1='205' y1='200' x2='205' y2='209' />
+        <line class='door ' x1='186' y1='199' x2='194' y2='199' />
+        <line class='door ' x1='205' y1='211.5' x2='205' y2='219.5' />
+        <line class='door ' x1='28' y1='260' x2='36' y2='260' />
+        <line class='door ' x1='24' y1='201' x2='24' y2='208' />
+        <line class='door ' x1='35' y1='143' x2='35' y2='150' />
+        <line class='door ' x1='24' y1='143' x2='24' y2='150' />
+        <line class='door ' x1='35' y1='87' x2='35' y2='94' />
+        <line class='door ' x1='24' y1='87' x2='24' y2='94' />
+        <line class='door ' x1='119' y1='38' x2='127' y2='38' />
+        <line class='door ' x1='119' y1='51' x2='119' y2='43' />
+        <line class='door ' x1='43' y1='241' x2='43' y2='249' />
+        <line class='door ' x1='25' y1='254' x2='25' y2='246' />
+        <line class='door ' x1='22' y1='257' x2='14' y2='257' />
+        <line class='door ' x1='10' y1='241' x2='10' y2='249' />
+        <line class='door ' x1='49.5' y1='193' x2='57.5' y2='193' />
+        <line class='door ' x1='49.5' y1='208' x2='57.5' y2='208' />
+        <line class='door ' x1='47' y1='196.5' x2='47' y2='204.5' />
+        <line class='door ' x1='27' y1='193' x2='19' y2='193' />
+        <line class='door ' x1='18' y1='196.5' x2='18' y2='204.5' />
+        <line class='door ' x1='27' y1='135' x2='19' y2='135' />
+        <line class='door ' x1='5.5' y1='135' x2='13.5' y2='135' />
+        <line class='door ' x1='33' y1='135' x2='41' y2='135' />
+        <line class='door ' x1='47' y1='135' x2='55' y2='135' />
+        <line class='door ' x1='27' y1='79' x2='19' y2='79' />
+        <line class='door ' x1='5.5' y1='78' x2='13.5' y2='78' />
+        <line class='door ' x1='33' y1='79' x2='41' y2='79' />
+        <line class='door ' x1='47' y1='79' x2='55' y2='79' />
+        <line class='door ' x1='109' y1='32' x2='109' y2='24' />
+        <line class='door ' x1='109' y1='7.5' x2='109' y2='15.5' />
+        <line class='door ' x1='109' y1='38' x2='109' y2='46' />
+        <line class='door ' x1='109' y1='61' x2='109' y2='69' />
+        <line class='door ' x1='357' y1='630' x2='349' y2='630' />
+        <line class='door ' x1='406' y1='638.5' x2='406' y2='646.5' />
+        <line class='door ' x1='403' y1='650' x2='395' y2='650' />
+        <line class='door ' x1='409' y1='650' x2='417' y2='650' />
+        <line class='door ' x1='487' y1='650' x2='479' y2='650' />
+        <line class='door ' x1='493' y1='650' x2='501' y2='650' />
+        <line class='door ' x1='535' y1='650' x2='543' y2='650' />
+        <line class='door ' x1='554' y1='638.5' x2='554' y2='646.5' />
+        <line class='door ' x1='535' y1='635' x2='543' y2='635' />
+        <line class='door ' x1='493' y1='635' x2='501' y2='635' />
+        <line class='door invisible' x1='451' y1='635' x2='487' y2='635' />
+        <line class='door ' x1='406' y1='632' x2='406' y2='624' />
+        <line class='door invisible' x1='328' y1='636' x2='328' y2='649' />
+        <line class='door ' x1='318' y1='635' x2='326' y2='635' />
+        <line class='door ' x1='298' y1='635' x2='315' y2='635' />
+        <line class='door ' x1='284' y1='624.5' x2='284' y2='632.5' />
+        <line class='door ' x1='262' y1='638.5' x2='262' y2='646.5' />
+        <line class='door invisible' x1='265' y1='635' x2='281' y2='635' />
+        <line class='door ' x1='270.5' y1='607' x2='278.5' y2='607' />
+        <line class='door ' x1='247.5' y1='635' x2='255.5' y2='635' />
+        <line class='door ' x1='238' y1='635' x2='230' y2='635' />
+        <line class='door ' x1='184.5' y1='635' x2='192.5' y2='635' />
+        <line class='door ' x1='163.5' y1='635' x2='171.5' y2='635' />
+        <line class='door ' x1='142.5' y1='635' x2='150.5' y2='635' />
+        <line class='door ' x1='121.5' y1='635' x2='129.5' y2='635' />
+        <line class='door ' x1='100.5' y1='635' x2='108.5' y2='635' />
+        <line class='door ' x1='79.5' y1='635' x2='87.5' y2='635' />
+        <line class='door ' x1='70' y1='635' x2='62' y2='635' />
+        <line class='door ' x1='35' y1='650' x2='43' y2='650' />
+        <line class='door ' x1='48' y1='650' x2='56' y2='650' />
+        <line class='door ' x1='60.5' y1='650' x2='68.5' y2='650' />
+        <line class='door ' x1='160' y1='650' x2='168' y2='650' />
+        <line class='door ' x1='118' y1='650' x2='126' y2='650' />
+        <line class='door ' x1='76' y1='650' x2='84' y2='650' />
+        <line class='door ' x1='205.5' y1='650' x2='213.5' y2='650' />
+        <line class='door ' x1='226.5' y1='650' x2='234.5' y2='650' />
+        <line class='door ' x1='247.5' y1='650' x2='255.5' y2='650' />
+        <line class='door ' x1='269' y1='650' x2='277' y2='650' />
+        <line class='door ' x1='285' y1='650' x2='293' y2='650' />
+        <line class='door ' x1='285' y1='662' x2='293' y2='662' />
+        <line class='door ' x1='294' y1='652' x2='294' y2='660' />
+        <line class='door ' x1='318.5' y1='650' x2='326.5' y2='650' />
+        <line class='door ' x1='318.5' y1='662' x2='326.5' y2='662' />
+        <line class='door ' x1='317' y1='652' x2='317' y2='660' />
+        <line class='door ' x1='287' y1='730' x2='295' y2='730' />
+        <line class='door ' x1='330' y1='678' x2='338' y2='678' />
+        <line class='door invisible' x1='327' y1='730' x2='341' y2='730' />
+        <line class='door ' x1='326' y1='796' x2='326' y2='804' />
+        <line class='door ' x1='326' y1='734' x2='326' y2='742' />
+        <line class='door ' x1='305' y1='777' x2='305' y2='785' />
+        <line class='door ' x1='295' y1='777' x2='295' y2='785' />
+        <line class='door ' x1='295' y1='768' x2='295' y2='774' />
+        <line class='door ' x1='305' y1='759' x2='305' y2='767' />
+        <line class='door ' x1='295' y1='759' x2='295' y2='767' />
+        <line class='door ' x1='305' y1='748' x2='305' y2='756' />
+        <line class='door ' x1='295' y1='748' x2='295' y2='756' />
+        <line class='door ' x1='210' y1='746' x2='218' y2='746' />
+        <line class='door invisible' x1='279' y1='731' x2='279' y2='745' />
+        <line class='door invisible' x1='218' y1='731' x2='218' y2='745' />
+        <line class='door ' x1='203' y1='833' x2='203' y2='841' />
+        <line class='door ' x1='203' y1='791' x2='203' y2='799' />
+        <line class='door ' x1='158' y1='830' x2='200' y2='830' />
+        <line class='door ' x1='203' y1='785' x2='203' y2='777' />
+        <line class='door ' x1='158' y1='788' x2='200' y2='788' />
+        <line class='door ' x1='200' y1='730' x2='192' y2='730' />
+        <line class='door ' x1='179' y1='730' x2='185' y2='730' />
+        <line class='door ' x1='176' y1='730' x2='168' y2='730' />
+        <line class='door ' x1='87' y1='746' x2='95' y2='746' />
+        <line class='door invisible' x1='155' y1='731' x2='155' y2='745' />
+        <line class='door invisible' x1='95' y1='731' x2='95' y2='745' />
+        <line class='door ' x1='78' y1='833' x2='78' y2='841' />
+        <line class='door ' x1='78' y1='791' x2='78' y2='799' />
+        <line class='door ' x1='34' y1='830' x2='75' y2='830' />
+        <line class='door ' x1='78' y1='785' x2='78' y2='777' />
+        <line class='door ' x1='34' y1='788' x2='75' y2='788' />
+        <line class='door ' x1='75' y1='730' x2='67' y2='730' />
+        <line class='door ' x1='51' y1='730' x2='43' y2='730' />
+        <line class='door ' x1='231' y1='910' x2='239' y2='910' />
+        <line class='door ' x1='200' y1='934.5' x2='200' y2='942.5' />
+        <line class='door ' x1='250' y1='911' x2='250' y2='919' />
+        <line class='door ' x1='250' y1='922.5' x2='250' y2='930.5' />
+        <line class='door ' x1='260' y1='935' x2='260' y2='943' />
+        <line class='door ' x1='250' y1='935' x2='250' y2='943' />
+        <line class='door ' x1='242' y1='945' x2='249' y2='945' />
+        <line class='door ' x1='260' y1='982' x2='260' y2='974' />
+        <line class='door ' x1='226.5' y1='945' x2='234.5' y2='945' />
+        <line class='door ' x1='223' y1='975' x2='231' y2='975' />
+        <line class='door ' x1='202' y1='945' x2='210' y2='945' />
+        <line class='door ' x1='212' y1='957' x2='212' y2='949' />
+        <line class='door ' x1='203' y1='960' x2='211' y2='960' />
+        <line class='door ' x1='210' y1='932' x2='218' y2='932' />
+        <line class='door ' x1='208' y1='929' x2='208' y2='921' />
+        <line class='door ' x1='217' y1='920' x2='209' y2='920' />
+        <line class='door ' x1='61' y1='915' x2='69' y2='915' />
+        <line class='door ' x1='38' y1='965' x2='46' y2='965' />
+        <line class='door ' x1='85' y1='971' x2='85' y2='979' />
+        <line class='door ' x1='31' y1='980' x2='39' y2='980' />
+        <line class='door ' x1='27' y1='965' x2='19' y2='965' />
+        <line class='door ' x1='15' y1='956' x2='15' y2='964' />
+        <line class='door ' x1='15' y1='946' x2='15' y2='954' />
+        <line class='door ' x1='15' y1='942' x2='15' y2='934' />
+        <line class='door ' x1='5' y1='945' x2='10' y2='945' />
+        <line class='door ' x1='18.5' y1='935' x2='26.5' y2='935' />
+        <line class='door ' x1='60' y1='956' x2='60' y2='964' />
+        <line class='door ' x1='30' y1='941' x2='30' y2='949' />
+        <line class='door ' x1='51' y1='945' x2='59' y2='945' />
+        <line class='door ' x1='51' y1='955' x2='59' y2='955' />
+        <line class='door ' x1='60' y1='932' x2='60' y2='924' />
+        <line class='door ' x1='485' y1='910' x2='493' y2='910' />
+        <line class='door ' x1='565' y1='910' x2='557' y2='910' />
+        <line class='door ' x1='571' y1='910' x2='579' y2='910' />
+        <line class='door ' x1='640' y1='912' x2='640' y2='920' />
+        <line class='door ' x1='654' y1='912' x2='654' y2='920' />
+        <line class='door ' x1='438' y1='938' x2='438' y2='946' />
+        <line class='door ' x1='438' y1='952' x2='438' y2='944' />
+        <line class='door ' x1='445' y1='910' x2='453' y2='910' />
+        <line class='door ' x1='460' y1='923.5' x2='460' y2='931.5' />
+        <line class='door ' x1='479' y1='945' x2='471' y2='945' />
+        <line class='door ' x1='460' y1='962.5' x2='460' y2='970.5' />
+        <line class='door ' x1='460' y1='976' x2='460' y2='984' />
+        <line class='door ' x1='438' y1='975' x2='438' y2='983' />
+        <line class='door ' x1='428' y1='976' x2='428' y2='984' />
+        <line class='door ' x1='438' y1='964.5' x2='438' y2='972.5' />
+        <line class='door ' x1='428' y1='964.5' x2='428' y2='972.5' />
+        <line class='door ' x1='415' y1='970' x2='423' y2='970' />
+        <line class='door ' x1='438' y1='955.5' x2='438' y2='963.5' />
+        <line class='door ' x1='438' y1='926' x2='438' y2='934' />
+        <line class='door ' x1='438' y1='913.5' x2='438' y2='921.5' />
+        <line class='door invisible' x1='342' y1='861' x2='342' y2='876' />
+        <line class='door ' x1='460' y1='898.5' x2='460' y2='906.5' />
+        <line class='door ' x1='641.5' y1='845' x2='649.5' y2='845' />
+        <line class='door ' x1='641.5' y1='895' x2='649.5' y2='895' />
+        <line class='door ' x1='654' y1='853.5' x2='654' y2='861.5' />
+        <line class='door ' x1='396' y1='960' x2='404' y2='960' />
+        <line class='door ' x1='390' y1='968.5' x2='390' y2='976.5' />
+        <line class='door ' x1='375' y1='974.5' x2='375' y2='982.5' />
+        <line class='door ' x1='375' y1='962' x2='375' y2='970' />
+        <line class='door ' x1='345' y1='982' x2='345' y2='974' />
+        <line class='door ' x1='333.5' y1='972' x2='341.5' y2='972' />
+        <line class='door ' x1='396' y1='940' x2='404' y2='940' />
+        <line class='door ' x1='385' y1='950' x2='390' y2='950' />
+        <line class='door ' x1='330' y1='950' x2='335' y2='950' />
+        <line class='door ' x1='390' y1='951' x2='390' y2='959' />
+        <line class='door ' x1='330' y1='951' x2='330' y2='959' />
+        <line class='door ' x1='637' y1='685.5' x2='637' y2='693.5' />
+        <line class='door ' x1='621.08823529412' y1='676.5' x2='617.91176470588' y2='682.5' />
+        <line class='door ' x1='662' y1='692' x2='670' y2='692' />
+        <line class='door ' x1='678' y1='694.5' x2='678' y2='702.5' />
+        <line class='door ' x1='654' y1='694.5' x2='654' y2='702.5' />
+        <line class='door ' x1='654' y1='719' x2='654' y2='727' />
+        <line class='door ' x1='694.5' y1='709' x2='702.5' y2='709' />
+        <line class='door ' x1='694.5' y1='741' x2='702.5' y2='741' />
+        <line class='door ' x1='678' y1='759.5' x2='678' y2='767.5' />
+        <line class='door ' x1='654' y1='759.5' x2='654' y2='767.5' />
+        <line class='door ' x1='654' y1='744.5' x2='654' y2='752.5' />
+        <line class='door ' x1='654' y1='775.5' x2='654' y2='783.5' />
+        <line class='door ' x1='654' y1='810' x2='654' y2='802' />
+        <line class='door ' x1='654' y1='791' x2='654' y2='799' />
+        <line class='door ' x1='654' y1='825' x2='654' y2='833' />
+        <line class='door ' x1='689.5' y1='788' x2='697.5' y2='788' />
+        <line class='door ' x1='689.5' y1='813' x2='697.5' y2='813' />
+    </g>
+    <g id='objects'>
+    </g>
+    <g id='AP'>
+        <circle class="ap ap-in ap-on" cx="581" cy="540" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="581" cy="540" r="9"/>
+        <circle class="ap ap-out ap-on" cx="581" cy="540" r="12"/>
+        <text class="ap ap-on" x="581" y="543">11</text>
+        <text class="ap ap-on" x="581" y="533">n</text>
+        <text class="ap ap-on" x="581" y="551">n</text>
+        <circle class="ap ap-in ap-on" cx="510" cy="540" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="510" cy="540" r="9"/>
+        <circle class="ap ap-out ap-on" cx="510" cy="540" r="12"/>
+        <text class="ap ap-on" x="510" y="543">6</text>
+        <text class="ap ap-on" x="510" y="533">n</text>
+        <text class="ap ap-on" x="510" y="551">n</text>
+        <circle class="ap ap-in ap-on" cx="401" cy="550" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="401" cy="550" r="9"/>
+        <circle class="ap ap-out ap-on" cx="401" cy="550" r="12"/>
+        <text class="ap ap-on" x="401" y="553">11</text>
+        <text class="ap ap-on" x="401" y="543">n</text>
+        <text class="ap ap-on" x="401" y="561">n</text>
+        <circle class="ap ap-in ap-on" cx="450" cy="540" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="450" cy="540" r="9"/>
+        <circle class="ap ap-out ap-on" cx="450" cy="540" r="12"/>
+        <text class="ap ap-on" x="450" y="543">1</text>
+        <text class="ap ap-on" x="450" y="533">n</text>
+        <text class="ap ap-on" x="450" y="551">n</text>
+        <circle class="ap ap-in ap-on" cx="340" cy="505" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="340" cy="505" r="9"/>
+        <circle class="ap ap-out ap-on" cx="340" cy="505" r="12"/>
+        <text class="ap ap-on" x="340" y="508">6</text>
+        <text class="ap ap-on" x="340" y="498">n</text>
+        <text class="ap ap-on" x="340" y="516">n</text>
+        <circle class="ap ap-in ap-on" cx="270" cy="515" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="270" cy="515" r="9"/>
+        <circle class="ap ap-out ap-on" cx="270" cy="515" r="12"/>
+        <text class="ap ap-on" x="270" y="518">11</text>
+        <text class="ap ap-on" x="270" y="508">n</text>
+        <text class="ap ap-on" x="270" y="526">n</text>
+        <circle class="ap ap-in ap-on" cx="652" cy="540" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="652" cy="540" r="9"/>
+        <circle class="ap ap-out ap-on" cx="652" cy="540" r="12"/>
+        <text class="ap ap-on" x="652" y="543">1</text>
+        <text class="ap ap-on" x="652" y="533">n</text>
+        <text class="ap ap-on" x="652" y="551">n</text>
+        <circle class="ap ap-in ap-on" cx="546" cy="540" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="546" cy="540" r="9"/>
+        <circle class="ap ap-out ap-on" cx="546" cy="540" r="12"/>
+        <text class="ap ap-on" x="546" y="543">1</text>
+        <text class="ap ap-on" x="546" y="533">n</text>
+        <text class="ap ap-on" x="546" y="551">n</text>
+        <circle class="ap ap-in ap-on" cx="707" cy="556" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="707" cy="556" r="9"/>
+        <circle class="ap ap-out ap-on" cx="707" cy="556" r="12"/>
+        <text class="ap ap-on" x="707" y="559">6</text>
+        <text class="ap ap-on" x="707" y="549">n</text>
+        <text class="ap ap-on" x="707" y="567">n</text>
+        <circle class="ap ap-in ap-on" cx="200" cy="394" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="200" cy="394" r="9"/>
+        <circle class="ap ap-out ap-on" cx="200" cy="394" r="12"/>
+        <text class="ap ap-on" x="200" y="397">1</text>
+        <text class="ap ap-on" x="200" y="387">n</text>
+        <text class="ap ap-on" x="200" y="405">n</text>
+        <circle class="ap ap-in ap-on" cx="295" cy="338" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="295" cy="338" r="9"/>
+        <circle class="ap ap-out ap-on" cx="295" cy="338" r="12"/>
+        <text class="ap ap-on" x="295" y="341">6</text>
+        <text class="ap ap-on" x="295" y="331">n</text>
+        <text class="ap ap-on" x="295" y="349">n</text>
+        <circle class="ap ap-in ap-on" cx="291" cy="414" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="291" cy="414" r="9"/>
+        <circle class="ap ap-out ap-on" cx="291" cy="414" r="12"/>
+        <text class="ap ap-on" x="291" y="417">11</text>
+        <text class="ap ap-on" x="291" y="407">n</text>
+        <text class="ap ap-on" x="291" y="425">n</text>
+        <circle class="ap ap-in ap-on" cx="392" cy="262" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="392" cy="262" r="9"/>
+        <circle class="ap ap-out ap-on" cx="392" cy="262" r="12"/>
+        <text class="ap ap-on" x="392" y="265">6</text>
+        <text class="ap ap-on" x="392" y="255">n</text>
+        <text class="ap ap-on" x="392" y="273">n</text>
+        <circle class="ap ap-in ap-on" cx="494" cy="262" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="494" cy="262" r="9"/>
+        <circle class="ap ap-out ap-on" cx="494" cy="262" r="12"/>
+        <text class="ap ap-on" x="494" y="265">11</text>
+        <text class="ap ap-on" x="494" y="255">n</text>
+        <text class="ap ap-on" x="494" y="273">n</text>
+        <circle class="ap ap-in ap-on" cx="605" cy="262" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="605" cy="262" r="9"/>
+        <circle class="ap ap-out ap-on" cx="605" cy="262" r="12"/>
+        <text class="ap ap-on" x="605" y="265">6</text>
+        <text class="ap ap-on" x="605" y="255">n</text>
+        <text class="ap ap-on" x="605" y="273">n</text>
+        <circle class="ap ap-in ap-on" cx="307" cy="262" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="307" cy="262" r="9"/>
+        <circle class="ap ap-out ap-on" cx="307" cy="262" r="12"/>
+        <text class="ap ap-on" x="307" y="265">11</text>
+        <text class="ap ap-on" x="307" y="255">n</text>
+        <text class="ap ap-on" x="307" y="273">n</text>
+        <circle class="ap ap-in ap-on" cx="448" cy="286" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="448" cy="286" r="9"/>
+        <circle class="ap ap-out ap-on" cx="448" cy="286" r="12"/>
+        <text class="ap ap-on" x="448" y="289">1</text>
+        <text class="ap ap-on" x="448" y="279">n</text>
+        <text class="ap ap-on" x="448" y="297">n</text>
+        <circle class="ap ap-in ap-on" cx="688" cy="262" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="688" cy="262" r="9"/>
+        <circle class="ap ap-out ap-on" cx="688" cy="262" r="12"/>
+        <text class="ap ap-on" x="688" y="265">1</text>
+        <text class="ap ap-on" x="688" y="255">n</text>
+        <text class="ap ap-on" x="688" y="273">n</text>
+        <circle class="ap ap-in ap-on" cx="325" cy="66" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="325" cy="66" r="9"/>
+        <circle class="ap ap-out ap-on" cx="325" cy="66" r="12"/>
+        <text class="ap ap-on" x="325" y="69">1</text>
+        <text class="ap ap-on" x="325" y="59">n</text>
+        <text class="ap ap-on" x="325" y="77">n</text>
+        <circle class="ap ap-in ap-on" cx="344" cy="188" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="344" cy="188" r="9"/>
+        <circle class="ap ap-out ap-on" cx="344" cy="188" r="12"/>
+        <text class="ap ap-on" x="344" y="191">6</text>
+        <text class="ap ap-on" x="344" y="181">n</text>
+        <text class="ap ap-on" x="344" y="199">n</text>
+        <circle class="ap ap-in ap-on" cx="344" cy="130" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="344" cy="130" r="9"/>
+        <circle class="ap ap-out ap-on" cx="344" cy="130" r="12"/>
+        <text class="ap ap-on" x="344" y="133">11</text>
+        <text class="ap ap-on" x="344" y="123">n</text>
+        <text class="ap ap-on" x="344" y="141">n</text>
+        <circle class="ap ap-in ap-on" cx="286" cy="104" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="286" cy="104" r="9"/>
+        <circle class="ap ap-out ap-on" cx="286" cy="104" r="12"/>
+        <text class="ap ap-on" x="286" y="107">6</text>
+        <text class="ap ap-on" x="286" y="97">n</text>
+        <text class="ap ap-on" x="286" y="115">n</text>
+        <circle class="ap ap-in ap-on" cx="190" cy="158" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="190" cy="158" r="9"/>
+        <circle class="ap ap-out ap-on" cx="190" cy="158" r="12"/>
+        <text class="ap ap-on" x="190" y="161">1</text>
+        <text class="ap ap-on" x="190" y="151">ac</text>
+        <text class="ap ap-on" x="190" y="169">n</text>
+        <circle class="ap ap-in ap-on" cx="105" cy="639" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="105" cy="639" r="9"/>
+        <circle class="ap ap-out ap-on" cx="105" cy="639" r="12"/>
+        <text class="ap ap-on" x="105" y="642">11</text>
+        <text class="ap ap-on" x="105" y="632">ax</text>
+        <text class="ap ap-on" x="105" y="650">ax</text>
+        <circle class="ap ap-in ap-on" cx="189" cy="639" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="189" cy="639" r="9"/>
+        <circle class="ap ap-out ap-on" cx="189" cy="639" r="12"/>
+        <text class="ap ap-on" x="189" y="642">1</text>
+        <text class="ap ap-on" x="189" y="632">ax</text>
+        <text class="ap ap-on" x="189" y="650">ax</text>
+        <circle class="ap ap-in ap-on" cx="360" cy="639" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="360" cy="639" r="9"/>
+        <circle class="ap ap-out ap-on" cx="360" cy="639" r="12"/>
+        <text class="ap ap-on" x="360" y="642">11</text>
+        <text class="ap ap-on" x="360" y="632">ax</text>
+        <text class="ap ap-on" x="360" y="650">ax</text>
+        <circle class="ap ap-in ap-on" cx="468" cy="639" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="468" cy="639" r="9"/>
+        <circle class="ap ap-out ap-on" cx="468" cy="639" r="12"/>
+        <text class="ap ap-on" x="468" y="642">1</text>
+        <text class="ap ap-on" x="468" y="632">ax</text>
+        <text class="ap ap-on" x="468" y="650">ax</text>
+        <circle class="ap ap-in ap-on" cx="520" cy="673" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="520" cy="673" r="9"/>
+        <circle class="ap ap-out ap-on" cx="520" cy="673" r="12"/>
+        <text class="ap ap-on" x="520" y="676">11</text>
+        <text class="ap ap-on" x="520" y="666">ax</text>
+        <text class="ap ap-on" x="520" y="684">ax</text>
+        <circle class="ap ap-in ap-on" cx="59" cy="621" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="59" cy="621" r="9"/>
+        <circle class="ap ap-out ap-on" cx="59" cy="621" r="12"/>
+        <text class="ap ap-on" x="59" y="624">6</text>
+        <text class="ap ap-on" x="59" y="614">ax</text>
+        <text class="ap ap-on" x="59" y="632">ax</text>
+        <circle class="ap ap-in ap-on" cx="185" cy="852" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="185" cy="852" r="9"/>
+        <circle class="ap ap-out ap-on" cx="185" cy="852" r="12"/>
+        <text class="ap ap-on" x="185" y="855">6</text>
+        <text class="ap ap-on" x="185" y="845">n</text>
+        <text class="ap ap-on" x="185" y="863">n</text>
+        <circle class="ap ap-in ap-on" cx="185" cy="768" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="185" cy="768" r="9"/>
+        <circle class="ap ap-out ap-on" cx="185" cy="768" r="12"/>
+        <text class="ap ap-on" x="185" y="771">1</text>
+        <text class="ap ap-on" x="185" y="761">n</text>
+        <text class="ap ap-on" x="185" y="779">n</text>
+        <circle class="ap ap-in ap-on" cx="61" cy="852" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="61" cy="852" r="9"/>
+        <circle class="ap ap-out ap-on" cx="61" cy="852" r="12"/>
+        <text class="ap ap-on" x="61" y="855">1</text>
+        <text class="ap ap-on" x="61" y="845">n</text>
+        <text class="ap ap-on" x="61" y="863">n</text>
+        <circle class="ap ap-in ap-on" cx="61" cy="768" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="61" cy="768" r="9"/>
+        <circle class="ap ap-out ap-on" cx="61" cy="768" r="12"/>
+        <text class="ap ap-on" x="61" y="771">11</text>
+        <text class="ap ap-on" x="61" y="761">n</text>
+        <text class="ap ap-on" x="61" y="779">n</text>
+        <circle class="ap ap-in ap-on" cx="550" cy="944" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="550" cy="944" r="9"/>
+        <circle class="ap ap-out ap-on" cx="550" cy="944" r="12"/>
+        <text class="ap ap-on" x="550" y="947">1</text>
+        <text class="ap ap-on" x="550" y="937">n</text>
+        <text class="ap ap-on" x="550" y="955">n</text>
+        <circle class="ap ap-in ap-on" cx="474" cy="932" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="474" cy="932" r="9"/>
+        <circle class="ap ap-out ap-on" cx="474" cy="932" r="12"/>
+        <text class="ap ap-on" x="474" y="935">11</text>
+        <text class="ap ap-on" x="474" y="925">n</text>
+        <text class="ap ap-on" x="474" y="943">n</text>
+        <circle class="ap ap-in ap-on" cx="670" cy="944" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="670" cy="944" r="9"/>
+        <circle class="ap ap-out ap-on" cx="670" cy="944" r="12"/>
+        <text class="ap ap-on" x="670" y="947">6</text>
+        <text class="ap ap-on" x="670" y="937">n</text>
+        <text class="ap ap-on" x="670" y="955">n</text>
+        <circle class="ap ap-in ap-on" cx="316" cy="934" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="316" cy="934" r="9"/>
+        <circle class="ap ap-out ap-on" cx="316" cy="934" r="12"/>
+        <text class="ap ap-on" x="316" y="937">6</text>
+        <text class="ap ap-on" x="316" y="927">n</text>
+        <text class="ap ap-on" x="316" y="945">n</text>
+        <circle class="ap ap-in ap-on" cx="366" cy="934" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="366" cy="934" r="9"/>
+        <circle class="ap ap-out ap-on" cx="366" cy="934" r="12"/>
+        <text class="ap ap-on" x="366" y="937">1</text>
+        <text class="ap ap-on" x="366" y="927">n</text>
+        <text class="ap ap-on" x="366" y="945">n</text>
+        <circle class="ap ap-in ap-on" cx="274" cy="934" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="274" cy="934" r="9"/>
+        <circle class="ap ap-out ap-on" cx="274" cy="934" r="12"/>
+        <text class="ap ap-on" x="274" y="937">11</text>
+        <text class="ap ap-on" x="274" y="927">n</text>
+        <text class="ap ap-on" x="274" y="945">n</text>
+        <circle class="ap ap-in ap-on" cx="702" cy="829" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="702" cy="829" r="9"/>
+        <circle class="ap ap-out ap-on" cx="702" cy="829" r="12"/>
+        <text class="ap ap-on" x="702" y="832">1</text>
+        <text class="ap ap-on" x="702" y="822">n</text>
+        <text class="ap ap-on" x="702" y="840">n</text>
+        <circle class="ap ap-in ap-on" cx="611" cy="654" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="611" cy="654" r="9"/>
+        <circle class="ap ap-out ap-on" cx="611" cy="654" r="12"/>
+        <text class="ap ap-on" x="611" y="657">1</text>
+        <text class="ap ap-on" x="611" y="647">n</text>
+        <text class="ap ap-on" x="611" y="665">n</text>
+        <circle class="ap ap-in ap-on" cx="670" cy="727" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="670" cy="727" r="9"/>
+        <circle class="ap ap-out ap-on" cx="670" cy="727" r="12"/>
+        <text class="ap ap-on" x="670" y="730">11</text>
+        <text class="ap ap-on" x="670" y="720">n</text>
+        <text class="ap ap-on" x="670" y="738">n</text>
+        <circle class="ap ap-in ap-on" cx="25" cy="538" r="6"/>
+        <circle class="ap ap-mid ap-on" cx="25" cy="538" r="9"/>
+        <circle class="ap ap-out ap-on" cx="25" cy="538" r="12"/>
+        <text class="ap ap-on" x="25" y="541">X</text>
+        <text class="ap ap-on" x="25" y="531">ax</text>
+        <text class="ap ap-on" x="25" y="549">ax</text>
+        <text class="ap ap-off" x="85" y="540">WiFi AP na kanálu X</text>
+    </g>
+</svg>

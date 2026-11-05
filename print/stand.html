@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>Jste tady — AI4Talents@FIT VUT</title>
+  <meta name="description" content="Plakát na stojan „Jste tady“ pro AI4Talents@FIT VUT — pátek 6 . 11 . 2026, FIT VUT v Brně.">
+  <!-- Print mode guard: must be set BEFORE map.js loads (inline script). -->
+  <script>window.AI4T_PRINT_MODE = true;</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="../assets/css/print.css">
+  <style>
+    /* ============ A4 portrait "Jste tady" stand poster (print/stand.html?at=<roomId>) ============
+       PRINT V2 (spec/PRINT-V2.md): the map renders the SAME decluttered style
+       as the app v2 map — neutral white rooms + hairline ink strokes, event
+       rooms #dbe7fa tint + bold mono labels, NO room-type colors, NO sector
+       letters, NO pins, NO legend. THIS stand's room = yellow #ffff7f + 3px
+       stroke. Static dashed magenta routes follow CORRIDOR CENTRES
+       (AI4TRoute.corridorPath — medial-axis snap, "as a person walks").
+       Exact paper size (210x297mm), no scrolling. */
+
+    @page { size: 210mm 297mm; margin: 0; }
+    html, body { width: 210mm; height: 297mm; }
+
+    .page-stand { padding: 7mm 8mm; }
+
+    /* ---------------------------------------------------------------- header */
+
+    .st-head { border-bottom: 2px solid var(--ink); padding-bottom: 2.5mm; flex: none; }
+    .st-head-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 6mm; margin-bottom: 1.5mm;
+    }
+    .st-kicker {
+      font-family: var(--font-mono); font-size: 9.5pt; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--blue);
+    }
+    .st-date {
+      font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft);
+      white-space: nowrap;
+    }
+    .st-head-room { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4mm; }
+    .st-code {
+      font-family: var(--font-display); font-weight: 700; font-size: 42pt;
+      line-height: 1; letter-spacing: -.01em; font-variant-numeric: tabular-nums;
+    }
+    .st-name {
+      font-family: var(--font-display); font-weight: 500; font-size: 16pt;
+      line-height: 1.1; max-width: 118mm;
+    }
+    .st-floor {
+      margin-top: 1.5mm; font-family: var(--font-mono); font-size: 8pt;
+      color: var(--ink-soft);
+    }
+
+    /* ------------------------------------------------------------------ map
+       map.js (v2, print mode) renders into #map-root. Its own CSS is scoped
+       to #map-root; overrides below must out-specify it (#poster prefix). */
+
+    .st-main {
+      flex: 1; min-height: 0; display: flex; gap: 5mm; padding-top: 3mm;
+    }
+    .st-mapcol { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+    #poster #map-root {
+      flex: 1; min-height: 0; display: flex; flex-direction: column;
+      width: auto; border-radius: 3px;
+    }
+    /* empty in print mode (floor buttons are stripped) — hide the bar */
+    #poster #map-root .map-floorbar { display: none; }
+    /* let the viewport fill the column instead of the 720/1000 aspect box */
+    #poster #map-root .map-viewport {
+      flex: 1; aspect-ratio: auto; height: auto; max-height: none;
+      touch-action: auto; cursor: default;
+    }
+
+    /* THIS stand's room: yellow + 3px ink stroke (app v2 subject style) */
+    #poster #map-root .room-g.st-subj .room {
+      fill: var(--yellow);
+      stroke: var(--ink);
+      stroke-width: 3px;
+    }
+
+    /* "Jste tady" label beside the blue position marker */
+    #poster #map-root .st-yah-label {
+      font-family: var(--font-mono); font-size: 15px; font-weight: 500;
+      fill: var(--blue); stroke: #fff; stroke-width: 3.5px; paint-order: stroke;
+      pointer-events: none;
+    }
+
+    /* floor-change handover marker on a route fragment */
+    #poster #map-root .st-hop rect {
+      fill: var(--blue); stroke: #fff; stroke-width: 2px;
+    }
+    #poster #map-root .st-hop text {
+      font-family: var(--font-mono); font-size: 14px; font-weight: 700; fill: #fff;
+    }
+
+    /* corridor-centre route: dashed magenta, one clean line (no halo) */
+    #poster #map-root .st-route {
+      fill: none; stroke: var(--magenta); stroke-width: 3px;
+      stroke-dasharray: 7 5; stroke-linecap: round; stroke-linejoin: round;
+      pointer-events: none;
+    }
+    /* destination ring at the end of a route (same floor only) */
+    #poster #map-root .st-dest {
+      fill: none; stroke: var(--magenta); stroke-width: 2.5px;
+      pointer-events: none;
+    }
+
+    .st-mapcap { margin-top: 1.2mm; flex: none; }
+    .st-mapcap .cap-strong { color: var(--ink); }
+
+    /* ------------------------------------------------------------- side rail */
+
+    .st-rail {
+      flex: none; width: 50mm; display: flex; flex-direction: column; gap: 4mm;
+      min-height: 0;
+    }
+    .rc-kicker {
+      font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+      border-bottom: 2px solid var(--ink); padding-bottom: 1mm;
+    }
+    .rc-route { margin-bottom: 3mm; }
+    .rc-route:last-of-type { margin-bottom: 0; }
+    .rc-route-head {
+      font-family: var(--font-mono); font-size: 7.5pt; font-weight: 500;
+      color: var(--blue); margin-bottom: 0.8mm;
+    }
+    .rc-route-head b { color: var(--ink); }
+    .rc-route-desc { font-size: 7.5pt; line-height: 1.45; color: var(--ink); }
+
+    .st-qr { margin-top: auto; }
+    .st-qr .qr-slot { width: 28mm; height: 28mm; }
+    .st-qr .qr-cap { max-width: 50mm; margin-top: 1.4mm; }
+
+    /* ---------------------------------------------------------------- chips */
+
+    .st-chips { margin-top: 3mm; flex: none; }
+    .st-chips-label {
+      font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+      margin-bottom: 1.5mm;
+    }
+    .st-chip-row { display: flex; flex-wrap: wrap; gap: 1.6mm; }
+    .st-chip {
+      font-family: var(--font-mono); font-size: 7pt; line-height: 1;
+      background: var(--paper); border: 1px solid var(--ink); border-radius: 3px;
+      padding: 1.6mm 2.2mm; white-space: nowrap;
+    }
+    .st-chip b { color: var(--blue); font-weight: 500; }
+
+    .pfooter { padding: 1.6mm 0 0; margin-top: 2.5mm; }
+
+    /* unknown room fallback */
+    .st-unknown { flex: 1; padding: 20mm 0; }
+    .st-unknown h2 { font-family: var(--font-display); font-size: 30pt; font-weight: 700; }
+    .st-unknown p { margin-top: 5mm; font-size: 12pt; max-width: 120mm; line-height: 1.45; }
+  </style>
+</head>
+<body class="pp page-stand">
+  <div id="poster" class="pp-root"></div>
+
+  <script src="../assets/js/data.js" defer></script>
+  <script src="../assets/js/routing.js" defer></script>
+  <script src="../assets/js/map.js" defer></script>
+  <script src="../assets/js/print.js" defer></script>
+  <script>
+    // stand.html boot — parametric "Jste tady" poster (?at=<roomId>).
+    // map.js runs in AI4T_PRINT_MODE (static, chrome-less). Routes use
+    // AI4TRoute.corridorPath (corridor centres). Runs after deferred libs.
+    window.addEventListener('DOMContentLoaded', function () {
+      var P = window.AI4TPrint;
+      var MAP = window.AI4TMap;
+      var RT = window.AI4TRoute;
+      var DATA = window.AI4T_DATA;
+      var root = document.getElementById('poster');
+      if (!P) { root.textContent = 'Chybí data (AI4TPrint).'; return; }
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      // ------------------------------------------------------------ room id --
+
+      var params = new URLSearchParams(location.search);
+      var wanted = (params.get('at') || 'A101').trim();
+      var info = P.findRoom(wanted);
+      if (!info) {
+        // Unknown room id — fallback sheet, still exactly A4.
+        root.innerHTML =
+          '<header class="st-head"><p class="st-kicker">Jste tady — you are here</p></header>' +
+          '<div class="st-unknown"><h2>Místnost „' + esc(wanted) + '“ nebyla nalezena</h2>' +
+          '<p>Zkontroluj parametr <span class="mono">?at=</span> v adrese — musí obsahovat ' +
+          'číslo místnosti z mapy fakulty, např. <span class="mono">?at=A101</span>.</p></div>' +
+          P.footerStrip();
+        return;
+      }
+      var at = info.room.id; // canonical id
+      var floor = info.floor;
+      var floorLbl = P.floorLabel(floor);
+      var meta = (DATA.events && DATA.events.meta) || {};
+
+      document.title = 'Jste tady — ' + at + ' · AI4Talents@FIT VUT';
+
+      // --------------------------------------------------------------- page --
+
+      var h =
+        '<header class="st-head">' +
+          '<div class="st-head-top">' +
+            '<p class="st-kicker">Jste tady — you are here</p>' +
+            '<p class="st-date">PÁ ' + esc(P.fmtDate(meta.date)) + ' · ' +
+              esc(meta.time || '9:00 — 14:00') + ' · KACHNA DO 16:00</p>' +
+          '</div>' +
+          '<div class="st-head-room">' +
+            '<h1 class="st-code">' + esc(at) + '</h1>' +
+            '<p class="st-name">' + esc(info.room.name || '') + '</p>' +
+          '</div>' +
+          '<p class="st-floor">' + esc(floorLbl) + ' · ' +
+            esc(meta.place || 'FIT VUT v Brně, Božetěchova 2') + '</p>' +
+        '</header>' +
+
+        '<main class="st-main">' +
+          '<div class="st-mapcol">' +
+            '<div id="map-root"></div>' +
+            '<p class="st-mapcap map-cap" id="map-cap"></p>' +
+          '</div>' +
+
+          '<aside class="st-rail">' +
+            '<div>' +
+              '<p class="rc-kicker">Jak se dostat</p>' +
+              '<div id="routes"></div>' +
+            '</div>' +
+            '<div class="st-qr">' + P.qrBlock(28, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
+          '</aside>' +
+        '</main>' +
+
+        '<section class="st-chips" aria-label="Program dne">' +
+          '<p class="st-chips-label">Program — pátek ' + esc(P.fmtDate(meta.date)) + '</p>' +
+          '<div class="st-chip-row" id="chips"></div>' +
+        '</section>';
+
+      root.innerHTML = h + P.footerStrip();
+
+      // -------------------------------------------------------- the v2 map --
+
+      if (MAP) {
+        MAP.init('#map-root', { floor: floor });
+        if (floor !== MAP.getFloor()) MAP.setFloor(floor);
+      }
+
+      // Position cell: routing anchor of the room (door cell), else the
+      // room centroid snapped to the nearest walkable cell.
+      var cell = null;
+      var anchor = RT ? RT.anchorOf(at, floor) : null;
+      if (anchor) {
+        floor = anchor.floor; // trust the routing anchor's floor
+        cell = [anchor.gx, anchor.gy];
+      } else if (RT && info.room.c) {
+        cell = RT.svgToCell(info.room.c);
+        var near = RT.nearestWalkable(floor, cell);
+        if (near) cell = near;
+      }
+
+      if (MAP && cell) MAP.setPosition({ floor: floor, cell: cell });
+
+      // THIS room = subject: yellow + 3px stroke (overrides any event tint)
+      function markSubject() {
+        var g = document.querySelector('#map-world .room-g[data-id="' + at + '"]');
+        if (g) g.setAttribute('class', 'room-g st-subj');
+      }
+      markSubject();
+
+      // Bigger "Jste tady" dot + mono label beside it (kept from v1 — user
+      // likes the marker; only the map style changed).
+      if (MAP && cell && RT) {
+        var layer = document.querySelector('#map-world .pos-layer');
+        var core = layer && layer.querySelector('.pos-core');
+        if (core) core.setAttribute('r', '11');
+        if (layer) {
+          var p = RT.cellToSvg(cell);
+          // place BELOW the room so it never collides with the room-code label
+          // at the centroid: anchor at the room's bbox bottom + 16 svg units
+          var room = P.findRoom(at);
+          var y = p[1] - 19;
+          if (room && room.room && room.room.c) {
+            var sb = null;
+            for (var si = 0; si < (room.room.s || []).length; si++) {
+              var sh = room.room.s[si];
+              if (sh.r) {
+                var btm = sh.r[1] + sh.r[3];
+                if (sb === null || btm > sb) sb = btm;
+              } else if (sh.p) {
+                for (var pj = 0; pj < sh.p.length; pj++) {
+                  if (sb === null || sh.p[pj][1] > sb) sb = sh.p[pj][1];
+                }
+              }
+            }
+            if (sb !== null) {
+              var roomTop = null;
+              for (var ti = 0; ti < (room.room.s || []).length; ti++) {
+                var tsh = room.room.s[ti];
+                var top = tsh.r ? tsh.r[1] : Math.min.apply(null, (tsh.p || []).map(function (q) { return q[1]; }));
+                if (roomTop === null || top < roomTop) roomTop = top;
+              }
+              if (roomTop !== null && sb - roomTop > 70) y = sb - 10;
+              else y = Math.min(sb + 18, 988);
+            }
+          }
+          layer.insertAdjacentHTML('beforeend',
+            '<text class="st-yah-label" x="' + p[0] + '" y="' + y +
+            '" text-anchor="middle">Jste tady</text>');
+        }
+      }
+
+      // ---- content crop: viewBox = union(subject, event rooms, route pts) ----
+      // Kills dead zones: the poster shows the walkable neighbourhood of the
+      // stand, not the whole floor. Same geometry as the app v2 cluster crop.
+      (function cropToContent() {
+        var svgEl = document.querySelector('#map-svg');
+        var world = document.querySelector('#map-world');
+        if (!svgEl || !world) return;
+        var roomIds = new Set([at]);
+        (DATA.events.events || []).forEach(function (ev) {
+          if (String(ev.floor) === String(floor) && ev.room) roomIds.add(ev.room);
+        });
+        var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+        var grow = function (bx0, by0, bx1, by1) {
+          x0 = Math.min(x0, bx0); y0 = Math.min(y0, by0);
+          x1 = Math.max(x1, bx1); y1 = Math.max(y1, by1);
+        };
+        var idx = P.roomIndex();
+        roomIds.forEach(function (id) {
+          var info = idx[id];
+          if (!info) return;
+          (info.room.s || []).forEach(function (sh) {
+            if (sh.r) grow(sh.r[0], sh.r[1], sh.r[0] + sh.r[2], sh.r[1] + sh.r[3]);
+            else if (sh.p) sh.p.forEach(function (pt) { grow(pt[0], pt[1], pt[0], pt[1]); });
+          });
+        });
+        document.querySelectorAll('#map-world .st-route').forEach(function (r) {
+          (r.getAttribute('points') || '').trim().split(/[\s,]+/).forEach(function (n, i, arr) {
+            if (i % 2) grow(+arr[i - 1], +n, +arr[i - 1], +n);
+          });
+        });
+        if (x0 > x1) return;
+        var mw = (x1 - x0) * 0.12, mh = (y1 - y0) * 0.12;
+        x0 = Math.max(0, x0 - mw); y0 = Math.max(0, y0 - mh);
+        x1 = Math.min(720, x1 + mw); y1 = Math.min(1000, y1 + mh);
+        svgEl.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
+      })();
+
+      // "modrá = místnosti s programem" only when the floor actually
+      // shows tinted event rooms (floor -2 / D0207 has none).
+      var nEvRooms = document.querySelectorAll('#map-root .ev-label').length;
+      document.getElementById('map-cap').innerHTML =
+        '<span class="cap-strong">' + esc(floorLbl) + '</span>' +
+        ' · žlutá = tento stojan' +
+        (nEvRooms ? ' · modrá = místnosti s programem' : '');
+
+      // ------------------------------------------- corridor-centre routes --
+
+      // Dashed magenta routes from THIS stand to C106 (registration) and
+      // E103 (hub/stands) — corridor CENTRES via AI4TRoute.corridorPath.
+      // A stand standing at its own target gets no route to it.
+      var TARGETS = [
+        { roomId: 'C106', head: '→ <b>C106</b> · registrace (8:30)' },
+        { roomId: 'E103', head: '→ <b>E103</b> · stánky firem a prohlídky' },
+      ];
+      var from = { roomId: at };
+      if (cell) { from.floor = floor; from.cell = cell; } // roomId kept for override keys
+      var routesEl = document.getElementById('routes');
+      var routeHtml = '';
+      var drawn = [];
+
+      TARGETS.forEach(function (t) {
+        if (t.roomId === at) {
+          routeHtml += '<div class="rc-route"><p class="rc-route-head">' + t.head + '</p>' +
+            '<p class="rc-route-desc">Tento stojan stojí přímo tady.</p></div>';
+          return;
+        }
+        var r = RT && typeof RT.corridorPath === 'function'
+          ? RT.corridorPath(from, { roomId: t.roomId })
+          : null;
+        if (r && r.legs && r.legs.length) {
+          drawn.push({ route: r, target: t.roomId });
+          routeHtml += '<div class="rc-route"><p class="rc-route-head">' + t.head + '</p>' +
+            '<p class="rc-route-desc">' + esc(RT.describe(r)) + '</p></div>';
+        } else {
+          routeHtml += '<div class="rc-route"><p class="rc-route-head">' + t.head + '</p>' +
+            '<p class="rc-route-desc">Trasu se nepodařilo spočítat.</p></div>';
+        }
+      });
+      routesEl.innerHTML = routeHtml;
+
+      drawn.forEach(function (d) {
+        var r = d.route;
+        var layer = document.querySelector('#map-world .route-layer');
+        if (!layer) return;
+        var parts = [];
+        var fragEnd = null, fragStart = null;
+        r.legs.forEach(function (leg) {
+          if (leg.floor !== floor) return; // only legs on the shown floor
+          if (leg.points.length > 1) {
+            var pts = leg.points.map(function (p) {
+              return p[0].toFixed(1) + ',' + p[1].toFixed(1);
+            }).join(' ');
+            parts.push('<polyline class="st-route" points="' + pts + '"/>');
+            if (!fragStart) fragStart = leg.points[0];
+            fragEnd = leg.points[leg.points.length - 1];
+          }
+        });
+        // multi-floor route: mark the handover points (blue square + glyph)
+        // so the fragments on this floor read as ONE route
+        if (r.legs.length > 1) {
+          var glyph = function (txt, x, y) {
+            parts.push('<g class="st-hop"><rect x="' + (x - 11) + '" y="' + (y - 11) +
+              '" width="22" height="22" rx="4"/><text x="' + x + '" y="' + (y + 5) +
+              '" text-anchor="middle">' + txt + '</text></g>');
+          };
+          var nextFloor = null, prevFloor = null;
+          for (var li = 0; li < r.legs.length; li++) {
+            if (r.legs[li].floor === floor) {
+              if (li > 0) prevFloor = r.legs[li - 1].floor;
+              if (li < r.legs.length - 1) nextFloor = r.legs[li + 1].floor;
+            }
+          }
+          if (fragStart && prevFloor !== null)
+            glyph('\u2193', fragStart[0], fragStart[1]);
+          if (fragEnd && nextFloor !== null)
+            glyph('\u2191', fragEnd[0], fragEnd[1]);
+        }
+        // destination ring at the route end when it is on this floor
+        var last = r.legs[r.legs.length - 1];
+        if (last.floor === floor && last.points.length) {
+          var end = last.points[last.points.length - 1];
+          parts.push('<circle class="st-dest" cx="' + end[0].toFixed(1) +
+            '" cy="' + end[1].toFixed(1) + '" r="10"/>');
+        }
+        layer.insertAdjacentHTML('beforeend', parts.join(''));
+      });
+
+      // ------------------------------------------------------- event chips --
+
+      // Short chip labels for events without speaker/partner (zones etc.);
+      // everything else uses the surname / partner name, like
+      // "9:00 Černocký — E112".
+      var SHORT_TITLE = {
+        'registrace': 'Registrace',
+        'nabidka-stanky': 'Stánky firem',
+        'prohlidky': 'Prohlídky fakulty',
+        'kachna': 'Kachna klub'
+      };
+      function chipWho(ev) {
+        if (ev.partner) return ev.partner;
+        if (ev.speaker) {
+          var words = String(ev.speaker).replace(/[„"«»]/g, ' ').trim().split(/\s+/);
+          return words[words.length - 1];
+        }
+        return SHORT_TITLE[ev.id] || ev.title;
+      }
+
+      document.getElementById('chips').innerHTML = P.allEvents().map(function (ev) {
+        return '<span class="st-chip"><b>' + esc(ev.start) + '</b> · ' +
+          esc(chipWho(ev)) + ' — ' + esc(ev.room) + '</span>';
+      }).join('');
+    });
+  </script>
+</body>
+</html>

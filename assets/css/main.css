@@ -1,0 +1,949 @@
+/* ==========================================================================
+   AI4Talents@FIT VUT — main.css (APP-V2, minimal QR-entry app)
+   Flat, light, print-like ledger. Mobile-first; no marketing surfaces.
+   Type spine: Space Grotesk (wordmark) · Inter (UI) · IBM Plex Mono
+   (times, room codes, tabs). Comments in English, user copy is Czech.
+   Section map.js injects its own styles; here we only give it a container.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design tokens (names kept from v1 — shared with map.js v2)
+   -------------------------------------------------------------------------- */
+:root {
+  /* ground */
+  --ground: #f6f5f1;
+  --ground-dark: #0d0c0b;
+  --panel-dark: #17161a;
+  --paper: #ffffff;
+
+  /* ink */
+  --ink: #14120f;
+  --ink-soft: #6f6b64;
+  --ink-on-dark: #f4f2ec;
+  --muted-on-dark: #9a948a;
+
+  /* accents */
+  --blue: #1761cc;
+  --blue-bright: #1987ef;
+  --magenta: #ff2fd6;
+  --magenta-deep: #c21f9f;
+  --yellow: #ffff7f;
+
+  /* room fills (map) */
+  --fill-lecture: #dbe7fa;
+  --fill-lab: #d4eefb;
+  --fill-office: #fff3c4;
+  --fill-circ: #ececec;
+  --fill-stairs: #dcdcdc;
+  --fill-building: #e8eaea;
+  --fill-live-now: #dbe7fa;      /* timetable: happening now */
+  --fill-past: #ececec;          /* timetable/map: past */
+
+  /* lines */
+  --hairline: #d8d5cf;
+  --edge-dark: #2c2424;
+
+  /* type */
+  --font-display: 'Space Grotesk', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --dur: 180ms;
+
+  /* app shell */
+  --topbar-h: 52px;
+  --tt-label-w: 92px;            /* grid: room label column width */
+  --lane-h: 58px;                /* grid: normal event lane height */
+  --lane-slim-h: 30px;          /* grid: all-day zone lane height */
+}
+
+/* --------------------------------------------------------------------------
+   2. Reset & base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--ground);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.vh { /* visually hidden, still screen-reader reachable */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.noscript {
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Topbar + tabs
+   -------------------------------------------------------------------------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 14px;
+  padding-top: env(safe-area-inset-top);
+  height: calc(var(--topbar-h) + env(safe-area-inset-top));
+  background: var(--ground);
+  border-bottom: 2px solid var(--ink);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1;
+  min-width: 0;
+}
+
+.brand-word {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.wm-4 { color: var(--blue); }
+
+.brand-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 2px solid var(--ink);
+  border-radius: 9px;
+  background: var(--paper);
+  flex: none;
+}
+
+.tab {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1;
+  padding: 8px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+/* phones: the pill must fit beside the wordmark — tighten it */
+@media (max-width: 480px) {
+  .tabs { gap: 2px; padding: 2px; }
+  .tab { font-size: 12px; padding: 7px 8px; }
+  .tab--muj-label { display: none; }
+  .tab-badge { min-width: 15px; margin-left: 4px; padding: 1px 3px 2px; }
+}
+
+.tab.is-active {
+  background: var(--blue);
+  color: #fff;
+}
+
+.tab:not(.is-active):hover {
+  background: var(--fill-lecture);
+}
+
+.tab-badge {
+  display: none; /* shown with .has-picks only */
+  min-width: 17px;
+  margin-left: 5px;
+  padding: 1px 4px 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  color: #fff;
+  background: var(--magenta-deep);
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+}
+
+.tab-badge.has-picks { display: inline-block; }
+
+.tab.is-active .tab-badge {
+  background: var(--yellow);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout: sections
+   -------------------------------------------------------------------------- */
+main {
+  padding: 14px 12px 40px;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  min-height: calc(100dvh - var(--topbar-h)); /* short pages: padding stays inside the viewport (no phantom 14px scroll) */
+  box-sizing: border-box;
+}
+
+.view[hidden] {
+  display: none;
+}
+
+/* Segmented control (grid/sequential toggle) */
+.seg {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border: 2px solid var(--ink);
+  border-radius: 9px;
+  background: var(--paper);
+}
+
+.seg-btn {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1;
+  padding: 7px 11px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.seg-btn.is-active {
+  background: var(--blue);
+  color: #fff;
+}
+
+.seg-btn:not(.is-active):hover {
+  background: var(--fill-lecture);
+}
+
+/* --------------------------------------------------------------------------
+   5. Timetable — view A: room × time grid
+   -------------------------------------------------------------------------- */
+.tt-scroll {
+  margin-top: 12px;
+  overflow: auto;                       /* scrolls x (and y past max-height) */
+  max-height: calc(100vh - var(--topbar-h) - 118px); /* dvh fallback */
+  max-height: calc(100dvh - var(--topbar-h) - 118px);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ttg-inner {
+  position: relative;
+  min-width: 680px;                     /* horizontal scroll on phones */
+}
+
+/* -- time header (sticky top within .tt-scroll) -- */
+.ttg-head {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  background: var(--paper);
+  border-bottom: 2px solid var(--ink);
+}
+
+.ttg-corner {
+  position: sticky;
+  left: 0;
+  z-index: 7;
+  flex: none;
+  width: var(--tt-label-w);
+  border-right: 1px solid var(--hairline);
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 8px 5px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+}
+
+.ttg-hours {
+  position: relative;
+  flex: 1;
+  height: 34px;
+}
+
+.ttg-hour {
+  position: absolute;
+  top: 6px;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.ttg-hour.is-edge-left { transform: none; }
+.ttg-hour.is-edge-right { transform: translateX(-100%); }
+
+.ttg-nowlabel {
+  position: absolute;
+  top: 5px;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--magenta-deep);
+  background: var(--paper);
+  padding: 0 3px;
+  white-space: nowrap;
+}
+
+/* -- body -- */
+.ttg-body {
+  position: relative;
+}
+
+/* hour gridlines (one layer behind all rows) */
+.ttg-lines {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--tt-label-w);
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ttg-vline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--hairline);
+}
+
+/* NOW line (above blocks, below sticky labels; click-through) */
+.nowlayer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--tt-label-w);
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.nowline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--magenta);
+}
+
+/* floor group tag */
+.ttg-floor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px 4px var(--tt-label-w);
+  background: var(--paper);             /* masks gridlines behind */
+  position: relative;
+  z-index: 1;
+}
+
+.ttg-floor span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.ttg-floor::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+/* room row */
+.ttg-row {
+  display: flex;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.ttg-row:last-child {
+  border-bottom: none;
+}
+
+.ttg-label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  flex: none;
+  width: var(--tt-label-w);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 6px 8px 6px 0;
+  text-align: right;
+  background: var(--paper);             /* masks blocks scrolling under */
+  border-right: 1px solid var(--hairline);
+  cursor: pointer;
+}
+
+.ttg-label:hover { background: var(--fill-lecture); }
+
+.ttg-code {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.ttg-name {
+  font-size: 10px;
+  line-height: 1.25;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ttg-track {
+  position: relative;
+  flex: 1;
+}
+
+/* -- event blocks -- */
+.evt-wrap {
+  position: absolute;
+  z-index: 1;
+  min-width: 76px;
+}
+
+.evt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 26px 5px 8px;
+  text-align: left;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-left-width: 3px;
+  border-left-color: var(--evt-color, var(--ink));
+  border-radius: 5px;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: background var(--dur) var(--ease);
+}
+
+.evt-time {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.1;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.evt-title {
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  hyphens: auto;
+}
+
+/* slim all-day zone lane (stánky, kachna) */
+.evt-wrap.is-slim .evt {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 22px 3px 7px;
+}
+
+.evt-wrap.is-slim .evt-time { font-size: 10px; }
+
+.evt-wrap.is-slim .evt-title {
+  order: -1;
+  font-size: 12px;
+  font-weight: 600;
+  -webkit-line-clamp: 1;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.evt-wrap.is-slim .evt-time { flex: none; margin-left: auto; }
+
+/* pick chip inside a block */
+.evt-add {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+}
+
+.evt-add::after { /* invisible 44px tap target (button stays visually small) */
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+
+.evt-add:hover { background: var(--fill-lecture); }
+
+/* live states */
+.evt-wrap.is-now .evt { background: var(--fill-live-now); }
+
+.evt-wrap.is-soon .evt {
+  animation: evt-soon 1.6s var(--ease) infinite;
+}
+
+@keyframes evt-soon {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(23, 97, 204, 0.55); }
+  50% { box-shadow: 0 0 0 4px rgba(23, 97, 204, 0.18); }
+}
+
+/* picked state (yellow = selection token) */
+.evt-wrap.is-picked .evt { background: var(--yellow); }
+.evt-wrap.is-picked .evt-add {
+  background: var(--yellow);
+}
+.evt-wrap.is-picked.is-now .evt { background: var(--fill-live-now); }
+.evt-wrap.is-picked.is-now .evt {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+/* room flash (ai4t:room-selected from the map) */
+.evt-wrap.room-flash .evt {
+  box-shadow: 0 0 0 2.5px var(--blue);
+}
+
+/* --------------------------------------------------------------------------
+   6. Timetable — view B: sequential list (+ Můj program)
+   -------------------------------------------------------------------------- */
+.seq {
+  margin-top: 14px;
+}
+
+.seq-group {
+  margin-top: 14px;
+  border-top: 2px solid var(--ink);
+  padding-top: 7px;
+}
+
+.seq-gh {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 2px;
+}
+
+.seq-time {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.seq-note {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.seq-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.seq-hit {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 8px 9px 10px;
+  border-left: 3px solid transparent; /* type color — the legend is true here too */
+  border-radius: 7px;
+  text-align: left;
+  transition: background var(--dur) var(--ease);
+}
+
+.seq-row.ev--lecture .seq-hit { border-left-color: var(--blue); }
+.seq-row.ev--workshop .seq-hit { border-left-color: var(--magenta-deep); }
+.seq-row.ev--zone .seq-hit,
+.seq-row.ev--milestone .seq-hit { border-left-color: var(--ink-soft); }
+
+.seq-hit:hover { background: rgba(255, 255, 255, 0.85); }
+
+.seq-body { min-width: 0; flex: 1; }
+
+.seq-title {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* one meta line, always the same anatomy: [ROOM] room name · speaker */
+.seq-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 7px;
+  row-gap: 2px;
+  margin-top: 4px;
+  min-width: 0;
+}
+
+.seq-meta .chip { margin-left: 0; }
+
+.seq-room,
+.seq-who {
+  font-size: 12px;
+  color: #5d5850; /* one step darker than ink-soft — 11–12px needs contrast */
+}
+
+/* group header carries the start — rows only say when they end */
+.seq-end {
+  flex: none;
+  padding-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.chip {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px 1px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  vertical-align: 1px;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  background: var(--paper);
+}
+
+.chip.is-conflict {
+  border-color: var(--magenta-deep);
+  color: var(--magenta-deep);
+}
+
+.seq-pick {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 7px;
+}
+
+.seq-pick:hover { background: var(--fill-lecture); }
+
+.seq-row.is-picked .seq-pick {
+  background: var(--yellow);
+}
+
+.seq-row.is-now .seq-hit { background: var(--fill-live-now); }
+
+.seq-row.is-soon .seq-hit {
+  animation: evt-soon 1.6s var(--ease) infinite;
+}
+
+.seq-row.room-flash .seq-hit {
+  box-shadow: 0 0 0 2.5px var(--blue);
+}
+
+.seq-end {
+  margin-top: 18px;
+  padding: 2px 2px 0;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+/* Můj program empty state */
+.muj-empty {
+  margin-top: 18px;
+  padding: 14px 2px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+.muj-cta {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 11px 16px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+}
+
+.muj-cta:hover { background: var(--fill-lecture); }
+
+/* --------------------------------------------------------------------------
+   7. Map container (map.js owns the internals)
+   -------------------------------------------------------------------------- */
+#map-root {
+  position: relative;
+  margin-top: 12px;
+  max-width: 860px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   8. Desktop refinements
+   -------------------------------------------------------------------------- */
+@media (max-width: 379px) {
+  .tab { font-size: 12px; padding: 7px 8px; }
+  .brand-word { font-size: 15px; }
+}
+
+@media (min-width: 760px) {
+  main {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  :root {
+    --tt-label-w: 108px;
+  }
+
+  .ttg-inner { min-width: 0; }           /* full width, no h-scroll needed */
+
+  .ttg-hour { font-size: 12.5px; }
+
+  .evt-title { font-size: 13px; }
+
+  .seq-when { width: 96px; font-size: 12px; }
+
+}
+
+/* --------------------------------------------------------------------------
+   9. Reduced motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .evt,
+  .seq-hit {
+    transition: none;
+  }
+
+  .evt-wrap.is-soon .evt,
+  .seq-row.is-soon .seq-hit {
+    animation: none;                      /* keep a static cue instead */
+    box-shadow: 0 0 0 3px rgba(23, 97, 204, 0.25);
+  }
+}
+
+/* spine-color legend under the view toggle */
+.tt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+.tt-legend .sw {
+  display: inline-block;
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  margin-right: 5px;
+  vertical-align: 2px;
+}
+
+.tt-legend .sw-lecture { background: var(--blue); }
+.tt-legend .sw-workshop { background: var(--magenta-deep); }
+.tt-legend .sw-zone { background: var(--ink-soft); }
+
+.tt-legend-hint { margin-left: auto; }
+
+/* outlier room hint chips (map floor bar) */
+#map-root .map-outliers { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+#map-root .map-outlier-chip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  padding: 7px 9px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  border-radius: 5px;
+  cursor: pointer;
+}
+#map-root .map-outlier-chip:hover { background: var(--fill-lecture); }
+
+/* narrow cards drop the end time (container query) instead of clipping it */
+.evt { container-type: inline-size; }
+@container (max-width: 74px) {
+  .evt-time-end { display: none; }
+}
+.evt-time { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.evt-time-end { font-style: normal; }
+
+/* --------------------------------------------------------------------------
+   9. Mobile pass — phones get a bottom tab bar, a taller map and calmer
+   sequential dividers. Desktop is untouched.
+   -------------------------------------------------------------------------- */
+@media (max-width: 700px) {
+  /* tabs move out of the topbar into a fixed bottom bar (thumb reach,
+     home-indicator safe area); the topbar keeps brand + date only */
+  .topbar { justify-content: flex-start; }
+  .tabs {
+    position: fixed;
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 60;
+    justify-content: stretch;
+    background: var(--ground);
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(13, 12, 11, 0.22);
+  }
+  .tab { flex: 1; text-align: center; padding: 13px 8px; font-size: 13px; }
+  .tab--muj-label { display: none; }
+  main { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+  /* rows slide under the fixed bar — a fade above it reads as depth,
+     not as a sliced half-row */
+  .tabs::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 42px;
+    background: linear-gradient(to top, var(--ground) 40%, transparent);
+    pointer-events: none;
+  }
+
+  /* the map is the point on a phone — it gets the viewport, not a stamp
+     (extra bottom clearance so the info card never kisses the tab bar) */
+  #map-root { max-width: none; }
+  #map-root .map-viewport {
+    aspect-ratio: auto;
+    height: calc(100dvh - var(--topbar-h) - 152px);
+    min-height: 440px;
+  }
+
+  /* grid cells are tiny — the + chip steals title width; picking still works
+     via long-press and via the sequential rows */
+  #tt-grid .evt-add { display: none; }
+
+  /* horizontal scroll affordance: content cut at the right frame edge must
+     read as "continues", not as a rendering bug */
+  #tt-grid { position: relative; }
+  #tt-grid::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    width: 34px;
+    background: linear-gradient(to right, rgba(246, 245, 241, 0), var(--paper) 92%);
+    pointer-events: none;
+    border-radius: 0 10px 10px 0;
+    transition: opacity 0.15s;
+  }
+  #tt-grid.at-scroll-end::after { opacity: 0; }
+
+  /* empty "Můj program": compose the emptiness instead of dropping it
+     top-left (margin auto centers short content, never clips a long list) */
+  #muj {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100dvh - var(--topbar-h) - 96px - 24px);
+  }
+  #muj > * { margin-top: auto; margin-bottom: auto; }
+
+  /* sequential view: one heavy rule reads as noise — calm it down */
+  .seq-group { border-top: 1px solid var(--hairline); }
+  .seq-group:first-child { border-top: 2px solid var(--ink); }
+
+  /* grid cells are tiny — mid-word hyphen + ellipsis is worse than ellipsis */
+  .evt-title { hyphens: none; }
+}

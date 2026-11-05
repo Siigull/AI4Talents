@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AI4Talents — program · 6. 11. 2026</title>
+  <meta name="description" content="Program akce AI4Talents@FIT VUT — pátek 6. 11. 2026, 8:30–16:00, FIT VUT v Brně, Božetěchova 2.">
+  <meta name="theme-color" content="#f6f5f1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d0c0b'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23ff2fd6'/%3E%3C/svg%3E">
+  <!-- One Google Fonts request: Space Grotesk 500/600/700, Inter 400/500/600, IBM Plex Mono 400/500 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+  <!-- App shell (SPEC APP-V2): QR entry → straight to the programme.
+       Tabs are wired by app.js (hidden attribute on sections + aria-selected).
+       Tab buttons carry data-view matching section ids. -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-word">AI<span class="wm-4">4</span>Talents</span>
+      <span class="brand-date">6. 11. 2026</span>
+    </div>
+    <nav class="tabs" aria-label="Záložky aplikace">
+      <button type="button" class="tab is-active" id="tab-program" data-view="program"
+              role="tab" aria-selected="true" aria-controls="program">Program</button>
+      <button type="button" class="tab" id="tab-muj" data-view="muj"
+              role="tab" aria-selected="false" aria-controls="muj">Můj<span class="tab--muj-label"> program</span>
+        <span class="tab-badge" id="tab-muj-count" hidden>0</span></button>
+      <button type="button" class="tab" id="tab-mapa" data-view="mapa"
+              role="tab" aria-selected="false" aria-controls="mapa">Mapa</button>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- ============ Program (default view) =============================== -->
+    <section class="view" id="program" data-view="program" role="tabpanel"
+             aria-labelledby="tab-program">
+      <h1 class="vh">Program akce AI4Talents@FIT VUT</h1>
+      <!-- grid / sequential toggle — owned by timetable.js -->
+      <div class="seg" role="group" aria-label="Zobrazení programu">
+        <button type="button" class="seg-btn is-active" id="tt-btn-grid" aria-pressed="true">Rozvrh</button>
+        <button type="button" class="seg-btn" id="tt-btn-seq" aria-pressed="false">Podle času</button>
+      </div>
+      <p class="tt-legend">
+        <span><i class="sw sw-lecture"></i>přednáška</span>
+        <span><i class="sw sw-workshop"></i>workshop</span>
+        <span><i class="sw sw-zone"></i>průběžně</span>
+        <span class="tt-legend-hint">→ posun v čase</span>
+      </p>
+      <div id="tt-grid"></div>
+      <div id="tt-seq" hidden></div>
+    </section>
+
+    <!-- ============ Můj program (picker) ================================== -->
+    <section class="view" id="muj" data-view="muj" role="tabpanel"
+             aria-labelledby="tab-muj" hidden>
+      <h2 class="vh">Můj program</h2>
+      <div id="tt-muj"></div>
+    </section>
+
+    <!-- ============ Mapa ================================================== -->
+    <section class="view" id="mapa" data-view="mapa" role="tabpanel"
+             aria-labelledby="tab-mapa" hidden>
+      <h2 class="vh">Mapa fakulty</h2>
+      <div id="map-root"></div>
+    </section>
+  </main>
+
+  <noscript>
+    <p class="noscript">Pro zobrazení programu a mapy potřebuješ JavaScript.</p>
+  </noscript>
+
+  <!-- Load order is a hard contract: data → routing → map → position → timetable → app -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/routing.js"></script>
+  <script src="assets/js/map.js"></script>
+  <script src="assets/js/position.js"></script>
+  <script src="assets/js/timetable.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

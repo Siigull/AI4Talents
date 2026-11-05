@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Print studio — AI4Talents</title>
+  <meta name="description" content="Print studio AI4Talents@FIT VUT — generátor tiskových podkladů: plakáty na dveře, stojany „Jste tady“, letáček a A3 program.">
+  <!-- One Google Fonts request: Space Grotesk 500/700, Inter 400/500/600, IBM Plex Mono 400/500 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    /* ============ Print studio (print/index.html) — SCREEN page, dark UI ============
+       Not for printing itself: it opens the parametric print pages
+       (door.html?room=, stand.html?at=, handout.html, program-a3.html),
+       each rendered at its exact paper size for screenshotting. */
+
+    :root {
+      --ground-dark: #0d0c0b; --panel-dark: #17161a; --panel-dark-2: #1d1c21;
+      --ink-on-dark: #f4f2ec; --muted-on-dark: #9a948a; --cream: #c9c2ad;
+      --blue: #1761cc; --blue-bright: #1987ef; --magenta: #ff2fd6;
+      --line-dark: #2c2a31;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--ground-dark);
+      color: var(--ink-on-dark);
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 20px 20px 80px; }
+    @media (min-width: 960px) { .wrap { padding: 32px 6vw 96px; } }
+
+    a { color: var(--blue-bright); }
+
+    :focus-visible {
+      outline: 3px solid var(--blue-bright);
+      outline-offset: 2px;
+    }
+
+    /* ------------------------------------------------------------- header -- */
+
+    .ps-head { padding: 28px 0 24px; border-bottom: 2px solid var(--line-dark); }
+
+    .ps-meta {
+      margin: 0 0 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted-on-dark);
+    }
+
+    .ps-title {
+      margin: 0 0 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(34px, 6vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -.01em;
+    }
+
+    .ps-title em {
+      font-style: normal; color: var(--blue-bright);
+    }
+
+    .ps-lede {
+      margin: 0;
+      max-width: 62ch;
+      color: var(--cream);
+      font-size: 15px;
+    }
+
+    .ps-notes {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 6px;
+      max-width: 78ch;
+    }
+
+    .ps-notes li {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; line-height: 1.6;
+      color: var(--muted-on-dark);
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .ps-notes li::before {
+      content: ''; position: absolute; left: 0; top: .55em;
+      width: 6px; height: 6px; background: var(--magenta);
+    }
+
+    /* ---------------------------------------------------------- sections -- */
+
+    .ps-sec { padding: 40px 0 8px; }
+
+    .ps-sec-kicker {
+      margin: 0 0 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--blue-bright);
+    }
+
+    .ps-sec-title {
+      margin: 0 0 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 26px; line-height: 1.15;
+    }
+
+    .ps-sec-desc { margin: 0 0 20px; color: var(--muted-on-dark); max-width: 72ch; }
+
+    /* ------------------------------------------------------- door posters -- */
+
+    .door-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .door-btn {
+      display: block;
+      background: var(--panel-dark);
+      border: 2px solid var(--line-dark);
+      border-radius: 8px;
+      padding: 14px 16px 16px;
+      color: var(--ink-on-dark);
+      text-decoration: none;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+
+    .door-btn:hover {
+      transform: translateY(-4px);
+      border-color: var(--blue);
+    }
+
+    .door-code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 26px; font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .door-name {
+      margin: 2px 0 10px;
+      font-size: 13px; color: var(--muted-on-dark);
+    }
+
+    .door-ev {
+      margin: 8px 0 0;
+      padding-top: 8px;
+      border-top: 1px solid var(--line-dark);
+      font-size: 13px; line-height: 1.4;
+    }
+
+    .door-ev time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; color: var(--blue-bright);
+      margin-right: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .custom-form {
+      margin-top: 18px;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    }
+
+    .custom-form label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--muted-on-dark);
+    }
+
+    .ps-input {
+      background: var(--ground-dark);
+      border: 1px solid var(--muted-on-dark);
+      border-radius: 5px;
+      color: var(--ink-on-dark);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      padding: 10px 12px;
+      width: 160px;
+    }
+
+    .ps-input::placeholder { color: #6f6b64; }
+
+    .ps-input:focus-visible { outline-offset: 0; border-color: var(--blue-bright); }
+
+    .ps-err {
+      margin: 10px 0 0;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: #ff8fd9;
+    }
+
+    /* --------------------------------------------------------------- stands -- */
+
+    .stand-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+    .stand-row {
+      display: grid;
+      grid-template-columns: 130px 1fr auto auto;
+      gap: 10px; align-items: center;
+      background: var(--panel-dark);
+      border: 2px solid var(--line-dark);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .stand-row input.ps-input { width: 100%; padding: 8px 10px; }
+
+    .stand-label {
+      font-size: 13px; line-height: 1.4;
+      color: var(--ink-on-dark);
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .stand-label small { color: var(--muted-on-dark); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+    .stand-label.is-bad { color: #ff8fd9; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+
+    .stand-add { margin-top: 14px; }
+
+    @media (max-width: 640px) {
+      .stand-row { grid-template-columns: 1fr auto; }
+      .stand-row input.ps-input { grid-column: 1 / -1; }
+      .stand-label { grid-column: 1 / -1; }
+    }
+
+    /* -------------------------------------------------------------- buttons -- */
+
+    .btn {
+      display: inline-block;
+      background: var(--blue);
+      color: #fff;
+      border: 0; border-radius: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; font-weight: 500;
+      letter-spacing: .06em; text-transform: uppercase;
+      text-decoration: none;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease;
+    }
+
+    .btn:hover { background: var(--blue-bright); transform: translateY(-2px); color: #fff; }
+
+    .btn--off {
+      background: var(--panel-dark-2);
+      color: var(--muted-on-dark);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .btn--ghost {
+      background: transparent;
+      color: var(--ink-on-dark);
+      border: 1px solid var(--muted-on-dark);
+    }
+
+    .btn--ghost:hover { border-color: var(--blue-bright); color: var(--blue-bright); background: transparent; }
+
+    .btn--remove {
+      background: transparent;
+      border: 1px solid var(--line-dark);
+      color: var(--muted-on-dark);
+      font-size: 14px; line-height: 1;
+      padding: 9px 12px;
+    }
+
+    .btn--remove:hover { border-color: #ff8fd9; color: #ff8fd9; background: transparent; transform: none; }
+
+    .other-grid { display: flex; flex-wrap: wrap; gap: 14px; }
+
+    .other-btn {
+      display: block;
+      min-width: 260px;
+      background: var(--panel-dark);
+      border: 2px solid var(--line-dark);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--ink-on-dark);
+      text-decoration: none;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+
+    .other-btn:hover { transform: translateY(-4px); border-color: var(--blue); color: var(--ink-on-dark); }
+
+    .other-btn .door-code { font-size: 20px; }
+    .other-btn p { margin: 4px 0 0; font-size: 13px; color: var(--muted-on-dark); }
+
+    /* --------------------------------------------------------------- footer -- */
+
+    .ps-foot {
+      margin-top: 56px;
+      padding-top: 16px;
+      border-top: 2px solid var(--line-dark);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; color: var(--muted-on-dark);
+      display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="ps-head">
+      <p class="ps-meta">AI4Talents@FIT VUT · pátek 6 . 11 . 2026</p>
+      <h1 class="ps-title">Print <em>studio</em> — AI4Talents</h1>
+      <p class="ps-lede">
+        Tiskové podklady akce. Každá stránka se otevírá v přesné velikosti papíru
+        (A4, A5, A3 — okraje 0, bez posouvání) a počítá se v prohlížeči z dat akce.
+      </p>
+      <ul class="ps-notes">
+        <li>Screenshot dělej při rozlišení obrazovky ≥ 2× (Retina), nebo tiskni do PDF s okraji „Žádné“ a bez záhlaví.</li>
+        <li>QR pole jsou placeholdry — po vytištění na ně nalep nebo doplň vlastní QR kód.</li>
+        <li>Vše běží lokálně v prohlížeči, nic se neodešle na server.</li>
+      </ul>
+    </header>
+
+    <main>
+      <!-- ---------------------------------------------------- door posters -->
+      <section class="ps-sec" aria-labelledby="doors-title">
+        <p class="ps-sec-kicker">A4 na dveře</p>
+        <h2 class="ps-sec-title" id="doors-title">Plakáty na dveře</h2>
+        <p class="ps-sec-desc">
+          Plakát s programem konkrétní místnosti: velký kód místnosti, program,
+          miniatura patra a QR. Veškeré místnosti s vlastním programem:
+        </p>
+        <div class="door-grid" id="door-grid"></div>
+
+        <form class="custom-form" id="door-custom" novalidate>
+          <label for="door-room">Jiná místnost:</label>
+          <input class="ps-input" id="door-room" name="room" list="stand-rooms"
+                 placeholder="např. E112" autocomplete="off" spellcheck="false">
+          <button class="btn" type="submit">Otevřít</button>
+        </form>
+        <p class="ps-err" id="door-err" role="alert" hidden></p>
+      </section>
+
+      <!-- --------------------------------------------------------- stands -->
+      <section class="ps-sec" aria-labelledby="stands-title">
+        <p class="ps-sec-kicker">A4 na stojan</p>
+        <h2 class="ps-sec-title" id="stands-title">Stojany — „Jste tady“</h2>
+        <p class="ps-sec-desc">
+          Plakát s velkou mapou patra: modrý marker „Jste tady“ na místě stojanu,
+          magenta trasy k registraci C106 a stánkům E103. Seznam míst se ukládá
+          v tomto prohlížeči (localStorage).
+        </p>
+        <ul class="stand-list" id="stand-list"></ul>
+        <button class="btn btn--ghost stand-add" id="stand-add" type="button">+ Přidat stojan</button>
+      </section>
+
+      <!-- --------------------------------------------------------- other -->
+      <section class="ps-sec" aria-labelledby="other-title">
+        <p class="ps-sec-kicker">Ostatní</p>
+        <h2 class="ps-sec-title" id="other-title">Další podklady</h2>
+        <div class="other-grid">
+          <a class="other-btn" href="handout.html" target="_blank" rel="noopener">
+            <span class="door-code">handout.html</span>
+            <p>A5 na šířku — kapesní program s miniaturou mapy</p>
+          </a>
+          <a class="other-btn" href="program-a3.html" target="_blank" rel="noopener">
+            <span class="door-code">program-a3.html</span>
+            <p>A3 na výšku — velký program akce</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="ps-foot">
+      <span>AI4Talents@FIT VUT · tiskové podklady</span>
+      <span>ai4talents.fit.vut.cz</span>
+    </footer>
+  </div>
+
+  <!-- room ids of floors 1 / 2 / -2 for the stand editor + custom door input -->
+  <datalist id="stand-rooms"></datalist>
+
+  <script src="../assets/js/data.js"></script>
+  <script>
+    // print/index.html — print studio logic (screen only, dark UI).
+    // Builds door-poster buttons from event data, a validated custom-room
+    // opener, and a localStorage-persisted stands editor ('ai4t-stands').
+    (function () {
+      'use strict';
+
+      var DATA = window.AI4T_DATA;
+
+      // ------------------------------------------------------------- index --
+
+      var roomIndex = {};   // canonical id -> {floor, room}
+      var FLOOR_CAPTION = {
+        '2': '2. patro', '1': '1. patro', '-1': '-1. podlaží',
+        '-2': '-2. podlaží', '3': '3. patro', '4': '4. patro'
+      };
+      Object.keys(DATA.map).forEach(function (f) {
+        DATA.map[f].rooms.forEach(function (r) {
+          if (!roomIndex[r.id]) roomIndex[r.id] = { floor: f, room: r };
+        });
+      });
+
+      function esc(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      // Case-insensitive room lookup; returns canonical id or null.
+      function findRoom(raw) {
+        var v = String(raw || '').trim();
+        if (!v) return null;
+        if (roomIndex[v]) return v;
+        var up = v.toUpperCase();
+        if (roomIndex[up]) return up;
+        return null;
+      }
+
+      function roomLabel(id) {
+        var info = roomIndex[id];
+        if (!info) return null;
+        var name = info.room.name || 'místnost bez názvu';
+        return { name: name, floor: FLOOR_CAPTION[info.floor] || info.floor };
+      }
+
+      // -------------------------------------------------------- door grid --
+
+      // Event rooms with their own programme (SPEC 4 door poster set).
+      var DOOR_ROOMS = ['E112', 'E105', 'E104', 'A218', 'C228', 'N105', 'R212'];
+      var eventsByRoom = {};
+      ((DATA.events && DATA.events.events) || []).forEach(function (ev) {
+        (eventsByRoom[ev.room] = eventsByRoom[ev.room] || []).push(ev);
+      });
+
+      var doorGrid = document.getElementById('door-grid');
+      doorGrid.innerHTML = DOOR_ROOMS.map(function (id) {
+        var evs = eventsByRoom[id] || [];
+        var lab = roomLabel(id) || { name: '', floor: '' };
+        var evHtml = evs.map(function (ev) {
+          return '<p class="door-ev"><time>' + esc(ev.start) + '—' + esc(ev.end) + '</time>' +
+            esc(ev.title) + (ev.partner ? ' · ' + esc(ev.partner) : '') + '</p>';
+        }).join('');
+        return '<a class="door-btn" href="door.html?room=' + encodeURIComponent(id) +
+          '" target="_blank" rel="noopener">' +
+          '<span class="door-code">' + esc(id) + '</span>' +
+          '<p class="door-name">' + esc(lab.name) + ' · ' + esc(lab.floor) + '</p>' +
+          evHtml + '</a>';
+      }).join('');
+
+      // -------------------------------------------------- custom door form --
+
+      var doorForm = document.getElementById('door-custom');
+      var doorInput = document.getElementById('door-room');
+      var doorErr = document.getElementById('door-err');
+
+      doorForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var id = findRoom(doorInput.value);
+        doorErr.hidden = true;
+        if (!id) {
+          doorErr.textContent = 'Neznámá místnost — zkontroluj kód (např. E112, C228, R212).';
+          doorErr.hidden = false;
+          doorInput.focus();
+          return;
+        }
+        doorInput.value = id;
+        window.open('door.html?room=' + encodeURIComponent(id), '_blank', 'noopener');
+      });
+
+      // ------------------------------------------------------ stands editor --
+
+      var DEFAULT_STANDS = ['A101', 'C106', 'E103', 'C228', 'N105', 'R212'];
+      var STORE_KEY = 'ai4t-stands';
+
+      function loadStands() {
+        try {
+          var raw = window.localStorage.getItem(STORE_KEY);
+          if (raw == null) return DEFAULT_STANDS.slice();
+          var arr = JSON.parse(raw);
+          if (Object.prototype.toString.call(arr) !== '[object Array]') return DEFAULT_STANDS.slice();
+          return arr.map(function (v) { return String(v).trim().toUpperCase(); })
+            .filter(function (v) { return v.length > 0; });
+        } catch (err) {
+          return DEFAULT_STANDS.slice();
+        }
+      }
+
+      function saveStands(ids) {
+        try { window.localStorage.setItem(STORE_KEY, JSON.stringify(ids)); }
+        catch (err) { /* storage unavailable (private mode) — keep session-only */ }
+      }
+
+      // Datalist: all room ids of the floors used by stands (1, 2, -2).
+      var datalist = document.getElementById('stand-rooms');
+      datalist.innerHTML = ['1', '2', '-2'].map(function (f) {
+        return DATA.map[f].rooms.map(function (r) {
+          return '<option value="' + esc(r.id) + '"></option>';
+        }).join('');
+      }).join('');
+
+      var standList = document.getElementById('stand-list');
+      var standSeq = 0; // unique input ids for label/aria wiring
+
+      function makeRow(value) {
+        standSeq += 1;
+        var li = document.createElement('li');
+        li.className = 'stand-row';
+
+        var input = document.createElement('input');
+        input.className = 'ps-input';
+        input.id = 'stand-input-' + standSeq;
+        input.setAttribute('list', 'stand-rooms');
+        input.setAttribute('autocomplete', 'off');
+        input.setAttribute('spellcheck', 'false');
+        input.placeholder = 'kód místnosti';
+        input.value = value;
+
+        var lab = document.createElement('label');
+        lab.className = 'sr-label'; // visually hidden, keyboard/AT label
+        lab.setAttribute('for', input.id);
+        lab.textContent = 'Místnost stojanu';
+        lab.style.position = 'absolute';
+        lab.style.width = '1px'; lab.style.height = '1px';
+        lab.style.overflow = 'hidden'; lab.style.clip = 'rect(0 0 0 0)';
+
+        var label = document.createElement('span');
+        label.className = 'stand-label';
+
+        var open = document.createElement('a');
+        open.className = 'btn';
+        open.target = '_blank';
+        open.rel = 'noopener';
+        open.textContent = 'Otevřít';
+
+        var remove = document.createElement('button');
+        remove.className = 'btn btn--remove';
+        remove.type = 'button';
+        remove.textContent = '×';
+        remove.addEventListener('click', function () {
+          li.remove();
+          persist();
+        });
+
+        li.appendChild(lab);
+        li.appendChild(input);
+        li.appendChild(label);
+        li.appendChild(open);
+        li.appendChild(remove);
+
+        input.addEventListener('input', function () { updateRow(li, input, label, open, remove); });
+        input.addEventListener('change', function () {
+          var id = findRoom(input.value);
+          if (id) input.value = id;
+          updateRow(li, input, label, open, remove);
+          persist();
+        });
+
+        updateRow(li, input, label, open, remove);
+        return li;
+      }
+
+      function updateRow(li, input, label, open, remove) {
+        var id = findRoom(input.value);
+        if (id) {
+          var lab = roomLabel(id);
+          label.className = 'stand-label';
+          label.innerHTML = esc(lab.name) + ' <small>· ' + esc(lab.floor) + '</small>';
+          open.className = 'btn';
+          open.setAttribute('aria-disabled', 'false');
+          open.removeAttribute('aria-label');
+          open.setAttribute('href', 'stand.html?at=' + encodeURIComponent(id));
+          remove.setAttribute('aria-label', 'Odebrat stojan ' + id);
+        } else {
+          var v = input.value.trim();
+          label.className = 'stand-label is-bad';
+          label.textContent = v ? ('Neznámá místnost „' + v + '“') : 'Zadej kód místnosti';
+          open.className = 'btn btn--off';
+          open.setAttribute('aria-disabled', 'true');
+          open.removeAttribute('href');
+          remove.setAttribute('aria-label', 'Odebrat prázdný stojan');
+        }
+      }
+
+      function persist() {
+        var ids = [];
+        standList.querySelectorAll('input').forEach(function (inp) {
+          var v = inp.value.trim().toUpperCase();
+          if (v) ids.push(v);
+        });
+        saveStands(ids);
+      }
+
+      loadStands().forEach(function (id) {
+        standList.appendChild(makeRow(id));
+      });
+
+      document.getElementById('stand-add').addEventListener('click', function () {
+        var row = makeRow('');
+        standList.appendChild(row);
+        persist();
+        row.querySelector('input').focus();
+      });
+    })();
+  </script>
+</body>
+</html>
