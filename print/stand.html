@@ -384,6 +384,25 @@
         }
       }
 
+      // ---- rail autofit: content-heavy stands (mp-box + signboard + cards)
+      // can push the QR past the main area into the chips row — zoom the
+      // whole rail down until it fits (Chrome print pipeline only).
+      var railAutofit = function () {
+        var rail = document.querySelector('.st-rail');
+        var main = document.querySelector('.st-main');
+        var qr = document.querySelector('.st-qr');
+        if (!rail || !main || !qr) return;
+        rail.style.zoom = 1; // reset — fonts may have changed metrics
+        var fits = function () {
+          return qr.getBoundingClientRect().bottom <= main.getBoundingClientRect().bottom + 1;
+        };
+        for (var z = 1; z > 0.68 && !fits(); z -= 0.04) rail.style.zoom = z;
+      };
+      railAutofit();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(railAutofit);
+      [400, 900, 1600].forEach(function (ms) { setTimeout(railAutofit, ms); });
+      window.addEventListener('load', railAutofit);
+
       // ---- content crop: viewBox = union(subject, event rooms, route pts) ----
       // Kills dead zones: the poster shows the walkable neighbourhood of the
       // stand, not the whole floor. Same geometry as the app v2 cluster crop.
@@ -427,7 +446,9 @@
       document.getElementById('map-cap').innerHTML =
         '<span class="cap-strong">' + esc(floorLbl) + '</span>' +
         ' · žlutá = tento stojan' +
-        (nEvRooms ? ' · modrá = místnosti s programem' : '');
+        ' · modrá čára = hlavní trasa' +
+        ' · fialová = odbočka trasy' +
+        (nEvRooms ? ' · modré místnosti = program' : '');
 
       // ---------------------------- tourist signs (v3) ----------------------
       // The poster works like trail signage: every DIRECTION gets one line
@@ -447,7 +468,7 @@
         if (idx < 0) return;
         var stops = MP.stops;
         var next = stops[idx + 1], prev = stops[idx - 1];
-        var h = '<div class="mp-box"><p class="mp-title">Hlavní trasa — E103 ↔ Kachna</p>';
+        var h = '<div class="mp-box"><p class="mp-title">Hlavní trasa</p>';
         if (next) h += '<div class="mp-row"><span class="mp-arrow">→</span><span><b>' +
           esc(next.label) + '</b><br><span class="mp-sub">dál po trase</span></span></div>';
         if (prev) h += '<div class="mp-row"><span class="mp-arrow">←</span><span><b>' +

@@ -107,12 +107,12 @@ const out = {
   splits: {
     d0207: {
       target: 'D0207', floor: '-2',
-      label: 'D0207 · workshop RedHat', hint: '-2. podlaží, sjezd schodištěm D',
+      label: 'D0207 · workshop RedHat', hint: '-2. podlaží · sjezd dolů',
       at: stops.find((s) => s.id === 'd106').at, legs: dLegs,
     },
     n105: {
       target: 'N105', floor: '1',
-      label: 'N105 · workshop Security@FIT', hint: '1. patro, schodiště N',
+      label: 'N105 · workshop Security@FIT', hint: '1. patro · schodiště N',
       at: [+splitPt[0].toFixed(1), +splitPt[1].toFixed(1)], legs: nLegs,
     },
   },

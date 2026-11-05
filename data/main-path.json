@@ -433,7 +433,7 @@
    "target": "D0207",
    "floor": "-2",
    "label": "D0207 · workshop RedHat",
-   "hint": "-2. podlaží, sjezd schodištěm D",
+   "hint": "-2. podlaží · sjezd dolů",
    "at": [
     614,
     373
@@ -526,7 +526,7 @@
    "target": "N105",
    "floor": "1",
    "label": "N105 · workshop Security@FIT",
-   "hint": "1. patro, schodiště N",
+   "hint": "1. patro · schodiště N",
    "at": [
     330,
     662
