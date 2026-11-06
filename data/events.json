@@ -145,6 +145,17 @@
       "icon": "tour"
     },
     {
+      "id": "muzeum",
+      "type": "zone",
+      "start": "11:30",
+      "end": "14:00",
+      "title": "Muzeum FIT",
+      "room": "A117",
+      "floor": "1",
+      "desc": "Fakultní muzeum je otevřené pro všechny účastníky — zastav se, i když nejdeš na prohlídku fakulty.",
+      "icon": "museum"
+    },
+    {
       "id": "kachna-obed-1",
       "type": "zone",
       "start": "11:10",
@@ -179,6 +190,7 @@
     "workshop-security",
     "prohlidky-1",
     "prohlidky-2",
+    "muzeum",
     "kachna-obed-1",
     "kachna-obed-2"
   ],

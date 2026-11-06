@@ -514,7 +514,7 @@
   var GRID_TYPE_COLOR = {
     lecture: '#1761cc', workshop: '#c21f9f', zone: '#6f6b64', milestone: '#14120f',
   };
-  var GRID_SLIM_MIN = 240;            // minutes — zones this long go slim
+  var GRID_SLIM_MIN = 150;            // minutes — zones this long go slim
 
   function gridPct(min) { return ((min - GRID_DAY_START) / GRID_SPAN) * 100; }
 

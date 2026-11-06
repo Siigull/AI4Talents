@@ -445,7 +445,7 @@
       // -------------------------------------------------------- door grid --
 
       // Event rooms with their own programme (SPEC 4 door poster set).
-      var DOOR_ROOMS = ['E112', 'E105', 'E104', 'D0207', 'C228', 'N105', 'R212', 'A104'];
+      var DOOR_ROOMS = ['E112', 'E105', 'E104', 'D0207', 'C228', 'N105', 'R212', 'A104', 'A117'];
       var eventsByRoom = {};
       ((DATA.events && DATA.events.events) || []).forEach(function (ev) {
         (eventsByRoom[ev.room] = eventsByRoom[ev.room] || []).push(ev);
@@ -623,7 +623,7 @@
       var PDFS = [
         ['../pdf/letak-a4.pdf', 'Leták A4 (složený na A5)', 'A4×2'],
         ['../pdf/program-a3.pdf', 'Velký program', 'A3'],
-        ['../pdf/doors.pdf', 'Všechny dveře v jednom PDF', 'A4×10'],
+        ['../pdf/doors.pdf', 'Všechny dveře v jednom PDF', 'A4×11'],
       ].concat(DOOR_ROOMS.map(function (id) {
         return ['../pdf/door-' + id.toLowerCase() + '.pdf', 'Dveře ' + id, 'A4'];
       })).concat([

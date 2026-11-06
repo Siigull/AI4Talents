@@ -126,7 +126,7 @@
       display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm 5mm;
       grid-auto-rows: 1fr;
     }
-    .ade:last-child:nth-child(3n+2) { grid-column: 1 / -1; }
+    .ade:last-child:nth-child(3n) .ade-desc { -webkit-line-clamp: 2; }
     .ade { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
     .ade-top { display: flex; align-items: baseline; gap: 2mm; }
     .ade-time { font-family: var(--font-mono); font-size: 9.5pt; font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -200,6 +200,7 @@
         { ev: 'prednaska-sekanina' },
         { ev: 'prednaska-bezpecnost', time: '10:10 · souběžně' },
         { evs: ['kachna-obed-1', 'kachna-obed-2'], time: '11:10–12:00 · 14:00–16:00', title: 'Oběd v Kachně' },
+        { ev: 'muzeum' },
         { evs: ['prohlidky-1', 'prohlidky-2'], time: '1. kolo 12:00 · 2. kolo 13:00', title: 'Prohlídka fakulty' },
         { ev: 'workshop-redhat' },
         { ev: 'workshop-solarwinds', title: 'Skill Issue' },
@@ -216,7 +217,7 @@
           '<p class="a3-sub">' + P.esc(meta.tagline || '') + ' · ' + P.esc(meta.place || '') + '</p>' +
         '</header>' +
         '<main class="a3-main">' +
-          '<div class="a3-grid">' + P.programGrid({ laneH: 17.5, slimH: 9, gap: 1.5, shortTitle: SHORT_TITLE, shortWho: SHORT_WHO }) + '</div>' +
+          '<div class="a3-grid">' + P.programGrid({ laneH: 17.1, slimH: 9, gap: 1.5, shortTitle: SHORT_TITLE, shortWho: SHORT_WHO }) + '</div>' +
           '<h2 class="a3-det-h">Podrobnosti programu <span class="sub">· všechny akce dne</span></h2>' +
           '<div class="a3-det">';
 
