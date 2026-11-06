@@ -623,9 +623,12 @@
       var PDFS = [
         ['../pdf/letak-a4.pdf', 'Leták A4 (složený na A5)', 'A4×2'],
         ['../pdf/program-a3.pdf', 'Velký program', 'A3'],
+        ['../pdf/doors.pdf', 'Všechny dveře v jednom PDF', 'A4×10'],
       ].concat(DOOR_ROOMS.map(function (id) {
         return ['../pdf/door-' + id.toLowerCase() + '.pdf', 'Dveře ' + id, 'A4'];
-      })).concat(loadStands().map(function (id) {
+      })).concat([
+        ['../pdf/stands.pdf', 'Všechny stojany v jednom PDF', 'A4×9'],
+      ]).concat(loadStands().map(function (id) {
         return ['../pdf/stand-' + id.toLowerCase() + '.pdf', 'Stojan ' + id, 'A4'];
       }));
       var pdfGrid = document.getElementById('pdf-grid');

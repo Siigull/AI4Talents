@@ -3,29 +3,31 @@
 <head>
   <meta charset="utf-8">
   <title>AI4Talents — velký program (A3)</title>
-  <script>window.AI4T_PRINT_MODE = true;</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;700&amp;display=swap">
   <link rel="stylesheet" href="../assets/css/print.css">
   <style>
-    /* A3 portrait — timeline poster: chronological blocks, top edge = start
-       time, parallel events side by side, zone bands behind. The room×time
-       grid could not fit readable titles at this density (3 attempts). */
+    /* =====================================================================
+       A3 programme poster — room × time grid (~2/3) + event cards (~1/3).
+       The same events twice: calendar view for when/where, cards for what.
+       Exact sheet: 297×420mm, 1123×1587px @96dpi.
+       ===================================================================== */
     @page { size: 297mm 420mm; margin: 0; }
     html, body { width: 297mm; height: 420mm; }
+
     .page-a3 { padding: 0; }
 
-    /* --- masthead --- */
-    .a3-head { flex: none; padding: 6mm 14mm 3.5mm; }
+    /* --- compact header band --- */
+    .a3-head { flex: none; padding: 6mm 14mm 4.5mm; }
     .a3-kick {
-      font-family: var(--font-mono); font-size: 12pt; letter-spacing: 0.09em;
+      font-family: var(--font-mono); font-size: 9pt; letter-spacing: 0.09em;
       text-transform: uppercase; color: var(--muted-on-dark);
     }
     .a3-kick .dot { color: var(--magenta); }
     .a3-title {
       font-family: var(--font-display); font-weight: 700; font-size: 38pt;
-      line-height: 0.98; letter-spacing: -0.015em; margin-top: 2mm;
+      line-height: 0.98; letter-spacing: -0.015em; margin-top: 1.8mm;
     }
     .a3-title .wm-4 { color: var(--blue-bright); }
     .a3-sub {
@@ -33,70 +35,118 @@
       margin-top: 2mm; letter-spacing: 0.02em;
     }
 
-    /* --- timeline: hour rail + chronological blocks --- */
-    .tl-wrap { flex: 1; min-height: 0; display: flex; gap: 5mm; padding: 1.5mm 14mm 0; }
-    .tl-rail { flex: none; width: 22mm; position: relative; }
-    .tl-hour { position: absolute; right: 0; transform: translateY(-50%); text-align: right; }
-    .tl-hour .h {
-      font-family: var(--font-mono); font-weight: 500; line-height: 1;
-      color: var(--ink); font-variant-numeric: tabular-nums;
+    /* --- THE programme: room × time grid (app v2 timetable, static) ------ */
+    .a3-main {
+      flex: 1; min-height: 0; display: flex; flex-direction: column;
+      padding: 4mm 14mm 3mm; gap: 4mm;
     }
-    .tl-hour .m { display: none; }
-    .tl-hour.t-half .h { color: var(--ink-soft); }
-    .tl-hour.t-half .m { display: block; font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft); }
 
-    .tl-canvas { flex: 1; position: relative; min-width: 0; }
-    .tl-h { position: absolute; left: 0; right: 0; height: 1px; background: rgba(20,18,15,0.15); }
-    .tl-band { position: absolute; left: 0; right: 0; background: #eeede9; }
-    .tl-band .band-in { padding: 13mm 4mm 3mm; }
-    .tl-band .band-kick {
-      font-family: var(--font-mono); font-size: 8.5pt; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft);
+    .pg { flex: none; border: 2px solid var(--ink); background: var(--paper); }
+    .pg-head { display: flex; border-bottom: 2px solid var(--ink); }
+    .pg-corner {
+      flex: none; width: 37mm; border-right: 1px solid var(--hairline);
+      display: flex; align-items: flex-end; padding: 1.6mm 2mm 1.2mm;
+      font-family: var(--font-mono); font-size: 8pt; color: var(--ink-soft);
+      letter-spacing: 0.05em;
     }
-    .tl-band .band-title { font-family: var(--font-display); font-weight: 600; font-size: 14pt; margin-top: 0.8mm; }
-
-    .evt {
-      position: absolute; background: #fff; border: 2px solid var(--ink);
-      border-bottom-style: dashed; border-left: 4px solid var(--ink);
-      border-radius: 2.5mm; box-sizing: border-box;
-      padding: 2mm 3mm; overflow: hidden;
-      display: flex; flex-direction: column; gap: 1mm;
+    .pg-hours { position: relative; flex: 1; height: 10mm; }
+    .pg-hour {
+      position: absolute; top: 3.2mm; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 9.5pt; color: var(--ink-soft);
+      font-variant-numeric: tabular-nums;
     }
-    .evt--lecture { border-left-color: var(--blue); }
-    .evt--workshop { border-left-color: var(--magenta-deep); }
-    .evt--zone, .evt--milestone { border-left-color: var(--ink-soft); }
-    .evt--zone { background: transparent; border: 0; padding: 0; }
-    .evt-time { font-family: var(--font-mono); font-weight: 700; font-size: 13pt; line-height: 1; white-space: nowrap; }
-    .evt-time .end { font-weight: 400; font-size: 9.5pt; color: var(--ink-soft); }
-    .evt-title { font-family: var(--font-display); font-weight: 600; font-size: 15.5pt; line-height: 1.1; flex: none; hyphens: auto; overflow-wrap: break-word; }
-    .evt-meta { font-family: var(--font-mono); font-size: 10.5pt; color: var(--ink-soft); line-height: 1.3; }
-    .evt-meta b { color: var(--ink); font-weight: 500; }
-    .evt-desc {
-      font-size: 10pt; line-height: 1.28; color: var(--ink);
+    .pg-hour.is-edge-left { transform: none; }
+    .pg-hour.is-edge-right { transform: translateX(-100%); }
+    .pg-legend {
+      display: flex; gap: 6mm; padding: 1.4mm 2mm 1.4mm 37mm; border-bottom: 1px solid var(--hairline);
+      font-family: var(--font-mono); font-size: 8pt; color: var(--ink-soft);
+    }
+    .pg-legend i { display: inline-block; width: 4mm; height: 2.6mm; border-radius: 1px; margin-right: 1.5mm; vertical-align: -0.3mm; }
+    .pg-body { position: relative; }
+    .pg-lines { position: absolute; top: 0; bottom: 0; left: 37mm; right: 0; pointer-events: none; }
+    .pg-vline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--hairline); }
+    .pg-floor {
+      display: flex; align-items: center; gap: 3mm; padding: 1.6mm 2mm 0.8mm 37mm;
+      position: relative; background: var(--paper);
+    }
+    .pg-floor span {
+      font-family: var(--font-mono); font-size: 8.5pt; color: var(--ink-soft);
+      letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .pg-floor::after { content: ''; flex: 1; height: 1px; background: var(--hairline); }
+    .pg-row { display: flex; border-bottom: 1px solid var(--hairline); }
+    .pg-row:last-child { border-bottom: none; }
+    .pg-label {
+      flex: none; width: 37mm; display: flex; flex-direction: column; justify-content: center;
+      gap: 0.4mm; padding: 1.4mm 2mm 1.4mm 0; text-align: right;
+      border-right: 1px solid var(--hairline);
+    }
+    .pg-code { font-family: var(--font-mono); font-weight: 700; font-size: 14pt; line-height: 1; }
+    .pg-name {
+      font-size: 7pt; line-height: 1.2; color: var(--ink-soft);
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .evt-kick {
-      font-family: var(--font-mono); font-size: 8pt; font-weight: 500; display: flex;
-      align-items: center; gap: 1.8mm; text-transform: uppercase; letter-spacing: 0.07em;
-    }
-    .evt-kick::before { content: ''; width: 3mm; height: 3mm; border-radius: 0.7mm; }
-    .evt--lecture .evt-kick::before { background: var(--blue); }
-    .evt--workshop .evt-kick::before { background: var(--magenta-deep); }
-    .evt--zone .evt-kick::before, .evt--milestone .evt-kick::before { background: var(--ink-soft); }
+    .pg-track { position: relative; flex: 1; }
 
-    /* legend */
-    .a3-legend {
-      flex: none; display: flex; flex-wrap: wrap; gap: 4mm 8mm; padding: 0 14mm 1.5mm;
-      font-family: var(--font-mono); font-size: 9.5pt; color: var(--ink-soft);
+    .pg-evt {
+      position: absolute; display: flex; flex-direction: column; gap: 0.6mm;
+      padding: 1.1mm 1.5mm; overflow: hidden;
+      background: var(--paper); border: 1.5px solid var(--ink);
+      border-left: 3px solid var(--evt-color, var(--ink)); border-radius: 1.2mm;
     }
-    .a3-legend i { display: inline-block; width: 3mm; height: 3mm; border-radius: 0.6mm; vertical-align: -0.2mm; margin-right: 1.5mm; }
+    .pg-time { font-family: var(--font-mono); font-size: 8pt; line-height: 1; color: var(--ink-soft); white-space: nowrap; }
+    .pg-title {
+      font-weight: 600; font-size: 10pt; line-height: 1.12; flex: none;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      overflow-wrap: break-word;
+    }
+    .pg-who {
+      font-family: var(--font-mono); font-size: 7.5pt; line-height: 1.15; color: var(--ink-soft);
+      flex: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pg-evt.is-short .pg-title { font-size: 8.5pt; }
+    .pg-evt.is-slim { flex-direction: row; align-items: center; gap: 2mm; padding: 0.7mm 1.5mm; }
+    .pg-evt.is-slim .pg-title {
+      order: -1; font-size: 9.5pt; font-weight: 600; -webkit-line-clamp: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 0 1 auto; min-width: 0;
+    }
+    .pg-evt.is-slim .pg-time { flex: none; margin-left: auto; }
+    .pg-evt.is-slim .pg-who { display: none; }
 
-    /* --- bottom band --- */
-    .a3-bottom { flex: none; display: flex; align-items: center; gap: 8mm; padding: 4mm 14mm 3.5mm; }
-    .a3-note { text-align: left; font-family: var(--font-mono); font-size: 11pt; line-height: 1.5; color: var(--ink); }
+    /* --- event cards: the same events, once as a list ------------------- */
+    .a3-det-h {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 11pt; font-weight: 500; letter-spacing: 0.06em;
+      border-bottom: 2px solid var(--ink); padding-bottom: 1.2mm; flex: none;
+    }
+    .a3-det-h .sub { font-size: 8pt; color: var(--ink-soft); letter-spacing: 0.1em; }
+    .a3-det {
+      flex: 1; min-height: 0;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm 5mm;
+      grid-auto-rows: 1fr;
+    }
+    .ade:last-child:nth-child(3n+2) { grid-column: 1 / -1; }
+    .ade { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+    .ade-top { display: flex; align-items: baseline; gap: 2mm; }
+    .ade-time { font-family: var(--font-mono); font-size: 9.5pt; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .ade-who { margin-left: auto; font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft); }
+    .ade-title { font-family: var(--font-display); font-weight: 600; font-size: 11pt; line-height: 1.08; margin-top: 0.7mm; }
+    .ade-desc {
+      flex: none; font-size: 8pt; line-height: 1.24; margin-top: 0.8mm; color: var(--ink);
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .ade .room-chip { font-size: 7.5pt; flex: none; }
+    .ade-type { border-left: 3px solid var(--ink-soft); padding-left: 2mm; }
+    .ade-type.lecture { border-left-color: var(--blue); }
+    .ade-type.workshop { border-left-color: var(--magenta-deep); }
+
+    /* --- bottom: registration note + QR, then footer strip --- */
+    .a3-bottom { flex: none; display: flex; align-items: center; gap: 7mm; padding: 2.5mm 14mm 2mm; }
+    .a3-note { text-align: left; font-family: var(--font-mono); font-size: 9.5pt; line-height: 1.5; color: var(--ink); }
     .a3-note .sub { color: var(--ink-soft); }
-    .a3-qr { margin-left: auto; text-align: right; }
-    .a3-qr .qr-cap { display: block; margin-top: 1.6mm; font-size: 9pt; color: #4a463f; }
+    .a3-qr { margin-left: auto; text-align: center; }
+    .a3-qr .qr-cap { display: block; margin-top: 1.2mm; font-family: var(--font-mono); font-size: 7pt; color: var(--ink-soft); }
     .pfooter { padding: 1.8mm 14mm 2.6mm; }
   </style>
 </head>
@@ -107,26 +157,19 @@
   <script src="../assets/js/routing.js" defer></script>
   <script src="../assets/js/print.js" defer></script>
   <script>
-    // A3 timeline poster — the door-poster language at wall scale:
-    // chronological blocks (top edge = start), parallels side by side in
-    // conflict clusters, long zones as background bands.
+    // A3 poster boot — room × time grid + event cards (chronological).
     window.addEventListener('DOMContentLoaded', function () {
       var P = window.AI4TPrint;
-      var DATA = window.AI4T_DATA;
       var root = document.getElementById('page');
       if (!P) { root.textContent = 'Chybí data (AI4TPrint).'; return; }
-      var meta = (DATA.events && DATA.events.meta) || {};
-      var evs = P.allEvents().map(function (ev) {
-        return {
-          ev: ev, s: P.toMin(ev.start), e: P.toMin(ev.end)
-        };
-      }).sort(function (a, b) { return a.s - b.s || a.e - b.e; });
 
-      var DAY0 = 8 * 60 + 30, DAY1 = 16 * 60;
+      var meta = (window.AI4T_DATA.events && window.AI4T_DATA.events.meta) || {};
+      var evs = P.allEvents();
+      function byId(id) { return evs.filter(function (e) { return e.id === id; })[0]; }
 
-      // wall-poster display titles: concise, must fit wide AND narrow blocks
+      // wall-poster display titles for the GRID (full titles live on cards)
       var SHORT_TITLE = {
-        'registrace': 'Registrace',
+        'registrace': 'Vstup',
         'prednaska-cernocky': 'Můj a možná i Váš život s AI',
         'prednaska-sekanina': 'Kolik energie potřebuje AI?',
         'prednaska-bezpecnost': 'Bezpečnostní aspekty AI',
@@ -135,159 +178,77 @@
         'workshop-sap': 'Digitální stopa',
         'workshop-security': 'Fact Injections',
         'nabidka-stanky': 'Stánky firem',
-        'prohlidky-1': 'Prohlídka fakulty · 1. kolo',
-        'prohlidky-2': 'Prohlídka fakulty · 2. kolo',
-        'kachna-obed-1': 'Přestávka na oběd',
-        'kachna-obed-2': 'Druhý oběd'
+        'prohlidky-1': 'Prohlídka · 1. kolo',
+        'prohlidky-2': 'Prohlídka · 2. kolo',
+        'kachna-obed-1': 'Oběd · Kachna',
+        'kachna-obed-2': 'Druhý oběd · Kachna'
       };
+
+      // grid blocks are narrow: surnames only (cards carry the full speaker)
+      var SHORT_WHO = {
+        'prednaska-cernocky': 'Černocký',
+        'prednaska-sekanina': 'Sekanina',
+        'prednaska-bezpecnost': 'Lička'
+      };
+
+      // ---- event cards: one per programme entry, merged where an activity
+      // runs twice (tours, lunches) — chronological, no grouping
+      var CARDS = [
+        { ev: 'registrace' },
+        { ev: 'nabidka-stanky' },
+        { ev: 'prednaska-cernocky' },
+        { ev: 'prednaska-sekanina' },
+        { ev: 'prednaska-bezpecnost', time: '10:10 · souběžně' },
+        { evs: ['kachna-obed-1', 'kachna-obed-2'], time: '11:10–12:00 · 14:00–16:00', title: 'Oběd v Kachně' },
+        { evs: ['prohlidky-1', 'prohlidky-2'], time: '1. kolo 12:00 · 2. kolo 13:00', title: 'Prohlídka fakulty' },
+        { ev: 'workshop-redhat' },
+        { ev: 'workshop-solarwinds', title: 'Skill Issue' },
+        { ev: 'workshop-sap' },
+        { ev: 'workshop-security', title: 'Fact Injections · dopady ROME na jazykové modely' }
+      ];
 
       var h =
         '<header class="p-head a3-head">' +
           '<p class="a3-kick">Pátek ' + P.esc(P.fmtDate(meta.date)) + ' · ' +
-            P.esc(meta.time || '8:30 — 16:00') + ' <span class="dot">●</span> ' +
+            P.esc(meta.time || '') + ' <span class="dot">●</span> ' +
             P.esc(meta.festival || '') + '</p>' +
           '<h1 class="a3-title">AI<span class="wm-4">4</span>Talents@FIT VUT</h1>' +
           '<p class="a3-sub">' + P.esc(meta.tagline || '') + ' · ' + P.esc(meta.place || '') + '</p>' +
         '</header>' +
-        '<p class="a3-legend">' +
-          '<span><i style="background:var(--blue)"></i>přednáška</span>' +
-          '<span><i style="background:var(--magenta-deep)"></i>workshop</span>' +
-          '<span><i style="background:var(--ink-soft)"></i>průběžně · registrace</span>' +
-          '<span>horní hrana bloku = začátek · přerušovaný spodek = konec textu, ne času</span>' +
-        '</p>' +
-        '<div class="tl-wrap">' +
-          '<div class="tl-rail" id="rail"></div>' +
-          '<div class="tl-canvas" id="canvas"></div>' +
-        '</div>' +
-        '<div class="a3-bottom">' +
-          '<p class="a3-note">' + P.esc(meta.registration || '') + '<br>' +
-            '<span class="sub">' + P.esc(meta.audience || '') + '</span></p>' +
-          '<div class="a3-qr">' + P.qrBlock(30, 'Naskenuj pro interaktivní mapu a program') + '</div>' +
-        '</div>';
-      root.innerHTML = h + P.footerStrip();
+        '<main class="a3-main">' +
+          '<div class="a3-grid">' + P.programGrid({ laneH: 17.5, slimH: 9, gap: 1.5, shortTitle: SHORT_TITLE, shortWho: SHORT_WHO }) + '</div>' +
+          '<h2 class="a3-det-h">Podrobnosti programu <span class="sub">· všechny akce dne</span></h2>' +
+          '<div class="a3-det">';
 
-      // ---- layout pass (fonts must be in for real metrics) ----------------
-      function layout() {
-        var rail = document.getElementById('rail');
-        var canvas = document.getElementById('canvas');
-        if (!rail || !canvas) return;
-        var H = canvas.clientHeight, W = canvas.clientWidth;
-        var mm = H / (DAY1 - DAY0);                    // px per minute
-        var y = function (min) { return (min - DAY0) * mm; };
+      CARDS.forEach(function (c) {
+        var first = byId(c.ev || c.evs[0]);
+        if (!first) return;
+        var time = c.time || (first.start + '–' + first.end);
+        var title = c.title || first.title;
+        var who = first.speaker || first.partner || '';
+        h +=
+          '<article class="ade ade-type ' + P.esc(first.type) + '">' +
+            '<div class="ade-top">' +
+              '<span class="ade-time">' + P.esc(time) + '</span>' +
+              '<span class="room-chip">' + P.esc(first.room) + '</span>' +
+              (who ? '<span class="ade-who">' + P.esc(who) + '</span>' : '') +
+            '</div>' +
+            '<h3 class="ade-title">' + P.esc(title) + '</h3>' +
+            (first.desc ? '<p class="ade-desc">' + P.esc(first.desc) + '</p>' : '') +
+          '</article>';
+      });
 
-        // hour rail
-        var rh = '';
-        // 8:30 endpoint, full hours, 16:00 endpoint — no half-hour dots
-        rh += '<div class="tl-hour" style="top:' + y(DAY0).toFixed(1) + 'px"><span class="h">8:30</span></div>';
-        for (var t = 9 * 60; t < DAY1; t += 60) {
-          rh += '<div class="tl-hour" style="top:' + y(t).toFixed(1) + 'px"><span class="h">' +
-            (t / 60) + ':00</span></div>';
-        }
-        rh += '<div class="tl-hour" style="top:' + y(DAY1).toFixed(1) + 'px"><span class="h">16:00</span></div>';
-        rail.innerHTML = rh;
-        // hour hairlines on the canvas
-        var lines = '';
-        for (var hl = 9; hl <= 16; hl++) {
-          if (y(hl * 60) <= H) lines += '<div class="tl-h" style="top:' + y(hl * 60).toFixed(1) + 'px"></div>';
-        }
+      h += '</div></main>';
 
-        // ---- events: zone bands behind, blocks in conflict clusters -------
-        var zones = [], blocks = [];
-        evs.forEach(function (it) {
-          if (it.ev.type === 'zone' && (it.e - it.s) >= 240) zones.push(it);
-          else blocks.push(it);
-        });
+      // ---- bottom: registration note + QR (spec: 30 mm) + footer --------
+      h += '<div class="a3-bottom">' +
+        '<p class="a3-note">' + P.esc(meta.registration || '') + '<br>' +
+          '<span class="sub">' + P.esc(meta.audience || '') + '</span></p>' +
+        '<div class="a3-qr">' + P.qrBlock(30) + '<span class="qr-cap">Naskenuj pro mapu a program</span></div>' +
+      '</div>';
 
-        var parts = [lines];
-        // zone bands
-        zones.forEach(function (it) {
-          var top = y(it.s), hh = Math.max(14, y(it.e) - top);
-          parts.push('<div class="tl-band" style="top:' + top.toFixed(1) + 'px;height:' + hh.toFixed(1) + 'px">' +
-            '<div class="band-in"><p class="band-kick">průběžně · ' + P.esc(it.ev.room) + '</p>' +
-            '<p class="band-title">' + P.esc(it.ev.title) + '</p></div></div>');
-        });
-
-        // conflict clusters → lane columns
-        var clusters = [];
-        blocks.forEach(function (it) {
-          var c = null;
-          for (var i = 0; i < clusters.length; i++) {
-            if (clusters[i].some(function (o) { return it.s < o.e && o.s < it.e; })) { c = clusters[i]; break; }
-          }
-          if (!c) { c = []; clusters.push(c); }
-          c.push(it);
-        });
-        var laneOf = {};
-        clusters.forEach(function (c) {
-          var lanes = [];
-          c.forEach(function (it) {
-            var li = 0;
-            while (li < lanes.length && lanes[li] > it.s) li++;
-            if (li === lanes.length) lanes.push(-1);
-            lanes[li] = it.e;
-            laneOf[it.ev.id] = { lane: li, lanes: 1 };
-          });
-          c.forEach(function (it) { laneOf[it.ev.id].lanes = c.length; });
-        });
-
-        blocks.forEach(function (it) {
-          var lo = laneOf[it.ev.id] || { lane: 0, lanes: 1 };
-          var w = (W - (lo.lanes - 1) * 4) / lo.lanes;    // 4mm gutters
-          var left = lo.lane * (w + 4);
-          var top = y(it.s);
-          var hh = Math.max(20, y(it.e) - top - 2);      // time-span height
-          var ev = it.ev;
-          var who = ev.speaker || ev.partner || '';
-          parts.push(
-            '<article class="evt evt--' + P.esc(ev.type) + '" data-lane="' + lo.lane + '" style="left:' + left.toFixed(1) +
-              'px;width:' + w.toFixed(1) + 'px;top:' + top.toFixed(1) + 'px;height:' + hh.toFixed(1) + 'px">' +
-              '<p class="evt-time">' + P.esc(ev.start) + ' <span class="end">— ' + P.esc(ev.end) + '</span></p>' +
-              '<h3 class="evt-title">' + P.esc(SHORT_TITLE[ev.id] || ev.title) + '</h3>' +
-              '<p class="evt-meta"><b>' + P.esc(ev.room) + '</b> · ' + P.esc(P.floorLabel(ev.floor)) +
-                (who ? ' · ' + P.esc(who) : '') + '</p>' +
-              (ev.desc ? '<p class="evt-desc">' + P.esc(ev.desc) + '</p>' : '') +
-            '</article>');
-        });
-        canvas.innerHTML = parts.join('');
-
-        // ---- pass 2: blocks grow to fit content; same-lane collisions push
-        // down (the dashed bottom says "content-sized"; the printed time and
-        // the rail keep the truth about the schedule).
-        var laneBottom = {};
-        var els = Array.prototype.slice.call(canvas.querySelectorAll('.evt'));
-        els.forEach(function (el) {
-          var contentH = el.scrollHeight + 4;
-          var h0 = parseFloat(el.style.height);
-          if (contentH > h0) el.style.height = contentH.toFixed(1) + 'px';
-          var key = el.getAttribute('data-lane') || '0';
-          var top = parseFloat(el.style.top);
-          var prev = laneBottom[key] || 0;
-          if (top < prev + 5) top = prev + 5;
-          el.style.top = top.toFixed(1) + 'px';
-          var hh2 = parseFloat(el.style.height);
-          if (top + hh2 > H) hh2 = Math.max(20, H - top); // never cross 16:00
-          el.style.height = hh2.toFixed(1) + 'px';
-          laneBottom[key] = top + hh2;
-        });
-
-        // leader lines: a block pushed off its start time stays bound to it
-        var leads = '';
-        els.forEach(function (el) {
-          var nominal = el._nominal, actual = parseFloat(el.style.top);
-          if (actual - nominal > 8) {
-            var lx = parseFloat(el.style.left) + 3;
-            leads += '<div class="tl-lead tl-lead--down" style="left:' + lx.toFixed(1) +
-              'px;top:' + nominal.toFixed(1) + 'px;height:' + (actual - nominal).toFixed(1) + 'px"></div>';
-          }
-        });
-        if (leads) canvas.insertAdjacentHTML('beforeend', leads);
-      }
-
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(layout);
-        setTimeout(layout, 900);
-      } else layout();
-      window.addEventListener('load', layout);
+      h += P.footerStrip();
+      root.innerHTML = h;
     });
   </script>
 </body>

@@ -575,7 +575,9 @@
       var who = ev.speaker || ev.partner || '';
       // A3 wall poster: concise display titles (full titles live on doors)
       var title = (opts.shortTitle && opts.shortTitle[ev.id]) || ev.title;
+      if (opts.shortWho && opts.shortWho[ev.id]) who = opts.shortWho[ev.id];
       var short = (item.endMin - item.startMin) <= 45;
+      if (short) cls += ' is-short';
       return '<div class="' + cls + '" style="' + style + '">' +
         '<span class="pg-time">' + esc(ev.start) + (short ? '' : '–' + esc(ev.end)) + '</span>' +
         '<span class="pg-title">' + esc(title) + '</span>' +

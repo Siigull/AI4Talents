@@ -3,7 +3,7 @@
 //
 // Hand-designed route (user spec), geometry computed with the corridor
 // router (hub Dijkstra picks the nearest stairwells):
-//   E103 → C107 (registrace, path enters the room's start)
+//   C107 (registrace — visitors start here) → E103 (stánky)
 //        → C106 → (C110 stairs) → C228
 //        → D106 stairs on floor 2  [SPLIT → D0207, descends the D-wing]
 //        → A218 (second story of A)
@@ -36,8 +36,8 @@ const D106_F2 = { floor: '2', cell: [158, 93] }; // D-wing stairwell, floor 2
 
 // --- main segments ---------------------------------------------------------
 const legs = [];
-legs.push(...legsToGeo(RT.corridorPath({ roomId: 'E103' }, { roomId: 'C107' }), 'E103→C107'));
-legs.push(...legsToGeo(RT.corridorPath({ roomId: 'C107' }, { roomId: 'C106' }), 'C107→C106'));
+legs.push(...legsToGeo(RT.corridorPath({ roomId: 'C107' }, { roomId: 'E103' }), 'C107→E103'));
+legs.push(...legsToGeo(RT.corridorPath({ roomId: 'E103' }, { roomId: 'C106' }), 'E103→C106'));
 legs.push(...legsToGeo(RT.corridorPath({ roomId: 'C106' }, { roomId: 'C228' }), 'C106→C228'));
 legs.push(...legsToGeo(RT.corridorPath({ roomId: 'C228' }, D106_F2), 'C228→D106'));
 legs.push(...legsToGeo(RT.corridorPath(D106_F2, { roomId: 'A218' }), 'D106→A218'));
@@ -74,8 +74,8 @@ const dLegs = legsToGeo(RT.corridorPath(D106_F2, { roomId: 'D0207' }), 'D106→D
 
 // --- stops ------------------------------------------------------------------
 const stops = [
-  { id: 'e103', room: 'E103', label: 'E103 · stánky, prohlídky', kind: 'start' },
   { id: 'c107', room: 'C107', label: 'C107 · REGISTRACE', kind: 'reg' },
+  { id: 'e103', room: 'E103', label: 'E103 · stánky, prohlídky', kind: 'way' },
   { id: 'c106', room: 'C106', label: 'C106', kind: 'way' },
   { id: 'c228', room: 'C228', label: 'C228 · workshopy', kind: 'way' },
   { id: 'd106', room: 'D106', label: 'D106 · rozcestí', kind: 'split', split: 'd0207',
@@ -101,7 +101,7 @@ for (const s of stops) {
 const out = {
   id: 'hlavni-trasa',
   title: 'Hlavní trasa',
-  note: 'E103 → registrace → C106 → schodiště → C228 → rozcestí D → A218 → most → Kachna. Obousměrná.',
+  note: 'registrace → E103 stánky → C106 → schodiště → C228 → rozcestí D → A218 → most → Kachna. Obousměrná.',
   stops,
   legs,
   splits: {

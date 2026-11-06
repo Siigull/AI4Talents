@@ -12,7 +12,7 @@
 //
 // Requires the test server: python3 -m http.server 8765 (repo root).
 
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 
 const BASE = 'http://localhost:8765';
@@ -97,5 +97,21 @@ for (const p of pages) {
 }
 
 proc.kill();
+
+// ---- combined PDFs: all pages of one type in a single file -----------------
+// (pdfunite from poppler; merged in the intentional order above, not ABC)
+const COMBINED = { door: 'doors', stand: 'stands' };
+for (const kind of [...new Set(pages.map((p) => p.kind))]) {
+  const out = COMBINED[kind];
+  if (!out) continue;
+  const files = PAGES
+    .filter((p) => p.kind === kind && existsSync(`${OUT}/${p.name}.pdf`))
+    .map((p) => `${OUT}/${p.name}.pdf`);
+  if (files.length < 2) continue;
+  const r = spawnSync('pdfunite', [...files, `${OUT}/${out}.pdf`]);
+  if (r.status === 0) console.log(`  ✓ ${out}.pdf (${files.length} pages, combined)`);
+  else console.error(`  ✗ ${out}.pdf — pdfunite failed (poppler installed?)`);
+}
+
 console.log(`${ok}/${pages.length} PDFs written to ${OUT}/`);
 process.exit(ok === pages.length ? 0 : 1);

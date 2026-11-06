@@ -68,7 +68,8 @@
       "room": "E104",
       "floor": "1",
       "desc": "Jak AI souvisí s kyberbezpečností a ochranou našich dat.",
-      "icon": "shield"
+      "icon": "shield",
+      "speaker": "Zbyněk Lička"
     },
     {
       "id": "workshop-redhat",

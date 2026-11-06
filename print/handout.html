@@ -113,6 +113,8 @@
     .pm-ov .stop-c { fill: #fff; stroke: var(--blue); stroke-width: 3px; }
     .pm-ov .stop-c.reg { fill: var(--yellow); }
     .pm-ov .stop-c.split { stroke: var(--magenta-deep); }
+    .pm-ov .stop-c.f2 { fill: var(--blue); }
+    .pm-ov .stop-c.split.f2 + .stop-t, .pm-ov .stop-c.f2 + .stop-t { fill: #fff; }
     .pm-ov .stop-t { font: 700 20px 'IBM Plex Mono', monospace; fill: var(--blue); text-anchor: middle; dominant-baseline: central; }
     .pm-ov .stop-c.split + .stop-t { fill: var(--magenta-deep); }
     .pm-ov .hop-c { fill: var(--blue); stroke: #fff; stroke-width: 3px; }
@@ -129,6 +131,7 @@
     .mp-legend i.dash { border-top-style: dashed; }
     .mp-legend i.mag { border-top-color: var(--magenta-deep); border-top-style: dashed; }
     .mp-legend .num { display: inline-flex; width: 3.4mm; height: 3.4mm; border: 1.5px solid var(--blue); border-radius: 50%; align-items: center; justify-content: center; font-size: 6pt; }
+    .mp-legend .num--f2 { background: var(--blue); color: #fff; }
 
     .mp-route { margin-top: 2mm; font-size: 8pt; line-height: 1.45; }
     .mp-route b { font-family: var(--font-mono); font-weight: 500; }
@@ -168,8 +171,14 @@
       margin-top: 0.9mm; padding: 1.1mm 1.8mm; background: var(--yellow); border-radius: 1.2mm;
       display: inline-block;
     }
+    .pev--lunch {
+      border-left: 4px solid #c79a00; background: #fdf28d;
+      border-radius: 0 1.5mm 1.5mm 0; padding: 1.5mm 2.4mm;
+    }
+    .pev--lunch .pev-d { margin-top: 0.7mm; }
+    .pr-list { gap: 2mm; }
     .pr-bar {
-      flex: none; font-family: var(--font-mono); font-size: 6.5pt; font-weight: 500;
+      flex: none; font-family: var(--font-mono); font-size: 7pt; font-weight: 500;
       letter-spacing: 0.1em; text-transform: uppercase;
       background: var(--ink); color: #fff; padding: 1.2mm 2mm; border-radius: 1.5mm;
       text-align: center;
@@ -179,15 +188,25 @@
     .pr-par .pev { min-width: 0; }
     .pr-end { margin-top: auto; }
 
-    /* dopoledne has fewer entries — bigger type, stacked parallels */
-    .pr--dopo .pr-list { gap: 5mm; justify-content: space-between; }
+    /* dopoledne has fewer entries — same type scale as odpoledne (the
+       pages face each other when unfolded); the air is handled with
+       separators, rhythm and real content, not bigger fonts */
+    .pr--dopo .pr-list { gap: 3.2mm; justify-content: space-between; }
     .pr--dopo .pr-end { margin-top: 0; }
+    .pr--dopo .pev ~ .pev {
+      border-top: 1px solid rgba(20, 18, 15, 0.16);
+      padding-top: 4.5mm;
+    }
     .pr-tip {
       border: 2px solid var(--ink); border-radius: 2.5mm; background: #fff;
       padding: 3mm 4mm; font-size: 9pt; line-height: 1.4;
     }
     .pr-tip b { font-family: var(--font-mono); font-weight: 500; font-size: 7pt;
       letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); display: block; margin-bottom: 1mm; }
+    .pr-lunchnote {
+      font-size: 7.5pt; line-height: 1.38; color: var(--ink);
+      margin-top: 1.6mm; text-align: center;
+    }
     .pr--dopo .pev-time { font-size: 10.5pt; }
     .pr--dopo .pev-room { font-size: 8pt; }
     .pr--dopo .pev-t { font-size: 13pt; }
@@ -268,10 +287,11 @@
           '<p class="mp-legend">' +
             '<span><i></i>1. patro</span><span><i class="dash"></i>2. patro</span>' +
             '<span><i class="mag"></i>odbočky (D0207, N105)</span>' +
-            '<span><span class="num">1</span> zastávky trasy</span>' +
-            '<span style="margin-left:auto">žlutá = registrace C107</span>' +
+            '<span><span class="num">1</span> zastávka 1. patra</span>' +
+            '<span><span class="num num--f2">1</span> zastávka 2. patra</span>' +
+            '<span style="margin-left:auto">žlutá = registrace</span>' +
           '</p>' +
-          '<p class="mp-route"><b>E103</b> stánky → <b>C107</b> registrace → <b>C106</b> → <b>C228</b> workshopy → ' +
+          '<p class="mp-route"><b>C107</b> registrace → <b>E103</b> stánky → <b>C106</b> → <b>C228</b> workshopy → ' +
             '<b>D106</b> ·odbočka dolů D0207· → <b>A218</b> → most ·odbočka N105· → <b>R212</b> Kachna' +
             '<span class="both">Trasa je značená šipkami na stojanech a funguje oběma směry.</span></p>' +
           '<div class="mp-bottom">' +
@@ -315,8 +335,12 @@
             '<p class="pr-bar">10:10–11:10 · současně na dvou místech</p>' +
             evBlock(sekanina, { noBring: true }) +
             evBlock(bezpec, { noBring: true }) +
-            '<div class="pr-tip"><b>Tip</b>Od 12:00 tě čekají workshopy a prohlídky fakulty — jejich program najdeš na druhé straně letáku. Na workshopy si vezmi vlastní notebook.</div>' +
-            '<p class="pr-bar pr-bar--lunch pr-end">Přestávka na oběd · 11:10–12:00 · Kachna R212 · 2. patro</p>' +
+            '<article class="pev pev--lunch">' +
+              '<div class="pev-head"><p class="pev-time">11:10–12:00</p>' +
+                '<p class="pev-room">Kachna · R212 · 2. patro</p></div>' +
+              '<p class="pev-t">Přestávka na oběd</p>' +
+              '<p class="pev-d">Vyrazit na oběd můžeš i mimo fakultu, ale nemusíš — studentský klub U Kachničky je přímo tady: toasty a točená Kofola za studentské ceny. Druhý oběd 14:00–16:00.</p>' +
+            '</article>' +
           '</div>' +
         '</section>';
 
@@ -340,7 +364,11 @@
             evBlock(solar) +
             evBlock(sap) +
             evBlock(sec) +
-            '<p class="pr-bar pr-bar--lunch pr-end">Druhý oběd · 14:00–16:00 · Kachna R212 · 2. patro</p>' +
+            '<article class="pev pev--lunch">' +
+              '<div class="pev-head"><p class="pev-time">14:00–16:00</p>' +
+                '<p class="pev-room">Kachna · R212 · 2. patro</p></div>' +
+              '<p class="pev-t">Druhý oběd — Kachna je otevřená znovu</p>' +
+            '</article>' +
           '</div>' +
         '</section>';
 
@@ -383,12 +411,14 @@
         };
 
         // main legs: floor 1 solid, floor 2 dashed; hop marker at floor changes
+        var hopPts = [];
         MP.legs.forEach(function (leg, i) {
           var cls = String(leg.floor) === '2' ? 'l2' : 'l1';
           poly(leg.points, cls);
           var next = MP.legs[i + 1];
           if (leg.stairs && next) {
             var at = next.points[0] || leg.points[leg.points.length - 1];
+            hopPts.push(at);
             el('circle', { class: 'hop-c', cx: at[0], cy: at[1], r: 19 });
             var up = Number(next.floor) > Number(leg.floor);
             el('text', { class: 'hop-t', x: at[0], y: at[1] + 1 }, up ? '↑' : '↓');
@@ -417,13 +447,18 @@
         (DATA.events.events || []).forEach(function (ev) { eventRoomIds[ev.room] = 1; });
         (MP.stops || []).forEach(function (s, i) {
           if (String(s.floor) !== '2' && String(s.floor) !== '1') return;
+          // a stop sitting on a floor-change hop marker (C106 = at the C110
+          // stairs) steps aside, so the two circles never fuse into one blob
+          var sx = s.at[0], sy = s.at[1];
+          if (hopPts.some(function (p) { return Math.hypot(p[0] - sx, p[1] - sy) < 24; })) sx -= 36;
           el('circle', {
-            class: 'stop-c' + (s.kind === 'reg' ? ' reg' : s.kind === 'split' ? ' split' : ''),
-            cx: s.at[0], cy: s.at[1], r: s.kind === 'split' ? 14 : 12
+            class: 'stop-c' + (s.kind === 'reg' ? ' reg' : s.kind === 'split' ? ' split' : '') +
+              (String(s.floor) === '2' ? ' f2' : ''),
+            cx: sx, cy: sy, r: s.kind === 'split' ? 14 : 12
           });
-          el('text', { class: 'stop-t', x: s.at[0], y: s.at[1] + 1 }, String(i + 1));
+          el('text', { class: 'stop-t', x: sx, y: sy + 1 }, String(i + 1));
           if (s.room && !eventRoomIds[s.room]) {
-            el('text', { class: 'lab', x: s.at[0] + 16, y: s.at[1] + 22 },
+            el('text', { class: 'lab', x: sx + 16, y: sy + 22 },
               s.room + (String(s.floor) === '2' ? ' · 2.p' : ' · 1.p'));
           }
         });

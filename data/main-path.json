@@ -1,19 +1,8 @@
 {
  "id": "hlavni-trasa",
  "title": "Hlavní trasa",
- "note": "E103 → registrace → C106 → schodiště → C228 → rozcestí D → A218 → most → Kachna. Obousměrná.",
+ "note": "registrace → E103 stánky → C106 → schodiště → C228 → rozcestí D → A218 → most → Kachna. Obousměrná.",
  "stops": [
-  {
-   "id": "e103",
-   "room": "E103",
-   "label": "E103 · stánky, prohlídky",
-   "kind": "start",
-   "at": [
-    474,
-    158
-   ],
-   "floor": "1"
-  },
   {
    "id": "c107",
    "room": "C107",
@@ -22,6 +11,17 @@
    "at": [
     466,
     266
+   ],
+   "floor": "1"
+  },
+  {
+   "id": "e103",
+   "room": "E103",
+   "label": "E103 · stánky, prohlídky",
+   "kind": "way",
+   "at": [
+    474,
+    158
    ],
    "floor": "1"
   },
@@ -99,6 +99,44 @@
    "stairs": null,
    "points": [
     [
+     466,
+     266
+    ],
+    [
+     478,
+     266
+    ],
+    [
+     478,
+     234
+    ],
+    [
+     482,
+     234
+    ],
+    [
+     482,
+     162
+    ],
+    [
+     478,
+     162
+    ],
+    [
+     478,
+     158
+    ],
+    [
+     474,
+     158
+    ]
+   ]
+  },
+  {
+   "floor": "1",
+   "stairs": null,
+   "points": [
+    [
      474,
      158
     ],
@@ -112,33 +150,35 @@
     ],
     [
      482,
-     250
+     202
     ],
     [
-     478,
-     250
+     486,
+     202
     ],
     [
-     478,
-     266
+     486,
+     210
     ],
     [
-     466,
-     266
-    ]
-   ]
-  },
-  {
-   "floor": "1",
-   "stairs": null,
-   "points": [
+     490,
+     210
+    ],
     [
-     466,
-     266
+     490,
+     234
+    ],
+    [
+     494,
+     234
+    ],
+    [
+     494,
+     242
     ],
     [
      498,
-     266
+     242
     ],
     [
      498,
